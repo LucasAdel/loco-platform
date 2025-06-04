@@ -1,0 +1,44 @@
+[application]
+name = "loco-platform"
+default_platform = "web"
+
+[web.app]
+title = "Loco Platform - Professional Pharmacy Marketplace"
+base_path = ""
+
+[web.watcher]
+watch_path = ["frontend/src", "shared/src"]
+reload_html = true
+index_on_404 = true
+
+[web.resource]
+# Add CSS - using both global styles and Tailwind output
+style = ["frontend/assets/output.css", "frontend/assets/global.css"]
+
+# Add JavaScript for Mapbox
+script = []
+
+[web.resource.dev]
+# Development-specific resources
+style = ["frontend/assets/output.css", "frontend/assets/global.css"]
+
+# Note: Proxy configuration temporarily disabled for compatibility
+
+[bundle]
+identifier = "com.loco.platform"
+publisher = "Loco Platform"
+icon = []
+resources = []
+copyright = "Copyright © 2025 Loco Platform. All rights reserved."
+category = "Business"
+short_description = "Professional pharmacy job marketplace"
+long_description = """
+Loco Platform is a comprehensive job marketplace designed specifically for 
+pharmacy professionals in Australia. Built with Rust and Dioxus for maximum 
+performance and reliability.
+"""
+
+[build]
+# Build configuration
+out_dir = "dist"
+asset_dir = "frontend/assets"

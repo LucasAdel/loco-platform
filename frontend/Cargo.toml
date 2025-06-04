@@ -1,0 +1,69 @@
+[package]
+name = "frontend"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# Workspace dependencies  
+shared = { path = "../shared" }
+serde = { workspace = true }
+serde_json = { workspace = true }
+chrono = { workspace = true }
+uuid = { workspace = true, features = ["v4", "js"] }
+
+# Dioxus framework
+dioxus = { workspace = true, features = ["web", "router"] }
+dioxus-helmet = { workspace = true }
+fermi = { workspace = true }
+
+# Web APIs
+gloo = { workspace = true }
+wasm-bindgen = { workspace = true }
+js-sys = { workspace = true }
+getrandom = { workspace = true, features = ["js"] }
+
+# HTTP client
+reqwest = { workspace = true }
+
+# Local storage
+gloo-storage = "0.3"
+
+# Timers for async operations
+gloo-timers = { version = "0.3", features = ["futures"] }
+
+# Futures
+wasm-bindgen-futures = "0.4"
+
+# Console logging
+console_error_panic_hook = "0.1"
+tracing-wasm = "0.2"
+tracing = { workspace = true }
+
+# Styling
+stylist = "0.13"
+
+[dependencies.web-sys]
+workspace = true
+features = [
+  "console",
+  "Window",
+  "Document",
+  "Element",
+  "HtmlElement",
+  "HtmlScriptElement",
+  "Storage",
+  "Location",
+  "Navigator",
+  "Geolocation",
+  "Position",
+  "Coordinates",
+  "MediaDevices",
+  "MediaStream",
+  "Event",
+  "EventTarget",
+  "MouseEvent",
+  "TouchEvent",
+  "KeyboardEvent",
+  "History",
+  "Url",
+]

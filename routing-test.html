@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loco Platform - Routing Test</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0e7ff 100%);
+            height: 100vh;
+            display: flex;
+        }
+        
+        .sidebar {
+            width: 300px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 20px;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #3b82f6;
+            margin-bottom: 30px;
+        }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            margin: 8px 0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            color: #374151;
+        }
+        
+        .nav-item:hover {
+            background: rgba(59, 130, 246, 0.1);
+            transform: translateX(4px);
+        }
+        
+        .nav-item.active {
+            background: linear-gradient(135deg, #3b82f6, #6366f1);
+            color: white;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+        
+        .nav-icon {
+            margin-right: 12px;
+            font-size: 18px;
+        }
+        
+        .content {
+            flex: 1;
+            padding: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .page-content {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 60px;
+            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.1);
+        }
+        
+        .page-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+        
+        .page-title {
+            font-size: 32px;
+            font-weight: bold;
+            color: #1f2937;
+            margin-bottom: 16px;
+        }
+        
+        .page-description {
+            font-size: 18px;
+            color: #6b7280;
+            margin-bottom: 30px;
+        }
+        
+        .demo-note {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 30px;
+            font-size: 14px;
+            color: #92400e;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">Lo.Co Platform</div>
+        
+        <nav>
+            <a href="#home" class="nav-item" onclick="showPage('home')">
+                <span class="nav-icon">🏠</span>
+                Home
+            </a>
+            <a href="#jobs" class="nav-item" onclick="showPage('jobs')">
+                <span class="nav-icon">💼</span>
+                Jobs
+            </a>
+            <a href="#map" class="nav-item" onclick="showPage('map')">
+                <span class="nav-icon">🗺️</span>
+                Map
+            </a>
+            <a href="#forum" class="nav-item" onclick="showPage('forum')">
+                <span class="nav-icon">💬</span>
+                Forum
+            </a>
+            <a href="#profile" class="nav-item" onclick="showPage('profile')">
+                <span class="nav-icon">👤</span>
+                Profile
+            </a>
+        </nav>
+    </div>
+    
+    <div class="content">
+        <div id="home" class="page-content">
+            <div class="page-icon">🏠</div>
+            <div class="page-title">Welcome Home</div>
+            <div class="page-description">Your Australian Pharmacy Job Portal</div>
+            <div class="demo-note">
+                <strong>Demo Note:</strong> This is a routing test. Click on "Map" in the sidebar to see the map page.
+            </div>
+        </div>
+        
+        <div id="jobs" class="page-content" style="display: none;">
+            <div class="page-icon">💼</div>
+            <div class="page-title">Available Jobs</div>
+            <div class="page-description">Find pharmacy positions across Australia</div>
+        </div>
+        
+        <div id="map" class="page-content" style="display: none;">
+            <div class="page-icon">🗺️</div>
+            <div class="page-title">Interactive Map</div>
+            <div class="page-description">Explore pharmacy job locations on the map</div>
+            <div style="background: linear-gradient(135deg, #dbeafe 0%, #dcfce7 100%); border-radius: 16px; padding: 40px; margin: 20px 0;">
+                <div style="font-size: 48px; margin-bottom: 16px;">🚀</div>
+                <div style="font-size: 18px; font-weight: 600; color: #1f2937;">Map Page Works!</div>
+                <div style="font-size: 14px; color: #6b7280; margin-top: 8px;">
+                    Your routing is working correctly. The comprehensive map interface will load here.
+                </div>
+            </div>
+        </div>
+        
+        <div id="forum" class="page-content" style="display: none;">
+            <div class="page-icon">💬</div>
+            <div class="page-title">Community Forum</div>
+            <div class="page-description">Connect with pharmacy professionals</div>
+        </div>
+        
+        <div id="profile" class="page-content" style="display: none;">
+            <div class="page-icon">👤</div>
+            <div class="page-title">Your Profile</div>
+            <div class="page-description">Manage your account and preferences</div>
+        </div>
+    </div>
+    
+    <script>
+        function showPage(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.page-content').forEach(page => {
+                page.style.display = 'none';
+            });
+            
+            // Remove active class from all nav items
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Show selected page
+            document.getElementById(pageId).style.display = 'block';
+            
+            // Add active class to clicked nav item
+            event.target.closest('.nav-item').classList.add('active');
+            
+            // Update URL hash
+            window.location.hash = pageId;
+            
+            console.log(`Navigated to: /${pageId}`);
+        }
+        
+        // Handle initial load and back/forward navigation
+        function handleHashChange() {
+            const hash = window.location.hash.slice(1) || 'home';
+            
+            // Find the nav item and trigger click
+            const navItem = document.querySelector(`[onclick="showPage('${hash}')"]`);
+            if (navItem) {
+                showPage(hash);
+                navItem.classList.add('active');
+            }
+        }
+        
+        // Initialize on load
+        window.addEventListener('load', handleHashChange);
+        window.addEventListener('hashchange', handleHashChange);
+        
+        // Set initial active state
+        document.querySelector('[onclick="showPage(\'home\')"]').classList.add('active');
+    </script>
+</body>
+</html>

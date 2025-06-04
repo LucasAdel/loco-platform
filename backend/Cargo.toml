@@ -1,0 +1,55 @@
+[package]
+name = "backend"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# Workspace dependencies
+shared = { path = "../shared" }
+serde = { workspace = true }
+serde_json = { workspace = true }
+chrono = { workspace = true }
+uuid = { workspace = true }
+thiserror = { workspace = true }
+anyhow = { workspace = true }
+tokio = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+
+# Web framework
+axum = { workspace = true }
+tower = { workspace = true }
+tower-http = { workspace = true }
+
+# Database
+sea-orm = { workspace = true }
+sqlx = { workspace = true }
+
+# Authentication
+argon2 = { workspace = true }
+jsonwebtoken = { workspace = true }
+
+# Email
+lettre = { workspace = true }
+
+# Environment
+dotenvy = "0.15"
+
+# HTTP client for external APIs
+reqwest = { version = "0.11", features = ["json"] }
+
+# Rate limiting
+tower_governor = "0.1"
+
+# Validation
+validator = { version = "0.18", features = ["derive"] }
+
+# Numeric types
+rust_decimal = "1.37"
+num-traits = "0.2"
+
+# Additional dependencies for database operations
+async-trait = "0.1"
+url = "2.4"
+rand = "0.8"
+migration = { path = "../migrations" }

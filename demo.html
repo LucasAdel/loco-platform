@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loco Platform - Demo Map Interface</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0e7ff 100%);
+            overflow: hidden;
+            height: 100vh;
+        }
+        
+        /* Glass morphism styles */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 16px;
+        }
+        
+        .glass-card:hover {
+            background: rgba(255, 255, 255, 0.8);
+            transform: translateY(-2px);
+            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+        }
+        
+        .glass-button {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(10px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: #374151;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 12px;
+            padding: 8px 16px;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .glass-button:hover {
+            background: rgba(255, 255, 255, 0.8);
+            transform: translateY(-1px);
+        }
+        
+        .glass-button-primary {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.9) 0%, rgba(99, 102, 241, 0.9) 100%);
+            color: white;
+            font-weight: 600;
+        }
+        
+        .filter-badge {
+            background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
+            color: white;
+            font-weight: 600;
+            border-radius: 12px;
+            padding: 4px 12px;
+            font-size: 12px;
+            animation: pulse 3s infinite;
+        }
+        
+        /* Layout */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(24px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 16px;
+        }
+        
+        .main-content {
+            display: flex;
+            height: calc(100vh - 80px);
+        }
+        
+        .sidebar {
+            width: 384px;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(24px);
+            border-right: 1px solid rgba(255, 255, 255, 0.2);
+            overflow-y: auto;
+        }
+        
+        .map-container {
+            flex: 1;
+            position: relative;
+            background: linear-gradient(135deg, #dbeafe 0%, #dcfce7 100%);
+        }
+        
+        .job-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 16px;
+            padding: 16px;
+            margin: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .job-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.15);
+        }
+        
+        .job-card.urgent {
+            border-left: 4px solid #ef4444;
+            animation: pulse 2s infinite;
+        }
+        
+        .map-controls {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .search-bar {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 24px;
+            backdrop-filter: blur(12px);
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .urgent-marker {
+            animation: pulse 2s infinite;
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.6);
+        }
+        
+        .map-cluster {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .map-cluster:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        }
+        
+        .heatmap-layer {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        
+        .density-heat { 
+            background: radial-gradient(circle, rgba(239, 68, 68, 0.3) 0%, transparent 70%);
+        }
+        
+        .salary-heat { 
+            background: radial-gradient(circle, rgba(34, 197, 94, 0.3) 0%, transparent 70%);
+        }
+        
+        .footer {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(24px);
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 12px 16px;
+            display: flex;
+            justify-content: between;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #3b82f6, #6366f1); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px;">🗺️</div>
+                <h1 style="font-size: 24px; font-weight: bold; background: linear-gradient(135deg, #3b82f6, #6366f1); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Loco Connect Map</h1>
+            </div>
+            
+            <input type="text" class="search-bar" placeholder="Search for address, suburb, pharmacy or position..." style="flex: 1; max-width: 500px; margin: 0 32px;">
+            
+            <div style="display: flex; gap: 12px;">
+                <button class="glass-button">⚙️</button>
+                <button class="glass-button">📍</button>
+                <button class="glass-button">☀️</button>
+                <span class="filter-badge">3</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Sidebar with Jobs -->
+        <div class="sidebar">
+            <div style="padding: 24px; border-bottom: 1px solid rgba(255, 255, 255, 0.2);">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+                    <h2 style="font-size: 20px; font-weight: bold; display: flex; align-items: center; gap: 8px;">
+                        💼 Available Jobs
+                    </h2>
+                    <div class="glass-button" style="padding: 4px 12px; font-weight: 600; color: #3b82f6;">10</div>
+                </div>
+                
+                <!-- Quick Stats -->
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; text-align: center;">
+                    <div class="glass-card" style="padding: 12px;">
+                        <div style="font-size: 16px; margin-bottom: 4px;">📊</div>
+                        <div style="font-size: 16px; font-weight: bold;">10</div>
+                        <div style="font-size: 10px; color: #6b7280;">Total</div>
+                    </div>
+                    <div class="glass-card" style="padding: 12px;">
+                        <div style="font-size: 16px; margin-bottom: 4px;">🚨</div>
+                        <div style="font-size: 16px; font-weight: bold;">3</div>
+                        <div style="font-size: 10px; color: #6b7280;">Urgent</div>
+                    </div>
+                    <div class="glass-card" style="padding: 12px;">
+                        <div style="font-size: 16px; margin-bottom: 4px;">💰</div>
+                        <div style="font-size: 16px; font-weight: bold;">$58</div>
+                        <div style="font-size: 10px; color: #6b7280;">Avg Rate</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Job Cards -->
+            <div style="padding: 16px;">
+                <!-- Sample Job 1 -->
+                <div class="job-card urgent">
+                    <div style="display: flex; justify-content: between; align-items: start; margin-bottom: 12px;">
+                        <div style="flex: 1;">
+                            <h3 style="font-weight: 600; font-size: 16px; margin-bottom: 4px;">Senior Hospital Pharmacist</h3>
+                            <p style="font-size: 14px; color: #6b7280; font-weight: 500;">Royal Adelaide Hospital</p>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 18px; font-weight: bold; color: #22c55e;">$58/hr</div>
+                            <span style="background: #fecaca; color: #991b1b; padding: 2px 8px; border-radius: 12px; font-size: 10px; font-weight: 600;">🚨 URGENT</span>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; align-items: center; font-size: 12px; color: #6b7280; margin-bottom: 8px;">
+                        <span style="margin-right: 8px;">📍</span>
+                        <span>Adelaide, SA 5000</span>
+                        <span style="margin-left: auto; color: #3b82f6; font-weight: 500;">(2.1 km)</span>
+                    </div>
+                    
+                    <div style="display: flex; align-items: center; font-size: 12px; color: #6b7280; margin-bottom: 16px;">
+                        <span style="margin-right: 8px;">🕐</span>
+                        <span>07:00 - 15:30 • 06/01/2025</span>
+                    </div>
+                    
+                    <div style="display: flex; gap: 8px;">
+                        <button class="glass-button" style="flex: 1; padding: 8px;">View on Map</button>
+                        <button class="glass-button-primary" style="flex: 1; padding: 8px;">View Details</button>
+                    </div>
+                </div>
+                
+                <!-- Sample Job 2 -->
+                <div class="job-card">
+                    <div style="display: flex; justify-content: between; align-items: start; margin-bottom: 12px;">
+                        <div style="flex: 1;">
+                            <h3 style="font-weight: 600; font-size: 16px; margin-bottom: 4px;">Retail Pharmacist</h3>
+                            <p style="font-size: 14px; color: #6b7280; font-weight: 500;">City Central Pharmacy</p>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 18px; font-weight: bold; color: #22c55e;">$45/hr</div>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; align-items: center; font-size: 12px; color: #6b7280; margin-bottom: 8px;">
+                        <span style="margin-right: 8px;">📍</span>
+                        <span>Adelaide, SA 5000</span>
+                        <span style="margin-left: auto; color: #3b82f6; font-weight: 500;">(1.8 km)</span>
+                    </div>
+                    
+                    <div style="display: flex; align-items: center; font-size: 12px; color: #6b7280; margin-bottom: 16px;">
+                        <span style="margin-right: 8px;">🕐</span>
+                        <span>08:30 - 17:30 • 19/01/2025</span>
+                    </div>
+                    
+                    <div style="display: flex; gap: 8px;">
+                        <button class="glass-button" style="flex: 1; padding: 8px;">View on Map</button>
+                        <button class="glass-button-primary" style="flex: 1; padding: 8px;">View Details</button>
+                    </div>
+                </div>
+                
+                <!-- Sample Job 3 -->
+                <div class="job-card urgent">
+                    <div style="display: flex; justify-content: between; align-items: start; margin-bottom: 12px;">
+                        <div style="flex: 1;">
+                            <h3 style="font-weight: 600; font-size: 16px; margin-bottom: 4px;">Clinical Pharmacy Specialist</h3>
+                            <p style="font-size: 14px; color: #6b7280; font-weight: 500;">Peter MacCallum Cancer Centre</p>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 18px; font-weight: bold; color: #22c55e;">$68/hr</div>
+                            <span style="background: #fecaca; color: #991b1b; padding: 2px 8px; border-radius: 12px; font-size: 10px; font-weight: 600;">🚨 URGENT</span>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; align-items: center; font-size: 12px; color: #6b7280; margin-bottom: 8px;">
+                        <span style="margin-right: 8px;">📍</span>
+                        <span>Melbourne, VIC 3000</span>
+                        <span style="margin-left: auto; color: #3b82f6; font-weight: 500;">(727 km)</span>
+                    </div>
+                    
+                    <div style="display: flex; align-items: center; font-size: 12px; color: #6b7280; margin-bottom: 16px;">
+                        <span style="margin-right: 8px;">🕐</span>
+                        <span>08:00 - 16:30 • 26/01/2025</span>
+                    </div>
+                    
+                    <div style="display: flex; gap: 8px;">
+                        <button class="glass-button" style="flex: 1; padding: 8px;">View on Map</button>
+                        <button class="glass-button-primary" style="flex: 1; padding: 8px;">View Details</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Map Area -->
+        <div class="map-container">
+            <!-- Map Controls -->
+            <div class="map-controls">
+                <!-- Map Style Switcher -->
+                <div class="glass-card" style="padding: 8px; display: flex; flex-direction: column; gap: 4px;">
+                    <button class="glass-button-primary" style="padding: 8px;">🌞</button>
+                    <button class="glass-button" style="padding: 8px;">🗺️</button>
+                    <button class="glass-button" style="padding: 8px;">🛰️</button>
+                    <button class="glass-button" style="padding: 8px;">🌙</button>
+                </div>
+                
+                <!-- Feature Controls -->
+                <div class="glass-card" style="padding: 8px; display: flex; flex-direction: column; gap: 4px;">
+                    <button class="glass-button-primary" style="padding: 8px; font-size: 12px;">🔥 Heat</button>
+                    <button class="glass-button" style="padding: 8px; font-size: 12px;">🏢 3D</button>
+                    <button class="glass-button" style="padding: 8px; font-size: 12px;">🚦 Traffic</button>
+                    <button class="glass-button-primary" style="padding: 8px; font-size: 12px;">📍 Cluster</button>
+                </div>
+                
+                <!-- User Location -->
+                <button class="glass-button" style="padding: 12px; font-size: 20px;">🎯</button>
+            </div>
+            
+            <!-- Map Visualization -->
+            <div style="position: absolute; inset: 0; background: linear-gradient(135deg, #dbeafe 0%, #dcfce7 100%); background-image: url('data:image/svg+xml,<svg xmlns=&quot;http://www.w3.org/2000/svg&quot; viewBox=&quot;0 0 100 100&quot;><defs><pattern id=&quot;grid&quot; width=&quot;10&quot; height=&quot;10&quot; patternUnits=&quot;userSpaceOnUse&quot;><path d=&quot;M 10 0 L 0 0 0 10&quot; fill=&quot;none&quot; stroke=&quot;%23e2e8f0&quot; stroke-width=&quot;0.5&quot;/></pattern></defs><rect width=&quot;100&quot; height=&quot;100&quot; fill=&quot;url(%23grid)&quot;/></svg>');">
+                
+                <!-- Heatmap Layer -->
+                <div class="heatmap-layer density-heat" style="top: 40%; left: 45%; width: 120px; height: 120px; transform: translate(-50%, -50%);"></div>
+                <div class="heatmap-layer salary-heat" style="top: 50%; left: 80%; width: 100px; height: 100px; transform: translate(-50%, -50%);"></div>
+                
+                <!-- Job Clusters -->
+                <div class="map-cluster urgent-marker" style="top: 45%; left: 48%; width: 64px; height: 64px; background: rgba(239, 68, 68, 0.8); color: white;">
+                    <div style="text-align: center;">
+                        <div style="font-size: 18px; font-weight: bold;">3</div>
+                        <div style="font-size: 10px;">jobs</div>
+                    </div>
+                </div>
+                
+                <div class="map-cluster" style="top: 65%; left: 75%; width: 48px; height: 48px; background: rgba(59, 130, 246, 0.8); color: white;">
+                    <div style="text-align: center;">
+                        <div style="font-size: 14px; font-weight: bold;">2</div>
+                        <div style="font-size: 8px;">jobs</div>
+                    </div>
+                </div>
+                
+                <div class="map-cluster" style="top: 55%; left: 85%; width: 52px; height: 52px; background: rgba(34, 197, 94, 0.8); color: white;">
+                    <div style="text-align: center;">
+                        <div style="font-size: 16px; font-weight: bold;">4</div>
+                        <div style="font-size: 9px;">jobs</div>
+                    </div>
+                </div>
+                
+                <!-- User Location -->
+                <div style="position: absolute; top: 50%; left: 50%; width: 24px; height: 24px; border-radius: 50%; background: rgba(20, 184, 166, 0.9); border: 2px solid white; transform: translate(-50%, -50%); box-shadow: 0 4px 12px rgba(20, 184, 166, 0.4);">
+                    <div style="position: absolute; inset: 0; border-radius: 50%; background: rgba(20, 184, 166, 0.6); animation: pulse 2s infinite;"></div>
+                </div>
+            </div>
+            
+            <!-- Map Legend -->
+            <div class="glass-card" style="position: absolute; bottom: 16px; left: 16px; padding: 16px;">
+                <h4 style="font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    🗺️ Map Legend
+                </h4>
+                <div style="display: flex; flex-direction: column; gap: 8px; font-size: 12px;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <div style="width: 16px; height: 16px; background: #3b82f6; border-radius: 50%;"></div>
+                        <span>Job Clusters</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <div style="width: 16px; height: 16px; background: #ef4444; border-radius: 50%;" class="urgent-marker"></div>
+                        <span>Urgent Positions</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <div style="width: 16px; height: 16px; background: #14b8a6; border-radius: 50%;"></div>
+                        <span>Your Location</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Live Feed Panel -->
+            <div class="glass-card" style="position: absolute; bottom: 16px; right: 16px; width: 320px; padding: 16px;">
+                <h4 style="font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    <span style="color: #ef4444;" class="urgent-marker">🔴</span>
+                    Live Job Feed
+                </h4>
+                <div style="font-size: 12px; color: #6b7280; text-align: center; padding: 16px;">
+                    <div style="font-size: 24px; margin-bottom: 8px;">📡</div>
+                    <p>Monitoring for new jobs...</p>
+                    <p style="font-size: 10px; margin-top: 4px;">Real-time updates will appear here</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <footer class="footer">
+        <div style="display: flex; align-items: center; gap: 24px;">
+            <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: #6b7280;">
+                <span style="color: #22c55e;">🟢</span>
+                <span>Live: 10 jobs</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: #6b7280;">
+                <span style="color: #3b82f6;">📊</span>
+                <span>Style: Light</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: #6b7280;">
+                <span style="color: #14b8a6;">📍</span>
+                <span>GPS enabled</span>
+            </div>
+        </div>
+        
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <button class="glass-button-primary" style="font-size: 12px;">⏸️ Auto-refresh</button>
+            <div style="font-size: 12px; color: #6b7280;">⚡ Virtual scrolling: on</div>
+        </div>
+    </footer>
+    
+    <script>
+        // Add some basic interactivity
+        document.querySelectorAll('.job-card').forEach(card => {
+            card.addEventListener('click', () => {
+                document.querySelectorAll('.job-card').forEach(c => c.style.borderLeft = '');
+                card.style.borderLeft = '4px solid #3b82f6';
+            });
+        });
+        
+        document.querySelectorAll('.map-cluster').forEach(cluster => {
+            cluster.addEventListener('click', () => {
+                cluster.style.transform = 'scale(1.2)';
+                setTimeout(() => {
+                    cluster.style.transform = 'scale(1)';
+                }, 200);
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,37 @@
+# Clippy configuration for Loco Platform
+# Enforces strict Rust practices and Australian English
+
+# Set the maximum cognitive complexity for functions
+cognitive-complexity-threshold = 20
+
+# Enforce doc comments for public items
+missing_docs_in_private_items = false
+
+# Australian English enforcement through custom lints
+# We'll use these to catch American spellings
+disallowed-names = [
+    "color",       # Use "colour"
+    "center",      # Use "centre"  
+    "behavior",    # Use "behaviour"
+    "optimize",    # Use "optimise"
+    "realize",     # Use "realise"
+    "organize",    # Use "organise"
+    "analyze",     # Use "analyse"
+    "license",     # Use "licence" (noun)
+]
+
+# Disallow certain methods that might lead to panics
+disallowed-methods = [
+    "std::collections::HashMap::get",  # Prefer get() with proper error handling
+    "std::env::var",                   # Prefer var_os() or expect()
+]
+
+# Maximum line length
+max_suggested_slice_pattern_length = 3
+
+# Enforce explicit types in some cases
+trivial_casts = "deny"
+trivial_numeric_casts = "deny"
+
+# Performance lints
+single_char_pattern = "warn"

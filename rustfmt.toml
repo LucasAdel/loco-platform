@@ -1,0 +1,46 @@
+# Rustfmt configuration for Loco Platform
+# Enforces Australian English and consistent formatting
+
+# Basic formatting
+max_width = 100
+hard_tabs = false
+tab_spaces = 4
+newline_style = "Unix"
+use_small_heuristics = "Default"
+
+# Imports
+imports_granularity = "Crate"
+reorder_imports = true
+reorder_modules = true
+
+# Strings
+format_strings = true
+format_macro_matchers = true
+
+# Comments
+wrap_comments = true
+comment_width = 80
+normalize_comments = true
+
+# Function definitions
+fn_args_layout = "Tall"
+fn_single_line = false
+
+# Control flow
+control_brace_style = "AlwaysSameLine"
+
+# Arrays and slices
+array_width = 60
+chain_width = 60
+
+# Misc
+remove_nested_parens = true
+use_try_shorthand = true
+use_field_init_shorthand = true
+force_explicit_abi = true
+empty_item_single_line = true
+struct_lit_single_line = true
+where_single_line = true
+
+# Australian English preferences (via naming conventions)
+# These will be enforced through clippy configuration
