@@ -40,7 +40,8 @@ pub enum AppError {
 impl From<shared::errors::AppError> for AppError {
     fn from(err: shared::errors::AppError) -> Self {
         match err {
-            shared::errors::AppError::Database { message, .. } => AppError::Database(message),
+            shared::errors::AppError::Database(message) => AppError::Database(message),
+            shared::errors::AppError::DatabaseWithContext { message, .. } => AppError::Database(message),
             shared::errors::AppError::Validation { field, message, .. } => {
                 AppError::Validation(format!("{}: {}", field, message))
             },
@@ -49,8 +50,16 @@ impl From<shared::errors::AppError> for AppError {
                 AppError::AuthenticationFailed
             },
             shared::errors::AppError::Authorisation { .. } => AppError::AuthorizationFailed,
-            shared::errors::AppError::NotFound { .. } => AppError::NotFound,
+            shared::errors::AppError::NotFound => AppError::NotFound,
+            shared::errors::AppError::NotFoundDetailed { resource_type, id, .. } => {
+                tracing::info!("Resource not found: {} with ID {}", resource_type, id);
+                AppError::NotFound
+            },
             shared::errors::AppError::InvalidInput { message, .. } => AppError::Validation(message),
+            shared::errors::AppError::Internal { message, error_id, .. } => {
+                tracing::error!("Internal error ({}): {}", error_id, message);
+                AppError::Internal(message)
+            },
             _ => AppError::Internal(err.to_string()),
         }
     }

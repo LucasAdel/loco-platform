@@ -1,0 +1,41 @@
+#!/bin/bash
+# Pre-push hook for Rust projects
+
+set -e
+
+echo "🚀 Running pre-push checks..."
+
+# Run all tests
+echo "🧪 Running tests..."
+if ! cargo test --all; then
+    echo "❌ Tests failed"
+    exit 1
+fi
+
+# Check for security vulnerabilities
+echo "🔒 Running security audit..."
+if command -v cargo-audit >/dev/null 2>&1; then
+    if ! cargo audit; then
+        echo "⚠️  Security vulnerabilities found (non-blocking)"
+        # Don't exit on audit failures, just warn
+    fi
+else
+    echo "ℹ️  cargo-audit not installed, skipping security check"
+    echo "   Install with: cargo install cargo-audit"
+fi
+
+# Build check for all targets
+echo "🏗️  Checking builds..."
+if ! cargo build --all; then
+    echo "❌ Build failed"
+    exit 1
+fi
+
+# Documentation check
+echo "📚 Checking documentation..."
+if ! cargo doc --no-deps --all; then
+    echo "❌ Documentation build failed"
+    exit 1
+fi
+
+echo "✅ All pre-push checks passed!"

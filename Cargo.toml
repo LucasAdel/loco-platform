@@ -1,55 +1,64 @@
 [workspace]
 members = [
-    "frontend",
-    "backend", 
-    "shared",
-    "migrations"
+    "app",        # Leptos SSR app (replaces frontend)
+    "backend",    # API backend with multi-tenancy
+    "shared",     # Shared types and utilities
+    "migrations"  # Database migrations
 ]
 resolver = "2"
 
 [workspace.dependencies]
-# Shared dependencies across workspace
+# Leptos framework
+leptos = { version = "0.6" }
+leptos_axum = { version = "0.6" }
+leptos_meta = { version = "0.6" }
+leptos_router = { version = "0.6" }
+
+# Shared dependencies
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 chrono = { version = "0.4", features = ["serde"] }
 uuid = { version = "1.0", features = ["v4", "serde", "js"] }
 thiserror = "1.0"
 anyhow = "1.0"
-tokio = { version = "1.0", features = ["full"] }
+tokio = { version = "1.35", features = ["full"] }
 tracing = "0.1"
 tracing-subscriber = "0.3"
 validator = { version = "0.18", features = ["derive"] }
 
-# Frontend specific
-dioxus = { version = "0.5", features = ["web", "router"] }
-dioxus-helmet = "0.2"
-fermi = "0.4"
-gloo = "0.10"
+# Supabase integration
+postgrest = "1.6"
+
+# WASM dependencies
 wasm-bindgen = "0.2"
 web-sys = "0.3"
 js-sys = "0.3"
-reqwest = { version = "0.11", features = ["json"] }
 getrandom = { version = "0.2", features = ["js"] }
+console_error_panic_hook = "0.1"
+
+# HTTP client
+reqwest = { version = "0.11", features = ["json", "rustls-tls"] }
+gloo-net = "0.5"
 
 # Backend specific  
-axum = { version = "0.7", features = ["ws", "multipart"] }
+axum = { version = "0.7", features = ["ws", "multipart", "macros"] }
 tower = "0.4"
-tower-http = { version = "0.5", features = ["cors", "trace", "fs"] }
+tower-http = { version = "0.5", features = ["cors", "trace", "fs", "timeout", "limit", "compression-gzip"] }
 sea-orm = { version = "0.12", features = ["sqlx-postgres", "runtime-tokio-rustls", "macros"] }
 sqlx = { version = "0.7", features = ["postgres", "runtime-tokio-rustls", "chrono", "uuid"] }
 argon2 = "0.5"
 jsonwebtoken = "9.2"
 lettre = "0.11"
 
-# Additional workspace dependencies
+# Additional dependencies
 async-trait = "0.1"
-url = "2.4"
+url = "2.5"
 rand = "0.8"
 rust_decimal = "1.37"
 
 [profile.release]
 opt-level = 3
-lto = true
+lto = "fat"
 codegen-units = 1
 panic = "abort"
 
@@ -61,6 +70,12 @@ incremental = true
 [profile.wasm-dev]
 inherits = "dev"
 opt-level = 1
+lto = "off"  # Disable LTO for WASM dev builds
+
+[profile.wasm-release]
+inherits = "release"
+lto = "thin"  # Use thin LTO for WASM compatibility
+panic = "abort"
 
 [profile.server-dev]
 inherits = "dev"

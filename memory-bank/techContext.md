@@ -27,29 +27,35 @@ chrono = { version = "0.4", features = ["serde"] }
 tracing = "0.1"
 ```
 
-### Frontend Stack (Dioxus + WASM)
+### Frontend Stack (Leptos + WASM)
 ```toml
 [dependencies]
-# Core Dioxus
-dioxus = { version = "0.5", features = ["web", "router"] }
-dioxus-web = "0.5"
+# Core Leptos (Migrated from Dioxus 2025-01-06)
+leptos = { version = "0.6", features = ["csr", "ssr"] }
+leptos_router = "0.6"
+leptos_meta = "0.6"
 
-# State management
-fermi = "0.4"
+# State management (Leptos built-in signals)
+# No external state management needed - using Leptos signals
 
 # WASM specific
 wasm-bindgen = "0.2"
 web-sys = { version = "0.3", features = [
     "Window", "Document", "Element", "HtmlElement",
-    "Navigator", "Geolocation", "Storage"
+    "Navigator", "Geolocation", "Storage", "History"
 ]}
 gloo = "0.10"  # Browser API helpers
 
 # HTTP client
 reqwest = { version = "0.11", features = ["json", "rustls-tls"] }
+gloo-net = "0.4"  # Leptos-compatible HTTP client
 
 # Styling
 stylist = { version = "0.13", optional = true }
+tailwind = { version = "3.0", optional = true }
+
+# Cross-platform support (desktop via Tauri)
+tauri = { version = "1.5", features = ["api-all"], optional = true }
 ```
 
 ### Backend Stack (Axum + SeaORM)
@@ -79,57 +85,68 @@ validator = { version = "0.18", features = ["derive"] }
 
 ## 🏗️ Project Structure Details
 
-### Frontend Architecture
+### Frontend Architecture (Leptos)
 ```
 frontend/
 ├── src/
-│   ├── main.rs                 # App entry point, Dioxus launch
-│   ├── app.rs                  # Root App component
-│   ├── router.rs               # Route definitions
+│   ├── main.rs                 # App entry point, Leptos launch
+│   ├── app.rs                  # Root App component with Leptos Router
+│   ├── router.rs               # Route definitions (Leptos Router)
 │   │
 │   ├── components/             # Reusable UI components
 │   │   ├── mod.rs
 │   │   ├── layout/
-│   │   │   ├── sidebar.rs      # Navigation sidebar
-│   │   │   ├── header.rs       # App header
-│   │   │   └── footer.rs       # App footer
-│   │   ├── common/
-│   │   │   ├── button.rs       # Button variants
-│   │   │   ├── input.rs        # Form inputs
-│   │   │   └── modal.rs        # Modal dialogs
-│   │   └── job/
-│   │       ├── job_card.rs     # Job listing card
-│   │       ├── job_detail.rs   # Full job view
-│   │       └── job_form.rs     # Job creation/edit
+│   │   │   ├── sidebar.rs      # Navigation sidebar (Leptos component)
+│   │   │   ├── header.rs       # App header (Leptos component)
+│   │   │   └── footer.rs       # App footer (Leptos component)
+│   │   ├── ui/                 # UI component library
+│   │   │   ├── button.rs       # Button variants (Leptos)
+│   │   │   ├── input.rs        # Form inputs (Leptos)
+│   │   │   ├── modal.rs        # Modal dialogs (Leptos)
+│   │   │   ├── alert.rs        # Alert component
+│   │   │   ├── badge.rs        # Badge component
+│   │   │   └── loading.rs      # Loading spinner
+│   │   ├── job/
+│   │   │   ├── job_card.rs     # Job listing card (Leptos)
+│   │   │   ├── job_detail.rs   # Full job view (Leptos)
+│   │   │   └── job_form.rs     # Job creation/edit (Leptos)
+│   │   └── auth/
+│   │       ├── login.rs        # Login component
+│   │       ├── register.rs     # Registration component
+│   │       └── password_reset.rs # Password reset
 │   │
-│   ├── pages/                  # Route components
+│   ├── pages/                  # Route components (Leptos)
 │   │   ├── mod.rs
 │   │   ├── home.rs             # Landing page
 │   │   ├── jobs.rs             # Job listings
 │   │   ├── map.rs              # Map view
 │   │   ├── profile.rs          # User profile
-│   │   └── admin.rs            # Admin panel
+│   │   ├── admin.rs            # Admin panel
+│   │   ├── connect.rs          # Connect page
+│   │   └── forum.rs            # Forum page
 │   │
-│   ├── hooks/                  # Custom Dioxus hooks
-│   │   ├── use_auth.rs         # Authentication state
-│   │   ├── use_api.rs          # API client hook
-│   │   └── use_debounce.rs     # Debounce helper
+│   ├── hooks/                  # Custom utilities (Leptos patterns)
+│   │   ├── auth.rs             # Authentication utilities
+│   │   ├── api.rs              # API client utilities
+│   │   └── signals.rs          # Custom signal patterns
 │   │
 │   ├── services/               # Frontend services
-│   │   ├── api.rs              # API client
+│   │   ├── api.rs              # API client (gloo-net)
 │   │   ├── auth.rs             # Auth helpers
 │   │   └── storage.rs          # LocalStorage wrapper
 │   │
-│   ├── state/                  # Global state atoms
+│   ├── state/                  # Global reactive state (Leptos signals)
 │   │   ├── mod.rs
-│   │   ├── auth.rs             # User/auth state
-│   │   ├── jobs.rs             # Job listings cache
-│   │   └── ui.rs               # UI preferences
+│   │   ├── auth.rs             # User/auth state (RwSignal)
+│   │   ├── jobs.rs             # Job listings cache (RwSignal)
+│   │   ├── ui.rs               # UI preferences (RwSignal)
+│   │   └── app.rs              # Global app state
 │   │
 │   └── utils/                  # Utility functions
 │       ├── formatters.rs       # Date, currency formatting
 │       ├── validators.rs       # Input validation
-│       └── constants.rs        # App constants
+│       ├── constants.rs        # App constants
+│       └── platform.rs         # Platform detection (web/desktop)
 ```
 
 ### Backend Architecture
@@ -202,18 +219,25 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 rustup target add wasm32-unknown-unknown
 
 # Install development tools
-cargo install dioxus-cli
+cargo install leptos-cli  # Replaced dioxus-cli
 cargo install sea-orm-cli
 cargo install cargo-watch
 cargo install wasm-pack
+cargo install tauri-cli    # For desktop builds
 
-# Frontend development
+# Frontend development (Leptos)
 cd frontend
-dx serve --hot-reload --port 8080
+cargo leptos watch         # Leptos development server with hot reload
+# Alternative: trunk serve  # If using Trunk build tool
 
 # Backend development
 cd backend
 cargo watch -x run
+
+# Cross-platform builds
+cargo leptos build --release              # Web build (WASM)
+cargo tauri build                        # Desktop build
+cargo build --target wasm32-unknown-unknown  # Manual WASM build
 
 # Run tests
 cargo test --all
@@ -254,6 +278,17 @@ SMTP_PASS=your-api-key
 # Feature Flags
 ENABLE_SIGNUPS=true
 ENABLE_DEMO_MODE=true
+
+# Cross-Platform Configuration
+LEPTOS_OUTPUT_NAME=loco-platform
+LEPTOS_SITE_ROOT=target/site
+LEPTOS_SITE_PKG_DIR=pkg
+LEPTOS_SITE_ADDR=127.0.0.1:3000
+LEPTOS_RELOAD_PORT=3001
+
+# Tauri Configuration (Desktop)
+TAURI_PLATFORM=desktop
+TAURI_BUNDLE_IDENTIFIER=com.loco.platform
 ```
 
 ## 🚀 Performance Optimizations
@@ -585,8 +620,63 @@ jobs:
           docker push loco-platform:${{ github.sha }}
 ```
 
+## 🔄 Migration Notes (Dioxus → Leptos)
+
+### Key Changes Made (2025-01-06)
+
+#### Framework Migration
+- **From**: Dioxus 0.5 with Fermi state management
+- **To**: Leptos 0.6 with built-in reactive signals
+- **Reason**: Better performance, fine-grained reactivity, stronger ecosystem
+
+#### State Management Evolution
+```rust
+// Old (Dioxus + Fermi)
+use fermi::{use_atom_ref, Atom};
+static JOBS: Atom<Vec<Job>> = Atom(|_| vec![]);
+
+// New (Leptos Signals)
+use leptos::*;
+let (jobs, set_jobs) = create_signal(Vec::<Job>::new());
+```
+
+#### Component Syntax Changes
+```rust
+// Old (Dioxus)
+#[component]
+fn JobCard(cx: Scope, job: Job) -> Element {
+    cx.render(rsx! {
+        div { class: "job-card",
+            h3 { "{job.title}" }
+        }
+    })
+}
+
+// New (Leptos)
+#[component]
+fn JobCard(job: Job) -> impl IntoView {
+    view! {
+        <div class="job-card">
+            <h3>{job.title}</h3>
+        </div>
+    }
+}
+```
+
+#### Cross-Platform Setup
+- **Web Target**: WebAssembly via Leptos CSR
+- **Desktop Target**: Tauri integration for native desktop apps
+- **Shared Codebase**: Single frontend codebase for both platforms
+- **Build System**: Leptos CLI for web, Tauri CLI for desktop
+
+#### Performance Improvements
+- **Fine-grained Reactivity**: Only affected DOM nodes update
+- **Smaller Bundle Size**: Leptos generates more efficient WASM
+- **Better Tree Shaking**: Unused code elimination
+- **Faster Hydration**: SSR/CSR optimization
+
 ---
 
 **Last Updated**: January 2025
-**Version**: 1.0
-**Tech Stack Version**: Rust 1.75, Dioxus 0.5, Axum 0.7
+**Version**: 2.0 (Major Framework Migration)
+**Tech Stack Version**: Rust 1.75, Leptos 0.6, Axum 0.7

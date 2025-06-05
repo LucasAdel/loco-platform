@@ -6,9 +6,10 @@
 ```
 loco-platform/
 ├── Cargo.toml (workspace)
-├── frontend/ (Dioxus + WebAssembly)
+├── frontend/ (Leptos + WebAssembly) [MIGRATED 2025-01-06]
 ├── backend/ (Axum + SeaORM)
-└── shared/ (Common types)
+├── shared/ (Common types)
+└── app/ (Minimal app crate for cross-compilation)
 ```
 
 ### Type System Patterns
@@ -33,53 +34,104 @@ pub enum AppError {
 }
 ```
 
-### Frontend Patterns (Dioxus)
+### Frontend Patterns (Leptos) [MIGRATED 2025-01-06]
 
 #### Component Structure
 ```rust
 #[component]
-fn ComponentName(props: Props) -> Element {
-    let state = use_signal(|| initial_value);
+fn ComponentName(props: Props) -> impl IntoView {
+    let (state, set_state) = create_signal(initial_value);
     
-    rsx! {
-        div { class: "component-container",
-            // JSX-like syntax
-        }
+    view! {
+        <div class="component-container">
+            // HTML-like syntax with reactive signals
+        </div>
     }
 }
 ```
 
-#### State Management with Fermi
+#### State Management with Leptos Signals
 ```rust
-// Global atoms for shared state
-static JOBS: Atom<Vec<Job>> = Atom(|_| vec![]);
-static SEARCH_FILTERS: Atom<JobFilters> = Atom(|_| JobFilters::default());
+// Reactive signals for global state
+let (jobs, set_jobs) = create_signal(Vec::<Job>::new());
+let (search_filters, set_search_filters) = create_signal(JobFilters::default());
+
+// Signal composition and derived state
+let filtered_jobs = create_memo(move |_| {
+    jobs.with(|j| filter_jobs(j, &search_filters.get()))
+});
 ```
 
-#### API Client Pattern
+#### Reactive Patterns
 ```rust
-// Centralized API client with error handling
+// Effect for side effects
+create_effect(move |_| {
+    let current_filters = search_filters.get();
+    // Automatically runs when search_filters changes
+});
+
+// Resource for async data loading
+let jobs_resource = create_resource(
+    move || search_filters.get(),
+    |filters| async move {
+        fetch_jobs_from_api(filters).await
+    },
+);
+```
+
+#### API Client Pattern (Leptos)
+```rust
+// Leptos-compatible API client with gloo-net
 pub struct ApiClient {
-    client: reqwest::Client,
+    client: gloo_net::http::Request,
     base_url: String,
 }
 
 impl ApiClient {
     pub async fn fetch_jobs(&self) -> Result<Vec<Job>, ApiError> {
-        // Implementation with proper error handling
+        let response = gloo_net::http::Request::get(&format!("{}/api/jobs", self.base_url))
+            .send()
+            .await?
+            .json::<Vec<Job>>()
+            .await?;
+        Ok(response)
     }
+}
+
+// Server function pattern for SSR
+#[server(FetchJobs, "/api")]
+pub async fn fetch_jobs(filters: JobFilters) -> Result<Vec<Job>, ServerFnError> {
+    // Server-side implementation for SSR/hydration
 }
 ```
 
-### Backend Patterns (Axum)
+### Backend Patterns (Axum) [IMPLEMENTED]
 
-#### Handler Structure (To Implement)
+#### Handler Structure
 ```rust
+#[axum::debug_handler]
 async fn handler_name(
     State(state): State<AppState>,
     Json(payload): Json<RequestType>,
 ) -> Result<Json<ResponseType>, AppError> {
-    // Implementation
+    // Validated implementation with proper error handling
+    let result = state.service.process(payload).await?;
+    Ok(Json(result))
+}
+```
+
+#### Service Layer Pattern
+```rust
+// Business logic separation
+pub struct JobService {
+    repository: JobRepository,
+}
+
+impl JobService {
+    pub async fn create_job(&self, job_data: CreateJobInput) -> Result<Job, ServiceError> {
+        // Business logic and validation
+        self.repository.save(job_data).await
+    }
 }
 ```
 
@@ -93,19 +145,53 @@ pub async fn auth_middleware(
 }
 ```
 
-### Database Patterns (SeaORM - To Implement)
+### Database Patterns (SeaORM) [MODELS IMPLEMENTED]
 
 #### Entity Definition Pattern
 ```rust
-#[derive(Clone, Debug, PartialEq, DeriveEntityModel)]
+#[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq)]
 #[sea_orm(table_name = "jobs")]
 pub struct Model {
     #[sea_orm(primary_key)]
     pub id: Uuid,
     pub title: String,
     pub description: String,
+    pub company_name: String,
+    pub location: String,
+    pub salary_min: Option<i32>,
+    pub salary_max: Option<i32>,
+    pub job_type: JobType,
+    pub experience_level: ExperienceLevel,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
     // Australian-specific fields
-    pub postcode: Postcode,
+    pub postcode: String,
+    pub state: AustralianState,
+}
+
+#[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
+pub enum Relation {
+    #[sea_orm(has_many = "super::application::Entity")]
+    Applications,
+}
+```
+
+#### Repository Pattern
+```rust
+pub struct JobRepository {
+    db: DatabaseConnection,
+}
+
+impl JobRepository {
+    pub async fn find_by_filters(&self, filters: JobFilters) -> Result<Vec<job::Model>, DbErr> {
+        let mut query = Job::find();
+        
+        if let Some(location) = filters.location {
+            query = query.filter(job::Column::Location.contains(&location));
+        }
+        
+        query.all(&self.db).await
+    }
 }
 ```
 
@@ -142,10 +228,12 @@ Error Occurs → Type-safe Error Enum → User-friendly Message → Recovery Act
 - **Serde validation** for API boundaries
 - **Australian-specific validation** (postcodes, phones)
 
-### Authentication (To Implement)
-- **JWT tokens** with proper expiration
-- **Role-based access control** (RBAC)
+### Authentication [MIDDLEWARE IMPLEMENTED]
+- **JWT tokens** with proper expiration and validation
+- **Role-based access control** (RBAC) with user roles
 - **Secure password hashing** with Argon2
+- **Middleware integration** with Axum request processing
+- **Session management** with secure token handling
 
 ## 📱 Mobile-First Patterns
 
@@ -167,11 +255,13 @@ Error Occurs → Type-safe Error Enum → User-friendly Message → Recovery Act
 - **Shared utilities** in common crate
 - **Type-driven development** with Rust
 
-### Testing Strategy (To Implement)
-- **Unit tests** for business logic
-- **Integration tests** for API endpoints
-- **Component tests** for UI
+### Testing Strategy [FRAMEWORK READY]
+- **Unit tests** for business logic (cargo test)
+- **Integration tests** for API endpoints (axum-test)
+- **Component tests** for UI (leptos-testing)
 - **Property-based tests** with proptest
+- **E2E tests** with browser automation (Playwright configured)
+- **Cross-platform testing** for web and desktop targets
 
 ## 🚀 Performance Patterns
 
@@ -192,10 +282,12 @@ Error Occurs → Type-safe Error Enum → User-friendly Message → Recovery Act
 - **Request tracing** across service boundaries
 - **Error context** preservation
 
-### Monitoring (To Implement)
-- **Health checks** for services
-- **Metrics collection** with Prometheus
-- **Alerting** for critical issues
+### Monitoring [HEALTH CHECKS IMPLEMENTED]
+- **Health checks** for services (implemented in backend)
+- **Structured logging** with tracing throughout application
+- **Error tracking** with proper context preservation
+- **Performance monitoring** ready for Prometheus integration
+- **Real-time metrics** for job processing and user activity
 
 ## 🌏 Australian Localisation Patterns
 
@@ -210,14 +302,38 @@ Error Occurs → Type-safe Error Enum → User-friendly Message → Recovery Act
 - **Australian healthcare** compliance
 - **Aboriginal and Torres Strait Islander** place names support
 
-## 🔮 Future Patterns
+## 🔮 Cross-Platform Patterns [NEW]
 
-### Scalability Preparation
-- **Microservices readiness** with clear boundaries
-- **Event-driven architecture** with message queues
-- **Horizontal scaling** considerations
+### Platform Abstraction
+```rust
+// Platform detection and adaptation
+#[cfg(target_arch = "wasm32")]
+mod web_platform {
+    // Web-specific implementations
+}
 
-### Feature Toggles
+#[cfg(not(target_arch = "wasm32"))]
+mod desktop_platform {
+    // Desktop-specific implementations (Tauri)
+}
+```
+
+### Build Target Patterns
+- **Conditional compilation** for web vs desktop features
+- **Shared component library** with platform-specific adaptations
+- **Unified state management** across platforms
+- **Platform-specific optimisations** (bundle size vs performance)
+
+### Future Patterns
+
+#### Scalability Preparation
+- **Microservices readiness** with clear service boundaries
+- **Event-driven architecture** with async message handling
+- **Horizontal scaling** with stateless design patterns
+- **Cross-platform deployment** strategies
+
+#### Feature Toggles
 - **Gradual rollouts** with feature flags
-- **A/B testing** infrastructure
-- **Backwards compatibility** maintenance
+- **A/B testing** infrastructure for UX improvements
+- **Platform-specific features** (desktop notifications, web push)
+- **Backwards compatibility** maintenance across versions

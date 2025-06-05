@@ -1,5 +1,5 @@
 use sea_orm::entity::prelude::*;
-use sea_orm::Set;
+use sea_orm::{Set, ActiveModelTrait};
 use serde::{Deserialize, Serialize};
 use async_trait::async_trait;
 use shared::types::{UserId, AustralianState};
@@ -51,6 +51,8 @@ pub enum Relation {
     Application,
     #[sea_orm(has_many = "super::session::Entity")]
     Session,
+    #[sea_orm(has_many = "super::tenant_users::Entity")]
+    TenantUsers,
 }
 
 impl Related<super::job::Entity> for Entity {
@@ -68,6 +70,12 @@ impl Related<super::application::Entity> for Entity {
 impl Related<super::session::Entity> for Entity {
     fn to() -> RelationDef {
         Relation::Session.def()
+    }
+}
+
+impl Related<super::tenant_users::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::TenantUsers.def()
     }
 }
 

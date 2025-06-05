@@ -11,29 +11,34 @@ Each decision follows this structure:
 
 ---
 
-## 2025-01-06: Choose Dioxus for Frontend Framework
+## 2025-01-06: MAJOR DECISION - Migration from Dioxus to Leptos
 
-**Decision**: Use Dioxus as the primary frontend framework
+**Decision**: Migrate from Dioxus to Leptos as the primary frontend framework
 
-**Context**: Need a Rust-based frontend framework that compiles to WebAssembly for the Loco Platform
+**Context**: After initial implementation with Dioxus, discovered superior performance and reactivity benefits of Leptos for our use case
 
-**Alternatives Considered**:
+**Original Choice (Dioxus)**:
 1. **Yew**: Mature, large ecosystem, Elm-inspired
 2. **Leptos**: Fine-grained reactivity, good performance
 3. **Sycamore**: Solid.js-inspired, reactive
 4. **Percy**: Virtual DOM approach
 
-**Rationale**: 
-- Dioxus offers React-like syntax familiar to many developers
-- Excellent cross-platform support (web, desktop, mobile)
-- Active development and community
-- Good documentation and examples
-- Built-in router and state management
+**Migration Rationale**:
+- **Fine-grained Reactivity**: Leptos only updates changed DOM nodes, not entire component trees
+- **Better Performance**: Faster hydration, smaller bundle sizes, more efficient updates
+- **Superior SSR/CSR**: Seamless integration between server and client rendering
+- **Modern Architecture**: More sophisticated signal system than Fermi atoms
+- **Growing Ecosystem**: Rapidly improving documentation and community
+- **Better TypeScript Integration**: For mixed language projects
 
-**Impact**: 
-- Faster developer onboarding due to familiar patterns
-- Potential for future mobile/desktop apps
-- Need to work around some WASM limitations
+**Migration Impact**:
+- ✅ **Performance**: Significantly faster reactive updates
+- ✅ **Bundle Size**: Smaller WASM output due to fine-grained compilation
+- ✅ **Developer Experience**: More intuitive reactive programming model
+- ✅ **Cross-Platform**: Better Tauri integration for desktop apps
+- ⚠️ **Migration Cost**: Required rewriting all frontend components
+- ⚠️ **Learning Curve**: Team needs to learn Leptos patterns
+- ✅ **Future-Proof**: Leptos is gaining momentum in Rust web development
 
 ---
 
@@ -289,5 +294,63 @@ Each decision follows this structure:
 
 ---
 
-**Last Updated**: 2025-01-06
-**Next Review**: When facing next major technical decision
+## 2025-01-06: Cross-Platform Compilation Strategy
+
+**Decision**: Configure build system for both web (WASM) and desktop (Tauri) targets
+
+**Context**: Need to maximise market reach with single codebase
+
+**Alternatives Considered**:
+1. **Web-only**: Simpler but limits distribution options
+2. **Progressive Web App**: Good mobile experience but limited desktop integration
+3. **Separate native apps**: Much higher development cost
+4. **Electron wrapper**: Larger bundle size and resource usage
+
+**Rationale**:
+- **Code Reuse**: 95%+ shared between platforms
+- **Leptos Compatibility**: Excellent support for both targets
+- **Market Coverage**: Web for accessibility, desktop for power users
+- **Distribution Flexibility**: App stores + web deployment
+- **Performance**: Native desktop performance when needed
+
+**Impact**:
+- ✅ **Broader Market**: Can serve both web and desktop users
+- ✅ **Single Codebase**: Maintains development efficiency
+- ✅ **Platform Optimisation**: Can tailor features per platform
+- ⚠️ **Build Complexity**: Multiple compilation targets to maintain
+- ⚠️ **Testing Overhead**: Need to test both platforms
+- ✅ **Future-Proof**: Ready for mobile expansion via Tauri Mobile
+
+---
+
+## 2025-01-06: Reactive State Architecture with Leptos Signals
+
+**Decision**: Replace Fermi atoms with Leptos built-in signal system
+
+**Context**: Leptos provides more efficient and ergonomic state management than external libraries
+
+**Alternatives Considered**:
+1. **Keep Fermi**: Would work but misses Leptos benefits
+2. **Redux Pattern**: Too complex for our needs
+3. **Context API**: Less efficient than signals
+4. **External Store**: Adds unnecessary dependency
+
+**Rationale**:
+- **Performance**: Fine-grained reactivity only updates changed values
+- **Ergonomics**: More intuitive than global atoms
+- **Integration**: Designed specifically for Leptos
+- **Composition**: Easier to build derived state
+- **Debugging**: Better development tools
+
+**Impact**:
+- ✅ **Better Performance**: Only affected components re-render
+- ✅ **Cleaner Code**: Less boilerplate than Fermi atoms
+- ✅ **Better DX**: Integrated error handling and debugging
+- ⚠️ **Pattern Change**: Different mental model for state
+- ✅ **Future-Ready**: Aligned with Leptos ecosystem direction
+
+---
+
+**Last Updated**: 2025-01-06 (Major Migration Completed)
+**Next Review**: When evaluating backend framework or database decisions
+**Migration Status**: ✅ Complete - All frontend components migrated to Leptos

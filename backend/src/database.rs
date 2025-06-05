@@ -113,7 +113,8 @@ pub async fn setup_database() -> Result<DatabaseConnection, anyhow::Error> {
     run_migrations(&db).await?;
     
     // Seed database with sample data if in development mode
-    if env::var("RUST_ENV").unwrap_or_else(|_| "development".to_string()) == "development" {
+    // TODO: Temporarily disabled due to stack overflow - investigate entity relationships
+    if false && env::var("RUST_ENV").unwrap_or_else(|_| "development".to_string()) == "development" {
         seed_database(&db).await?;
     }
     
@@ -137,6 +138,20 @@ pub async fn seed_database(db: &DatabaseConnection) -> Result<(), anyhow::Error>
         tracing::info!("📊 Database already contains data, skipping seeding");
         return Ok(());
     }
+    
+    // Create sample tenant first
+    use crate::entities::{tenants, tenant_users};
+    
+    let tenant_id = Uuid::new_v4();
+    let tenant = tenants::ActiveModel {
+        id: Set(tenant_id),
+        name: Set("Demo Pharmacy Group".to_string()),
+        slug: Set("demo-pharmacy".to_string()),
+        domain: Set(None),
+        settings: Set(tenants::TenantSettings::default()),
+        ..Default::default()
+    };
+    tenant.insert(db).await?;
     
     // Create sample users
     let argon2 = Argon2::default();
@@ -163,6 +178,17 @@ pub async fn seed_database(db: &DatabaseConnection) -> Result<(), anyhow::Error>
     };
     employer.insert(db).await?;
     
+    // Create tenant association for employer
+    let employer_tenant_user = tenant_users::ActiveModel {
+        id: Set(Uuid::new_v4()),
+        user_id: Set(employer_id),
+        tenant_id: Set(tenant_id),
+        role: Set("Admin".to_string()),
+        permissions: Set(serde_json::to_string(&vec!["manage_jobs", "manage_users"]).unwrap()),
+        ..Default::default()
+    };
+    employer_tenant_user.insert(db).await?;
+    
     // Sample professional user
     let professional_id = Uuid::new_v4();
     let professional = user::ActiveModel {
@@ -182,6 +208,17 @@ pub async fn seed_database(db: &DatabaseConnection) -> Result<(), anyhow::Error>
         ..Default::default()
     };
     professional.insert(db).await?;
+    
+    // Create tenant association for professional
+    let professional_tenant_user = tenant_users::ActiveModel {
+        id: Set(Uuid::new_v4()),
+        user_id: Set(professional_id),
+        tenant_id: Set(tenant_id),
+        role: Set("Member".to_string()),
+        permissions: Set(serde_json::to_string(&vec!["view_jobs", "apply_jobs"]).unwrap()),
+        ..Default::default()
+    };
+    professional_tenant_user.insert(db).await?;
     
     // Sample jobs across major Australian cities
     let sample_jobs = vec![

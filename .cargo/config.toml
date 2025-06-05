@@ -1,0 +1,67 @@
+# Cargo configuration for cross-compilation
+
+# [build]
+# Default target for development - commented out to allow native builds
+# target = "wasm32-unknown-unknown"
+
+[target.wasm32-unknown-unknown]
+# Use wasm-bindgen for the web target
+runner = "wasm-bindgen-test-runner"
+
+[target.aarch64-apple-darwin]
+# Native macOS ARM64 target (M1/M2)
+linker = "clang"
+
+[target.x86_64-apple-darwin]
+# Native macOS x86_64 target
+linker = "clang"
+
+[target.x86_64-pc-windows-msvc]
+# Windows target
+linker = "link.exe"
+
+[target.x86_64-unknown-linux-gnu]
+# Linux target
+linker = "gcc"
+
+# Rust flags for optimisation - only for WASM release builds
+[target.'cfg(target_arch = "wasm32")']
+rustflags = [
+  "-C", "link-arg=-s",
+  "-C", "opt-level=z",
+  # LTO removed to fix compilation conflicts
+]
+
+# Development profile
+[profile.dev]
+opt-level = 0
+debug = true
+incremental = true
+
+# Release profile with optimisations
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
+
+# WASM-specific release profile
+[profile.wasm-release]
+inherits = "release"
+opt-level = "z"
+lto = "fat"
+panic = "abort"
+
+# Desktop release profile
+[profile.desktop-release]
+inherits = "release"
+opt-level = 3
+lto = "thin"
+
+[alias]
+# Convenient aliases for building different targets
+build-web = "build --target wasm32-unknown-unknown"
+build-desktop = "build --target aarch64-apple-darwin"
+serve = "leptos serve"
+watch = "leptos watch"

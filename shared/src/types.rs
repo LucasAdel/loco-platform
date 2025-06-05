@@ -495,11 +495,48 @@ pub struct User {
     pub updated_at: DateTime<Utc>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub enum UserType {
     Professional,
     Employer,
     SuperAdmin,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub enum UserRole {
+    Admin,
+    Manager,
+    User,
+    Guest,
+}
+
+impl UserRole {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            UserRole::Admin => "admin",
+            UserRole::Manager => "manager",
+            UserRole::User => "user",
+            UserRole::Guest => "guest",
+        }
+    }
+}
+
+impl Display for UserRole {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl From<&str> for UserRole {
+    fn from(s: &str) -> Self {
+        match s {
+            "admin" => UserRole::Admin,
+            "manager" => UserRole::Manager,
+            "user" => UserRole::User,
+            "guest" => UserRole::Guest,
+            _ => UserRole::Guest,
+        }
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -561,4 +598,76 @@ pub struct SearchResponse {
     pub page: u32,
     pub limit: u32,
     pub has_more: bool,
+}
+
+// ============================================================================
+// Simplified Types for Frontend Use
+// ============================================================================
+
+/// Simplified Job struct for frontend components
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub struct SimpleJob {
+    pub id: String,
+    pub title: String,
+    pub company: String,
+    pub location: String,
+    pub description: String,
+    pub salary_range: String,
+    pub job_type: SimpleJobType,
+    pub posted_date: String,
+    pub urgent: bool,
+    pub latitude: Option<f64>,
+    pub longitude: Option<f64>,
+}
+
+/// Simple job type enum for frontend use
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub enum SimpleJobType {
+    #[serde(rename = "Full-time")]
+    FullTime,
+    #[serde(rename = "Part-time")]
+    PartTime,
+    #[serde(rename = "Contract")]
+    Contract,
+    #[serde(rename = "Casual")]
+    Casual,
+}
+
+impl From<String> for SimpleJobType {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "Full-time" => SimpleJobType::FullTime,
+            "Part-time" => SimpleJobType::PartTime,
+            "Contract" => SimpleJobType::Contract,
+            "Casual" => SimpleJobType::Casual,
+            _ => SimpleJobType::FullTime,
+        }
+    }
+}
+
+impl Display for SimpleJobType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let s = match self {
+            SimpleJobType::FullTime => "Full-time",
+            SimpleJobType::PartTime => "Part-time",
+            SimpleJobType::Contract => "Contract",
+            SimpleJobType::Casual => "Casual",
+        };
+        write!(f, "{}", s)
+    }
+}
+
+// ============================================================================
+// API Error Types
+// ============================================================================
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum ApiError {
+    Network(String),
+    Parse(String),
+    Http(u16),
+    Validation(String),
+    NotFound,
+    Unauthorised,
+    Internal(String),
 }

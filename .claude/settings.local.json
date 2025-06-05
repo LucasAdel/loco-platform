@@ -40,7 +40,24 @@
       "Bash(./run)",
       "Bash(./run status)",
       "Bash(git init:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(gh repo create:*)",
+      "Bash(gh auth:*)",
+      "Bash(./scripts/setup-database.sh:*)",
+      "Bash(DATABASE_URL=\"postgresql://postgres:password@localhost:9001/loco_platform\" cargo run -- up)",
+      "Bash(DATABASE_URL=\"postgresql://postgres:password@localhost:9001/loco_platform\" cargo run -- fresh)",
+      "Bash(DATABASE_URL=\"postgresql://postgres:password@localhost:9001/loco_platform\" cargo run -- down -n 10)",
+      "Bash(PGPASSWORD=password psql:*)",
+      "Bash(./scripts/quick-db-test.sh:*)",
+      "Bash(npm run remove-jobs:*)",
+      "Bash(node:*)",
+      "Bash(./run-leptos.sh:*)",
+      "Bash(npm test:*)",
+      "Bash(RUSTFLAGS=\"-C lto=off\" cargo build --package backend)",
+      "Bash(RUSTFLAGS=\"-C lto=off\" cargo build --package backend --target x86_64-apple-darwin)",
+      "Bash(RUSTFLAGS=\"-C lto=off\" cargo build --package backend --target aarch64-apple-darwin)",
+      "Bash(./run start)",
+      "Bash(./run stop)"
     ],
     "deny": []
   }

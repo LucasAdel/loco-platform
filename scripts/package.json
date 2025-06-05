@@ -1,0 +1,13 @@
+{
+  "name": "loco-platform-scripts",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Utility scripts for Loco Platform",
+  "scripts": {
+    "remove-jobs": "node remove-jobs-supabase.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.3",
+    "dotenv": "^16.3.1"
+  }
+}

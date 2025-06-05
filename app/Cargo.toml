@@ -1,0 +1,99 @@
+[package]
+name = "loco-app"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+leptos = { workspace = true, features = ["hydrate"] }
+leptos_meta = { workspace = true, features = ["hydrate"] }
+leptos_router = { workspace = true, features = ["hydrate"] }
+leptos_axum = { workspace = true, optional = true }
+
+# Core dependencies
+serde = { workspace = true }
+serde_json = { workspace = true }
+chrono = { workspace = true }
+uuid = { workspace = true }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+
+# Shared types
+shared = { path = "../shared" }
+
+# HTTP client
+gloo-net = { workspace = true }
+reqwest = { workspace = true }
+
+# WASM specific
+wasm-bindgen = { workspace = true }
+web-sys = { workspace = true, features = [
+    "Window", "Document", "Element", "HtmlElement", "Node",
+    "Navigator", "Geolocation", "Storage", "Location", "History",
+    "CustomEvent", "DomRect", "DomTokenList", "MediaQueryList"
+]}
+js-sys = { workspace = true }
+getrandom = { workspace = true }
+console_error_panic_hook = { workspace = true }
+
+# Supabase client
+postgrest = { workspace = true }
+
+# Additional utilities
+once_cell = "1.19"
+
+# SSR dependencies
+axum = { workspace = true, optional = true }
+tokio = { workspace = true, optional = true }
+tower = { workspace = true, optional = true }
+tower-http = { workspace = true, features = ["fs"], optional = true }
+
+[features]
+default = ["csr"]
+csr = ["leptos/csr", "leptos_meta/csr", "leptos_router/csr"]
+hydrate = ["leptos/hydrate", "leptos_meta/hydrate", "leptos_router/hydrate"]
+ssr = [
+    "dep:axum",
+    "dep:tokio",
+    "dep:tower",
+    "dep:tower-http",
+    "dep:leptos_axum",
+    "leptos/ssr",
+    "leptos_meta/ssr",
+    "leptos_router/ssr",
+]
+
+# Platform-specific features
+web = ["csr"]
+desktop = ["ssr"]
+
+# Target-specific dependencies
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+wasm-bindgen-futures = "0.4"
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+tokio = { workspace = true, features = ["full"] }
+axum = { workspace = true }
+tower = { workspace = true }
+tower-http = { workspace = true }
+dotenv = "0.15"
+
+[package.metadata.leptos]
+# The site root folder
+site-root = "target/site"
+# The site pkg folder
+site-pkg-dir = "pkg"
+# Assets source dir
+assets-dir = "assets"
+# JS output dir
+site-addr = "127.0.0.1:3001"
+reload-port = 3002
+browserquery = "defaults"
+watch = false
+env = "DEV"
+bin-features = ["ssr"]
+bin-default-features = false
+lib-features = ["hydrate"]
+lib-default-features = false

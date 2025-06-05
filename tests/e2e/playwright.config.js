@@ -70,18 +70,10 @@ module.exports = defineConfig({
   ],
 
   /* Run your local dev server before starting the tests */
-  webServer: [
-    {
-      command: 'cargo run -p backend',
-      port: 3000,
-      reuseExistingServer: !process.env.CI,
-      timeout: 120 * 1000,
-    },
-    {
-      command: 'dx serve --platform web --port 8080',
-      port: 8080,
-      reuseExistingServer: !process.env.CI,
-      timeout: 120 * 1000,
-    },
-  ],
+  webServer: {
+    command: 'cd ../../static && python3 server.py',
+    port: 8080,
+    reuseExistingServer: !process.env.CI,
+    timeout: 30 * 1000,
+  },
 });

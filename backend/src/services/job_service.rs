@@ -37,7 +37,7 @@ impl JobService {
         _user_id: Uuid,
     ) -> Result<SharedJob, shared::errors::AppError> {
         // Demo mode: Create a new job with provided data
-        let job = SharedJob {
+        let mut job = SharedJob {
             id: JobId::new(),
             title: request.title,
             description: request.description,
@@ -64,6 +64,10 @@ impl JobService {
             created_by: UserId(_user_id),
         };
         
+        // Fix location if needed
+        use crate::services::LocationService;
+        LocationService::ensure_valid_location(&mut job)?;
+        
         Ok(job)
     }
     
@@ -75,7 +79,7 @@ impl JobService {
         // Demo mode: Create updated job if it exists in sample data
         let jobs = Self::get_sample_jobs();
         if jobs.iter().any(|j| j.id == JobId(job_id)) {
-            let job = SharedJob {
+            let mut job = SharedJob {
                 id: JobId(job_id),
                 title: request.title,
                 description: request.description,
@@ -101,6 +105,11 @@ impl JobService {
                 updated_at: chrono::Utc::now(),
                 created_by: UserId(Uuid::new_v4()),
             };
+            
+            // Fix location if needed
+            use crate::services::LocationService;
+            LocationService::ensure_valid_location(&mut job)?;
+            
             Ok(Some(job))
         } else {
             Ok(None)
@@ -121,16 +130,16 @@ impl JobService {
         vec![
             SharedJob {
                 id: JobId(Uuid::parse_str("550e8400-e29b-41d4-a716-446655440001").unwrap()),
-                title: "Senior Pharmacist - Bondi Beach".to_string(),
-                description: "Looking for an experienced pharmacist to join our busy beachside pharmacy.".to_string(),
-                pharmacy_name: "Bondi Health Pharmacy".to_string(),
-                hourly_rate: 42.5,
-                address: "123 Campbell Parade".to_string(),
-                suburb: "Bondi Beach".to_string(),
-                postcode: Postcode::new("2026").unwrap(),
-                state: AustralianState::NewSouthWales,
-                latitude: Some(-33.8908),
-                longitude: Some(151.2743),
+                title: "Senior Pharmacist - Norwood".to_string(),
+                description: "Looking for an experienced pharmacist to join our busy Parade pharmacy.".to_string(),
+                pharmacy_name: "Norwood Health Pharmacy".to_string(),
+                hourly_rate: 52.5,
+                address: "123 The Parade".to_string(),
+                suburb: "Norwood".to_string(),
+                postcode: Postcode::new("5067").unwrap(),
+                state: AustralianState::SouthAustralia,
+                latitude: Some(-34.9206),
+                longitude: Some(138.6326),
                 start_date: chrono::Utc::now() + chrono::Duration::days(7),
                 end_date: chrono::Utc::now() + chrono::Duration::days(30),
                 start_time: "09:00".to_string(),
@@ -145,16 +154,16 @@ impl JobService {
             },
             SharedJob {
                 id: JobId(Uuid::parse_str("550e8400-e29b-41d4-a716-446655440002").unwrap()),
-                title: "Pharmacy Assistant - Parramatta".to_string(),
-                description: "Great opportunity for a pharmacy assistant in a modern healthcare facility.".to_string(),
+                title: "Pharmacy Assistant - Marion".to_string(),
+                description: "Great opportunity for a pharmacy assistant in Westfield Marion.".to_string(),
                 pharmacy_name: "Westfield Medical Pharmacy".to_string(),
                 hourly_rate: 28.5,
-                address: "159 Church St".to_string(),
-                suburb: "Parramatta".to_string(),
-                postcode: Postcode::new("2150").unwrap(),
-                state: AustralianState::NewSouthWales,
-                latitude: Some(-33.8151),
-                longitude: Some(151.0011),
+                address: "297 Diagonal Road".to_string(),
+                suburb: "Marion".to_string(),
+                postcode: Postcode::new("5043").unwrap(),
+                state: AustralianState::SouthAustralia,
+                latitude: Some(-35.0117),
+                longitude: Some(138.5450),
                 start_date: chrono::Utc::now() + chrono::Duration::days(3),
                 end_date: chrono::Utc::now() + chrono::Duration::days(10),
                 start_time: "08:00".to_string(),
@@ -165,6 +174,78 @@ impl JobService {
                 distance_km: None,
                 created_at: chrono::Utc::now() - chrono::Duration::days(1),
                 updated_at: chrono::Utc::now() - chrono::Duration::days(1),
+                created_by: UserId(Uuid::new_v4()),
+            },
+            SharedJob {
+                id: JobId(Uuid::parse_str("550e8400-e29b-41d4-a716-446655440003").unwrap()),
+                title: "Locum Pharmacist - Glenelg".to_string(),
+                description: "Urgent locum coverage needed for busy beachside pharmacy.".to_string(),
+                pharmacy_name: "Glenelg Beach Pharmacy".to_string(),
+                hourly_rate: 65.0,
+                address: "15 Jetty Road".to_string(),
+                suburb: "Glenelg".to_string(),
+                postcode: Postcode::new("5045").unwrap(),
+                state: AustralianState::SouthAustralia,
+                latitude: Some(-34.9823),
+                longitude: Some(138.5166),
+                start_date: chrono::Utc::now() + chrono::Duration::days(1),
+                end_date: chrono::Utc::now() + chrono::Duration::days(7),
+                start_time: "09:00".to_string(),
+                end_time: "18:00".to_string(),
+                job_type: JobType::Pharmacist,
+                status: JobStatus::Active,
+                is_urgent: true,
+                distance_km: None,
+                created_at: chrono::Utc::now() - chrono::Duration::hours(6),
+                updated_at: chrono::Utc::now() - chrono::Duration::hours(6),
+                created_by: UserId(Uuid::new_v4()),
+            },
+            SharedJob {
+                id: JobId(Uuid::parse_str("550e8400-e29b-41d4-a716-446655440004").unwrap()),
+                title: "Part-time Pharmacist - Burnside".to_string(),
+                description: "Seeking experienced pharmacist for weekend shifts in premium location.".to_string(),
+                pharmacy_name: "Burnside Village Pharmacy".to_string(),
+                hourly_rate: 48.0,
+                address: "447 Portrush Road".to_string(),
+                suburb: "Burnside".to_string(),
+                postcode: Postcode::new("5066").unwrap(),
+                state: AustralianState::SouthAustralia,
+                latitude: Some(-34.9397),
+                longitude: Some(138.6444),
+                start_date: chrono::Utc::now() + chrono::Duration::days(14),
+                end_date: chrono::Utc::now() + chrono::Duration::days(180),
+                start_time: "10:00".to_string(),
+                end_time: "14:00".to_string(),
+                job_type: JobType::Pharmacist,
+                status: JobStatus::Active,
+                is_urgent: false,
+                distance_km: None,
+                created_at: chrono::Utc::now() - chrono::Duration::days(3),
+                updated_at: chrono::Utc::now() - chrono::Duration::days(3),
+                created_by: UserId(Uuid::new_v4()),
+            },
+            SharedJob {
+                id: JobId(Uuid::parse_str("550e8400-e29b-41d4-a716-446655440005").unwrap()),
+                title: "Hospital Pharmacist - North Adelaide".to_string(),
+                description: "Join our hospital pharmacy team in a clinical role.".to_string(),
+                pharmacy_name: "Women's and Children's Hospital".to_string(),
+                hourly_rate: 56.0,
+                address: "72 King William Road".to_string(),
+                suburb: "North Adelaide".to_string(),
+                postcode: Postcode::new("5006").unwrap(),
+                state: AustralianState::SouthAustralia,
+                latitude: Some(-34.9065),
+                longitude: Some(138.5934),
+                start_date: chrono::Utc::now() + chrono::Duration::days(21),
+                end_date: chrono::Utc::now() + chrono::Duration::days(365),
+                start_time: "08:00".to_string(),
+                end_time: "16:30".to_string(),
+                job_type: JobType::Pharmacist,
+                status: JobStatus::Active,
+                is_urgent: false,
+                distance_km: None,
+                created_at: chrono::Utc::now() - chrono::Duration::days(4),
+                updated_at: chrono::Utc::now() - chrono::Duration::days(4),
                 created_by: UserId(Uuid::new_v4()),
             },
         ]

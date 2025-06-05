@@ -1,0 +1,115 @@
+name: Cross-Platform Build
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build-web:
+    name: Build Web (WASM)
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Install Rust
+      uses: actions-rs/toolchain@v1
+      with:
+        profile: minimal
+        toolchain: stable
+        target: wasm32-unknown-unknown
+        override: true
+    
+    - name: Install wasm tools
+      run: |
+        cargo install wasm-bindgen-cli
+        cargo install wasm-opt
+    
+    - name: Build WASM
+      run: |
+        cd app
+        cargo build --target wasm32-unknown-unknown --release --features web
+    
+    - name: Generate bindings
+      run: |
+        wasm-bindgen \
+          --out-dir dist/pkg \
+          --target web \
+          --no-typescript \
+          target/wasm32-unknown-unknown/release/loco_app.wasm
+    
+    - name: Upload WASM artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: wasm-build
+        path: dist/
+
+  build-desktop:
+    name: Build Desktop (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            binary: loco-platform
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            binary: loco-platform.exe
+          - os: macOS-latest
+            target: x86_64-apple-darwin
+            binary: loco-platform
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Install Rust
+      uses: actions-rs/toolchain@v1
+      with:
+        profile: minimal
+        toolchain: stable
+        target: ${{ matrix.target }}
+        override: true
+    
+    - name: Build backend
+      run: |
+        cd backend
+        cargo build --release --target ${{ matrix.target }}
+    
+    - name: Build app with SSR
+      run: |
+        cd app
+        cargo build --release --features ssr --target ${{ matrix.target }}
+    
+    - name: Upload desktop artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: desktop-${{ matrix.os }}
+        path: target/${{ matrix.target }}/release/${{ matrix.binary }}
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Install Rust
+      uses: actions-rs/toolchain@v1
+      with:
+        profile: minimal
+        toolchain: stable
+        override: true
+    
+    - name: Run tests
+      run: cargo test --all --verbose
+    
+    - name: Run clippy
+      run: cargo clippy --all-targets -- -D warnings
+    
+    - name: Check formatting
+      run: cargo fmt --all -- --check

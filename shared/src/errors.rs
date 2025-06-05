@@ -6,8 +6,12 @@ use serde::{Deserialize, Serialize};
 #[derive(Error, Debug, Clone, Serialize, Deserialize)]
 pub enum AppError {
     // Database errors with context preservation
+    #[error("Database error: {0}")]
+    Database(String),
+    
+    // Database errors with additional context
     #[error("Database error: {message} (Context: {context})")]
-    Database {
+    DatabaseWithContext {
         message: String,
         context: String,
     },
@@ -35,9 +39,13 @@ pub enum AppError {
         user_id: Option<String>,
     },
     
+    // Simple not found error
+    #[error("Resource not found")]
+    NotFound,
+    
     // Not found errors with helpful suggestions
     #[error("Resource not found: {resource_type} with ID {id}")]
-    NotFound {
+    NotFoundDetailed {
         resource_type: String,
         id: String,
         suggestions: Vec<String>,
@@ -112,7 +120,7 @@ pub enum ErrorSeverity {
 impl AppError {
     /// Create a database error with context
     pub fn database(message: impl Into<String>, context: impl Into<String>) -> Self {
-        Self::Database {
+        Self::DatabaseWithContext {
             message: message.into(),
             context: context.into(),
         }
@@ -129,7 +137,7 @@ impl AppError {
     
     /// Create a not found error with suggestions
     pub fn not_found(resource_type: impl Into<String>, id: impl Into<String>) -> Self {
-        Self::NotFound {
+        Self::NotFoundDetailed {
             resource_type: resource_type.into(),
             id: id.into(),
             suggestions: Vec::new(),
@@ -142,6 +150,15 @@ impl AppError {
             message: message.into(),
             error_id: uuid::Uuid::new_v4().to_string(),
             component: component.into(),
+        }
+    }
+    
+    /// Create a timeout error
+    pub fn timeout(message: impl Into<String>) -> Self {
+        Self::Network {
+            message: message.into(),
+            timeout: true,
+            retry_count: 0,
         }
     }
     
@@ -158,11 +175,12 @@ impl AppError {
     /// Get user-friendly error message (Australian English)
     pub fn user_message(&self) -> String {
         match self {
-            AppError::Database { .. } => "We're experiencing technical difficulties. Please try again.".to_string(),
+            AppError::Database(_) | AppError::DatabaseWithContext { .. } => "We're experiencing technical difficulties. Please try again.".to_string(),
             AppError::Validation { field, message, .. } => format!("Please check your {}: {}", field, message),
             AppError::Authentication { .. } => "Please check your login details and try again.".to_string(),
             AppError::Authorisation { .. } => "You don't have permission to perform this action.".to_string(),
-            AppError::NotFound { resource_type, .. } => format!("Sorry, we couldn't find that {}.", resource_type),
+            AppError::NotFound => "Sorry, we couldn't find that resource.".to_string(),
+            AppError::NotFoundDetailed { resource_type, .. } => format!("Sorry, we couldn't find that {}.", resource_type),
             AppError::RateLimit { retry_after_seconds, .. } => {
                 format!("You're doing that too quickly. Please wait {} seconds.", retry_after_seconds)
             },

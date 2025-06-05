@@ -1,0 +1,81 @@
+# Pre-commit hooks configuration
+# Install with: pre-commit install
+
+repos:
+  # Rust formatting and linting
+  - repo: local
+    hooks:
+      - id: cargo-fmt
+        name: Cargo format
+        entry: cargo fmt --all --
+        language: system
+        types: [rust]
+        pass_filenames: false
+      
+      - id: cargo-check
+        name: Cargo check
+        entry: cargo check --all
+        language: system
+        types: [rust]
+        pass_filenames: false
+      
+      - id: cargo-clippy
+        name: Cargo clippy
+        entry: cargo clippy --all-targets --all-features -- -D warnings
+        language: system
+        types: [rust]
+        pass_filenames: false
+      
+      - id: cargo-test
+        name: Cargo test
+        entry: cargo test --all
+        language: system
+        types: [rust]
+        pass_filenames: false
+        stages: [push]
+      
+      - id: cargo-audit
+        name: Cargo audit
+        entry: cargo audit
+        language: system
+        pass_filenames: false
+        stages: [push]
+
+  # General file checks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+        args: ['--maxkb=1000']
+      - id: check-toml
+      - id: check-json
+      - id: check-merge-conflict
+      - id: mixed-line-ending
+        args: ['--fix=lf']
+
+  # Markdown linting
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.38.0
+    hooks:
+      - id: markdownlint
+        args: ['--fix']
+
+  # YAML linting
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.33.0
+    hooks:
+      - id: yamllint
+        args: ['-c', '.yamllint.yml']
+
+  # Shell script linting
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.9.0.6
+    hooks:
+      - id: shellcheck
+
+# Configuration for stages
+default_stages: [commit]
+fail_fast: false

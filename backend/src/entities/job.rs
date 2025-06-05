@@ -1,7 +1,8 @@
 use sea_orm::entity::prelude::*;
-use sea_orm::Set;
+use sea_orm::{Set, ActiveModelTrait};
 use serde::{Deserialize, Serialize};
 use async_trait::async_trait;
+use rust_decimal::Decimal;
 use shared::types::{JobId, UserId, JobType, JobStatus, AustralianState, Postcode};
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Serialize, Deserialize)]
@@ -109,6 +110,7 @@ impl Related<super::application::Entity> for Entity {
         Relation::Application.def()
     }
 }
+
 
 #[async_trait]
 impl ActiveModelBehavior for ActiveModel {

@@ -1,49 +1,23 @@
 # Test info
 
 - Name: Page Navigation >> Profile page loads successfully
-- Location: /Users/hbl/Documents/loco-platform/tests/e2e/specs/navigation.spec.js:93:3
+- Location: /Users/hbl/Documents/loco-platform/tests/e2e/specs/navigation.spec.js:96:3
 
 # Error details
 
 ```
-Error: expect(received).toBeTruthy()
+Error: page.goto: net::ERR_SOCKET_NOT_CONNECTED at http://localhost:8080/profile
+Call log:
+  - navigating to "http://localhost:8080/profile", waiting until "load"
 
-Received: false
-    at /Users/hbl/Documents/loco-platform/tests/e2e/specs/navigation.spec.js:103:31
-```
-
-# Page snapshot
-
-```yaml
-- text: Lo.Co Platform Australian Pharmacy Jobs
-- navigation:
-  - list:
-    - listitem:
-      - button "🏠 Home"
-    - listitem:
-      - button "💼 Jobs"
-    - listitem:
-      - button "🗺️ Map"
-    - listitem:
-      - button "💬 Forum"
-    - listitem:
-      - button "👤 Profile"
-    - listitem:
-      - button "🔔 Notifications"
-    - listitem:
-      - button "📅 Availability"
-    - listitem:
-      - button "⚙️ Admin Panel"
-    - listitem:
-      - button "🔗 Lo.Co Connect"
-- main:
-  - heading "Profile" [level=1]
-  - paragraph: Profile management coming soon...
+    at /Users/hbl/Documents/loco-platform/tests/e2e/specs/navigation.spec.js:97:16
 ```
 
 # Test source
 
 ```ts
+   1 | // Navigation and page loading tests for Loco Platform
+   2 | const { test, expect } = require('@playwright/test');
    3 |
    4 | test.describe('Page Navigation', () => {
    5 |   test.beforeEach(async ({ page }) => {
@@ -125,79 +99,97 @@ Received: false
    81 |     await page.goto('/forum');
    82 |     
    83 |     await page.waitForLoadState('networkidle');
-   84 |     
-   85 |     // Should be on forum page
-   86 |     expect(page.url()).toContain('/forum');
-   87 |     
-   88 |     // Check for forum content (even if placeholder)
-   89 |     const hasForumContent = await page.locator('text=/forum/i, text=/discussion/i, text=/coming soon/i').count() > 0;
-   90 |     expect(hasForumContent).toBeTruthy();
-   91 |   });
-   92 |
-   93 |   test('Profile page loads successfully', async ({ page }) => {
-   94 |     await page.goto('/profile');
-   95 |     
-   96 |     await page.waitForLoadState('networkidle');
-   97 |     
-   98 |     // Should be on profile page
-   99 |     expect(page.url()).toContain('/profile');
-  100 |     
-  101 |     // Check for profile content (even if placeholder)
-  102 |     const hasProfileContent = await page.locator('text=/profile/i, text=/account/i, text=/coming soon/i').count() > 0;
-> 103 |     expect(hasProfileContent).toBeTruthy();
-      |                               ^ Error: expect(received).toBeTruthy()
-  104 |   });
-  105 |
-  106 |   test('Notifications page loads successfully', async ({ page }) => {
-  107 |     await page.goto('/notifications');
+   84 |     await page.waitForTimeout(1000); // Give JS routing time
+   85 |     
+   86 |     // Should be on forum page
+   87 |     expect(page.url()).toContain('/forum');
+   88 |     
+   89 |     // Check for specific forum content
+   90 |     const hasForumHeading = await page.locator('h2:has-text("Professional Forum")').count() > 0;
+   91 |     const hasComingSoon = await page.locator('text=Forum features coming soon').count() > 0;
+   92 |     
+   93 |     expect(hasForumHeading || hasComingSoon).toBeTruthy();
+   94 |   });
+   95 |
+   96 |   test('Profile page loads successfully', async ({ page }) => {
+>  97 |     await page.goto('/profile');
+      |                ^ Error: page.goto: net::ERR_SOCKET_NOT_CONNECTED at http://localhost:8080/profile
+   98 |     
+   99 |     await page.waitForLoadState('networkidle');
+  100 |     await page.waitForTimeout(1000); // Give JS routing time
+  101 |     
+  102 |     // Should be on profile page
+  103 |     expect(page.url()).toContain('/profile');
+  104 |     
+  105 |     // Check for specific profile content
+  106 |     const hasProfileHeading = await page.locator('h2:has-text("Your Profile")').count() > 0;
+  107 |     const hasComingSoon = await page.locator('text=Profile management coming soon').count() > 0;
   108 |     
-  109 |     await page.waitForLoadState('networkidle');
-  110 |     
-  111 |     // Should be on notifications page
-  112 |     expect(page.url()).toContain('/notifications');
-  113 |     
-  114 |     // Check for notifications content (even if placeholder)
-  115 |     const hasNotificationsContent = await page.locator('text=/notification/i, text=/alert/i, text=/coming soon/i').count() > 0;
-  116 |     expect(hasNotificationsContent).toBeTruthy();
-  117 |   });
-  118 |
-  119 |   test('Availability page loads successfully', async ({ page }) => {
-  120 |     await page.goto('/availability');
-  121 |     
-  122 |     await page.waitForLoadState('networkidle');
-  123 |     
-  124 |     // Should be on availability page
-  125 |     expect(page.url()).toContain('/availability');
-  126 |     
-  127 |     // Check for availability content (even if placeholder)
-  128 |     const hasAvailabilityContent = await page.locator('text=/availability/i, text=/schedule/i, text=/coming soon/i').count() > 0;
-  129 |     expect(hasAvailabilityContent).toBeTruthy();
-  130 |   });
-  131 |
-  132 |   test('Admin page loads successfully', async ({ page }) => {
-  133 |     await page.goto('/admin');
-  134 |     
-  135 |     await page.waitForLoadState('networkidle');
+  109 |     expect(hasProfileHeading || hasComingSoon).toBeTruthy();
+  110 |   });
+  111 |
+  112 |   test('Notifications page loads successfully', async ({ page }) => {
+  113 |     await page.goto('/notifications');
+  114 |     
+  115 |     await page.waitForLoadState('networkidle');
+  116 |     await page.waitForTimeout(1000); // Give JS routing time
+  117 |     
+  118 |     // Should be on notifications page
+  119 |     expect(page.url()).toContain('/notifications');
+  120 |     
+  121 |     // Check for specific notifications content
+  122 |     const hasNotificationsHeading = await page.locator('h2:has-text("Notifications")').count() > 0;
+  123 |     const hasComingSoon = await page.locator('text=Notification system coming soon').count() > 0;
+  124 |     
+  125 |     expect(hasNotificationsHeading || hasComingSoon).toBeTruthy();
+  126 |   });
+  127 |
+  128 |   test('Availability page loads successfully', async ({ page }) => {
+  129 |     await page.goto('/availability');
+  130 |     
+  131 |     await page.waitForLoadState('networkidle');
+  132 |     await page.waitForTimeout(1000); // Give JS routing time
+  133 |     
+  134 |     // Should be on availability page
+  135 |     expect(page.url()).toContain('/availability');
   136 |     
-  137 |     // Should be on admin page
-  138 |     expect(page.url()).toContain('/admin');
-  139 |     
-  140 |     // Check for admin content (even if placeholder)
-  141 |     const hasAdminContent = await page.locator('text=/admin/i, text=/dashboard/i, text=/coming soon/i').count() > 0;
-  142 |     expect(hasAdminContent).toBeTruthy();
-  143 |   });
-  144 |
-  145 |   test('Connect page loads successfully', async ({ page }) => {
-  146 |     await page.goto('/connect');
-  147 |     
-  148 |     await page.waitForLoadState('networkidle');
+  137 |     // Check for specific availability content
+  138 |     const hasAvailabilityHeading = await page.locator('h2:has-text("Availability Management")').count() > 0;
+  139 |     const hasComingSoon = await page.locator('text=Availability features coming soon').count() > 0;
+  140 |     
+  141 |     expect(hasAvailabilityHeading || hasComingSoon).toBeTruthy();
+  142 |   });
+  143 |
+  144 |   test('Admin page loads successfully', async ({ page }) => {
+  145 |     await page.goto('/admin');
+  146 |     
+  147 |     await page.waitForLoadState('networkidle');
+  148 |     await page.waitForTimeout(1000); // Give JS routing time
   149 |     
-  150 |     // Should be on connect page
-  151 |     expect(page.url()).toContain('/connect');
+  150 |     // Should be on admin page
+  151 |     expect(page.url()).toContain('/admin');
   152 |     
-  153 |     // Check for connect content (even if placeholder)
-  154 |     const hasConnectContent = await page.locator('text=/connect/i, text=/network/i, text=/coming soon/i').count() > 0;
-  155 |     expect(hasConnectContent).toBeTruthy();
-  156 |   });
-  157 | });
+  153 |     // Check for specific admin content
+  154 |     const hasAdminHeading = await page.locator('h2:has-text("Admin Dashboard")').count() > 0;
+  155 |     const hasComingSoon = await page.locator('text=Admin features coming soon').count() > 0;
+  156 |     
+  157 |     expect(hasAdminHeading || hasComingSoon).toBeTruthy();
+  158 |   });
+  159 |
+  160 |   test('Connect page loads successfully', async ({ page }) => {
+  161 |     await page.goto('/connect');
+  162 |     
+  163 |     await page.waitForLoadState('networkidle');
+  164 |     await page.waitForTimeout(1000); // Give JS routing time
+  165 |     
+  166 |     // Should be on connect page
+  167 |     expect(page.url()).toContain('/connect');
+  168 |     
+  169 |     // Check for specific connect content
+  170 |     const hasConnectHeading = await page.locator('h2:has-text("Lo.Co Connect")').count() > 0;
+  171 |     const hasComingSoon = await page.locator('text=Connect features coming soon').count() > 0;
+  172 |     
+  173 |     expect(hasConnectHeading || hasComingSoon).toBeTruthy();
+  174 |   });
+  175 | });
 ```

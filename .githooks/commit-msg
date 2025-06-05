@@ -1,0 +1,48 @@
+#!/bin/bash
+# Commit message validation hook
+
+set -e
+
+# Get the commit message
+COMMIT_MSG_FILE=$1
+COMMIT_MSG=$(cat "$COMMIT_MSG_FILE")
+
+# Conventional commit pattern
+# type(scope): description
+# 
+# Types: feat, fix, docs, style, refactor, test, chore, perf, ci, build
+PATTERN="^(feat|fix|docs|style|refactor|test|chore|perf|ci|build)(\([a-z]+\))?: .{1,72}$"
+
+# Check first line
+FIRST_LINE=$(echo "$COMMIT_MSG" | head -n1)
+
+if ! echo "$FIRST_LINE" | grep -qE "$PATTERN"; then
+    echo "❌ Invalid commit message format!"
+    echo ""
+    echo "Expected format: type(scope): description"
+    echo "Example: feat(auth): add JWT token validation"
+    echo ""
+    echo "Valid types:"
+    echo "  feat     - New feature"
+    echo "  fix      - Bug fix"
+    echo "  docs     - Documentation changes"
+    echo "  style    - Code style changes (formatting, etc)"
+    echo "  refactor - Code refactoring"
+    echo "  test     - Test additions or changes"
+    echo "  chore    - Maintenance tasks"
+    echo "  perf     - Performance improvements"
+    echo "  ci       - CI/CD changes"
+    echo "  build    - Build system changes"
+    echo ""
+    echo "Your message: $FIRST_LINE"
+    exit 1
+fi
+
+# Check message length
+if [ ${#FIRST_LINE} -gt 72 ]; then
+    echo "❌ Commit message too long (${#FIRST_LINE} > 72 characters)"
+    echo "Keep the first line under 72 characters"
+    exit 1
+fi
+
+echo "✅ Commit message validated"
