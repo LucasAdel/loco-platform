@@ -34,13 +34,14 @@ use tokio::signal;
 
 use crate::{
     config::Config,
-    handlers::{jobs, health, users, auth},
+    handlers::{jobs, health, users, auth, local_auth, websocket, search, root as handlers},
 };
 
 #[derive(Clone)]
 pub struct AppState {
     pub config: Config,
     pub db: DatabaseConnection,
+    pub demo_mode: bool,
 }
 
 #[tokio::main]
@@ -66,7 +67,7 @@ async fn main() -> anyhow::Result<()> {
     match if true { Err(anyhow::anyhow!("Forced demo mode")) } else { database::setup_database().await } {
         Ok(db) => {
             tracing::info!("🚀 Starting Loco Platform server with full database support");
-            let state = AppState { config: config.clone(), db };
+            let state = AppState { config: config.clone(), db, demo_mode: false };
             
             // Build middleware stack (simplified for now)
             let middleware_stack = ServiceBuilder::new()
@@ -95,6 +96,9 @@ async fn main() -> anyhow::Result<()> {
                 // User routes  
                 .route("/api/users/:id", get(users::get_user).put(users::update_user).delete(users::delete_user))
                 
+                // WebSocket routes
+                .route("/ws", get(websocket::websocket_handler))
+                
                 // Apply middleware stack
                 .layer(middleware_stack)
                 .with_state(state);
@@ -106,23 +110,32 @@ async fn main() -> anyhow::Result<()> {
             tracing::warn!("⚠️ Database connection failed: {}", e);
             tracing::info!("🚀 Starting Loco Platform server in DEMO MODE (no database)");
             
-            // Demo mode - create a simple state without database
-            #[derive(Clone)]
-            struct DemoState {
-                config: Config,
-            }
+            // Demo mode - create state with mock database connection
+            let state = AppState { 
+                config: config.clone(), 
+                db: DatabaseConnection::default(), // Mock connection
+                demo_mode: true 
+            };
             
-            let demo_state = DemoState { config };
-            
-            // Build demo application with limited routes
+            // Build demo application with full routes but demo data
             let app = Router::new()
-                .route("/", get(demo_root))
-                .route("/health", get(demo_health))
-                .route("/api/jobs", get(demo_jobs))
+                .route("/", get(handlers::root))
+                .route("/health", get(health::health_check))
+                .route("/health/detailed", get(health::health_detailed))
+                .route("/health/ready", get(health::readiness_check))
+                .route("/health/live", get(health::liveness_check))
+                
+                // API routes
+                .nest("/api/v1", api_v1_routes())
+                .nest("/api", legacy_routes())
+                
+                // WebSocket endpoint
+                .route("/ws", get(websocket::websocket_handler))
+                
                 .layer(CorsLayer::permissive())
-                .with_state(demo_state);
+                .with_state(state);
 
-            let addr = SocketAddr::from(([0, 0, 0, 0], 3000));
+            let addr = SocketAddr::from(([0, 0, 0, 0], 3070));
             tracing::info!("🚀 Loco Platform backend (DEMO MODE) listening on {}", addr);
             
             let listener = tokio::net::TcpListener::bind(addr).await?;
@@ -175,9 +188,10 @@ fn create_cors_layer() -> CorsLayer {
             axum::http::header::USER_AGENT,
         ])
         // Australian domains and localhost for development
-        .allow_origin("http://localhost:3000".parse::<HeaderValue>().unwrap())
-        .allow_origin("http://localhost:3001".parse::<HeaderValue>().unwrap())
-        .allow_origin("http://127.0.0.1:3000".parse::<HeaderValue>().unwrap())
+        .allow_origin("http://localhost:3070".parse::<HeaderValue>().unwrap())
+        .allow_origin("http://localhost:3080".parse::<HeaderValue>().unwrap())
+        .allow_origin("http://127.0.0.1:3070".parse::<HeaderValue>().unwrap())
+        .allow_origin("http://127.0.0.1:3080".parse::<HeaderValue>().unwrap())
         .allow_origin("https://locoplatform.com.au".parse::<HeaderValue>().unwrap())
         .allow_origin("https://www.locoplatform.com.au".parse::<HeaderValue>().unwrap())
         .allow_origin("https://api.locoplatform.com.au".parse::<HeaderValue>().unwrap())
@@ -188,26 +202,59 @@ fn create_cors_layer() -> CorsLayer {
 /// Create API v1 routes with versioning
 fn api_v1_routes() -> Router<AppState> {
     Router::new()
-        // Job management routes
-        .route("/jobs", get(jobs::list_jobs).post(jobs::create_job))
-        .route("/jobs/search", post(jobs::search_jobs))
-        .route("/jobs/:id", get(jobs::get_job).put(jobs::update_job).delete(jobs::delete_job))
+        // Public routes (no authentication required)
+        .route("/auth/login", post(auth::login))
+        .route("/auth/register", post(auth::register))
+        .route("/auth/logout", post(auth::logout))
+        .route("/auth/forgot-password", post(auth::forgot_password))
+        .route("/auth/verify-otp", post(auth::verify_otp))
+        .route("/auth/oauth/:provider", get(auth::oauth_signin))
         
-        // User management routes
+        // Local auth routes (JWT-based, no Supabase)
+        .route("/auth/local/login", post(local_auth::local_login))
+        .route("/auth/local/register", post(local_auth::local_register))
+        .route("/auth/local/logout", post(local_auth::local_logout))
+        .route("/auth/local/verify", get(local_auth::verify_token))
+        .route("/auth/local/refresh", post(local_auth::refresh_token))
+        .route("/jobs", get(jobs::list_jobs)) // Public job listing
+        .route("/jobs/search", post(jobs::search_jobs)) // Public job search
+        .route("/jobs/:id", get(jobs::get_job)) // Public job details
+        
+        // Advanced search routes
+        .route("/search/advanced", post(search::advanced_search))
+        .route("/search/quick", get(search::quick_search))
+        .route("/search/suggestions", get(search::search_suggestions))
+        .route("/search/trending", get(search::trending_searches))
+        .route("/search/recommendations", get(search::job_recommendations))
+        
+        // Protected routes (require authentication)
+        .route("/jobs", post(jobs::create_job))
+        .route("/jobs/:id", put(jobs::update_job).delete(jobs::delete_job))
+        
+        // User management routes (protected)
         .route("/users/:id", get(users::get_user).put(users::update_user).delete(users::delete_user))
         
         // Authentication routes
-        .route("/auth/login", post(auth::login))
-        .route("/auth/register", post(auth::register))
         .route("/auth/refresh", post(auth::refresh_token))
-        .route("/auth/logout", post(auth::logout))
         
-        // Profile routes
+        // Profile routes (protected)
         .route("/profile", get(auth::get_profile).put(auth::update_profile))
         
-        // Application routes
+        // Application routes (protected)
         .route("/applications", get(placeholder_handler).post(placeholder_handler))
         .route("/applications/:id", get(placeholder_handler).put(placeholder_handler).delete(placeholder_handler))
+        
+        // Protected search routes
+        .route("/search/saved", get(search::get_saved_searches))
+        .route("/search/save", post(search::save_search))
+}
+
+/// Legacy API routes (backward compatibility)
+fn legacy_routes() -> Router<AppState> {
+    Router::new()
+        .route("/jobs", get(jobs::list_jobs))
+        .route("/jobs/:id", get(jobs::get_job))
+        .route("/users/:id", get(users::get_user))
 }
 
 /// Placeholder handler for routes not yet implemented

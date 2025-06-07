@@ -1,6 +1,7 @@
 use leptos::*;
 use wasm_bindgen::{JsCast, closure::Closure};
 use web_sys::HtmlElement;
+use std::rc::Rc;
 
 /// Modal size variants
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -29,7 +30,7 @@ pub fn Modal(
     show: ReadSignal<bool>,
     
     /// Callback to close the modal
-    on_close: impl Fn() + 'static,
+    on_close: Box<dyn Fn()>,
     
     /// Modal title
     #[prop(optional)]
@@ -189,43 +190,47 @@ pub fn ConfirmModal(
     show: ReadSignal<bool>,
     
     /// Modal title
-    #[prop(default = "Confirm Action")]
-    title: &'static str,
+    #[prop(optional)]
+    title: Option<&'static str>,
     
     /// Confirmation message
     message: &'static str,
     
     /// Confirm button text
-    #[prop(default = "Confirm")]
+    #[prop(optional)]
     confirm_text: &'static str,
     
     /// Cancel button text
-    #[prop(default = "Cancel")]
-    cancel_text: &'static str,
+    #[prop(optional)]
+    cancel_text: Option<&'static str>,
     
     /// Whether the action is dangerous (changes button color)
-    #[prop(default = false)]
+    #[prop(optional)]
     is_dangerous: bool,
     
     /// Callback when confirmed
-    on_confirm: impl Fn() + 'static + Clone,
+    on_confirm: Rc<dyn Fn()>,
     
     /// Callback when cancelled
-    on_cancel: impl Fn() + 'static + Clone,
+    on_cancel: Rc<dyn Fn()>,
 ) -> impl IntoView {
-    let on_confirm = on_confirm.clone();
-    let on_cancel = on_cancel.clone();
+    let on_confirm_clone = on_confirm.clone();
+    let on_cancel_clone = on_cancel.clone();
+    
+    let title_text = title.unwrap_or("Confirm Action");
+    let confirm_text = confirm_text.unwrap_or("Confirm");
+    let cancel_text = cancel_text.unwrap_or("Cancel");
     
     let footer = view! {
         <div class="flex justify-end gap-3">
             <button
-                on:click=move |_| on_cancel()
+                on:click=move |_| on_cancel_clone()
                 class="px-4 py-2 text-sm font-medium text-secondary bg-secondary hover:bg-tertiary rounded-lg transition-base"
             >
                 {cancel_text}
             </button>
             <button
-                on:click=move |_| on_confirm()
+                on:click=move |_| on_confirm_clone()
                 class=format!(
                     "px-4 py-2 text-sm font-medium text-white rounded-lg transition-base {}",
                     if is_dangerous {
@@ -243,8 +248,8 @@ pub fn ConfirmModal(
     view! {
         <Modal
             show=show
-            on_close=on_cancel
-            title=Some(title)
+            on_close=Box::new(move || on_cancel())
+            title=Some(title_text)
             size=ModalSize::Small
             footer=Some(footer.into_view())
         >
@@ -260,7 +265,7 @@ pub fn AlertModal(
     show: ReadSignal<bool>,
     
     /// Callback to close the modal
-    on_close: impl Fn() + 'static + Clone,
+    on_close: Rc<dyn Fn()>,
     
     /// Alert type
     #[prop(default = AlertType::Info)]

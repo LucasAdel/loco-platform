@@ -43,16 +43,16 @@ check_port() {
 cleanup_ports() {
     print_status "Cleaning up existing processes..."
     
-    # Kill processes on frontend port (3001)
-    if check_port 3001; then
-        print_warning "Killing existing process on port 3001"
-        lsof -ti:3001 | xargs kill -9 2>/dev/null || true
+    # Kill processes on frontend port (3080)
+    if check_port 3080; then
+        print_warning "Killing existing process on port 3080"
+        lsof -ti:3080 | xargs kill -9 2>/dev/null || true
     fi
     
-    # Kill processes on backend port (3000)
-    if check_port 3000; then
-        print_warning "Killing existing process on port 3000"
-        lsof -ti:3000 | xargs kill -9 2>/dev/null || true
+    # Kill processes on backend port (3070)
+    if check_port 3070; then
+        print_warning "Killing existing process on port 3070"
+        lsof -ti:3070 | xargs kill -9 2>/dev/null || true
     fi
     
     sleep 2
@@ -75,7 +75,7 @@ start_backend() {
     echo $BACKEND_PID > ../backend.pid
     
     cd ..
-    print_success "Backend server starting on http://localhost:3000 (PID: $BACKEND_PID)"
+    print_success "Backend server starting on http://localhost:3070 (PID: $BACKEND_PID)"
 }
 
 # Function to start frontend server
@@ -83,20 +83,41 @@ start_frontend() {
     print_status "Starting frontend server (Leptos)..."
     cd app
     
-    # Check if cargo-leptos is available
-    if ! command -v cargo-leptos &> /dev/null; then
-        print_error "Cargo Leptos not found. Installing..."
-        cargo install cargo-leptos
+    # Check if trunk is available, otherwise install it
+    if ! command -v trunk &> /dev/null; then
+        print_warning "Trunk not found. Installing trunk for WASM development..."
+        cargo install trunk
+        if [ $? -ne 0 ]; then
+            print_error "Failed to install trunk. Trying alternative method..."
+            # Alternative: use wasm-pack
+            cargo install wasm-pack
+        fi
     fi
     
-    # Start frontend with Leptos
-    print_status "Building and serving Leptos frontend..."
-    cargo leptos serve --hot-reload --port 3001 > ../frontend.log 2>&1 &
-    FRONTEND_PID=$!
-    echo $FRONTEND_PID > ../frontend.pid
+    # Start frontend with trunk (preferred) or fallback to cargo
+    if command -v trunk &> /dev/null; then
+        print_status "Building and serving Leptos frontend with trunk..."
+        trunk serve --port 3080 > ../frontend.log 2>&1 &
+        FRONTEND_PID=$!
+    else
+        print_status "Building Leptos frontend with cargo..."
+        # Build WASM target directly
+        wasm-pack build --target web --out-dir pkg --dev
+        # Use Python simple server or Node.js to serve
+        if command -v python3 &> /dev/null; then
+            cd pkg
+            python3 -m http.server 3080 > ../../frontend.log 2>&1 &
+            FRONTEND_PID=$!
+            cd ..
+        else
+            print_error "No suitable web server found. Please install Python 3."
+            exit 1
+        fi
+    fi
     
+    echo $FRONTEND_PID > ../frontend.pid
     cd ..
-    print_success "Frontend server starting on http://localhost:3001 (PID: $FRONTEND_PID)"
+    print_success "Frontend server starting on http://localhost:3080 (PID: $FRONTEND_PID)"
 }
 
 # Function to wait for servers to be ready
@@ -106,7 +127,7 @@ wait_for_servers() {
     # Wait for backend (max 30 seconds)
     backend_ready=false
     for i in {1..30}; do
-        if check_port 3000; then
+        if check_port 3070; then
             backend_ready=true
             break
         fi
@@ -116,7 +137,7 @@ wait_for_servers() {
     # Wait for frontend (max 60 seconds - compilation takes time)
     frontend_ready=false
     for i in {1..60}; do
-        if check_port 3001; then
+        if check_port 3080; then
             frontend_ready=true
             break
         fi
@@ -125,23 +146,23 @@ wait_for_servers() {
     
     # Report status
     if $backend_ready; then
-        print_success "Backend server is ready on http://localhost:3000"
+        print_success "Backend server is ready on http://localhost:3070"
     else
         print_warning "Backend server may still be starting. Check backend.log for details."
     fi
     
     if $frontend_ready; then
-        print_success "Frontend server is ready on http://localhost:3001"
+        print_success "Frontend server is ready on http://localhost:3080"
         print_status "Opening browser..."
         # Open browser based on OS
         case "$(uname -s)" in
-            Darwin)  open "http://localhost:3001" ;;
-            Linux)   xdg-open "http://localhost:3001" ;;
-            CYGWIN*|MINGW*) start "http://localhost:3001" ;;
+            Darwin)  open "http://localhost:3080" ;;
+            Linux)   xdg-open "http://localhost:3080" ;;
+            CYGWIN*|MINGW*) start "http://localhost:3080" ;;
         esac
     else
         print_warning "Frontend server may still be compiling. Check frontend.log for details."
-        print_status "You can manually open http://localhost:3001 when ready."
+        print_status "You can manually open http://localhost:3080 when ready."
     fi
 }
 
@@ -150,14 +171,14 @@ show_status() {
     echo
     print_status "Server Status:"
     
-    if check_port 3000; then
-        echo -e "  Backend:  ${GREEN}✓ Running${NC} on http://localhost:3000"
+    if check_port 3070; then
+        echo -e "  Backend:  ${GREEN}✓ Running${NC} on http://localhost:3070"
     else
         echo -e "  Backend:  ${RED}✗ Not running${NC}"
     fi
     
-    if check_port 3001; then
-        echo -e "  Frontend: ${GREEN}✓ Running${NC} on http://localhost:3001"
+    if check_port 3080; then
+        echo -e "  Frontend: ${GREEN}✓ Running${NC} on http://localhost:3080"
     else
         echo -e "  Frontend: ${RED}✗ Not running${NC}"
     fi
@@ -306,8 +327,8 @@ show_help() {
     echo "  $0 logs frontend      # Show frontend logs"
     echo
     echo "Servers:"
-    echo "  Backend:  http://localhost:3000 (Axum/Rust)"
-    echo "  Frontend: http://localhost:3001 (Leptos/WASM)"
+    echo "  Backend:  http://localhost:3070 (Axum/Rust)"
+    echo "  Frontend: http://localhost:3080 (Leptos/WASM)"
 }
 
 # Main script logic

@@ -1,0 +1,90 @@
+# Test configuration for Loco Platform
+[test]
+# Server URLs
+base_url = "http://localhost:3080"
+api_url = "http://localhost:3070"
+webdriver_url = "http://localhost:4444"
+
+# Timeouts (in seconds)
+timeout = 30
+page_load_timeout = 10
+element_wait_timeout = 5
+
+# Browser settings
+headless = true
+window_width = 1920
+window_height = 1080
+
+# Test data
+use_mock_data = true
+create_test_users = false
+
+# Logging
+log_level = "info"
+save_screenshots = true
+screenshot_dir = "target/screenshots"
+
+# WebDriver settings
+[webdriver]
+# Selenium Grid URL (if using remote WebDriver)
+grid_url = "http://localhost:4444"
+
+# Browser capabilities
+[webdriver.chrome]
+args = [
+    "--no-sandbox",
+    "--disable-dev-shm-usage", 
+    "--disable-gpu",
+    "--window-size=1920,1080"
+]
+
+[webdriver.firefox]
+args = [
+    "--width=1920",
+    "--height=1080"
+]
+
+# Test environment settings
+[environment]
+# Override default ports for testing
+frontend_port = 3080
+backend_port = 3070
+
+# Database settings for integration tests
+[database]
+use_test_db = true
+test_db_url = "postgresql://localhost/loco_platform_test"
+
+# API testing
+[api]
+# Mock external services during tests
+mock_external_apis = true
+api_timeout = 10
+
+# Rate limiting for load tests
+max_requests_per_second = 100
+
+# WebSocket testing
+[websocket]
+enabled = true
+connection_timeout = 5
+message_timeout = 2
+
+# Performance testing thresholds
+[performance]
+max_page_load_time = 3.0  # seconds
+max_api_response_time = 1.0  # seconds
+max_memory_usage = 100  # MB
+
+# Accessibility testing
+[accessibility]
+enabled = true
+wcag_level = "AA"
+check_color_contrast = true
+check_keyboard_navigation = true
+
+# Visual regression testing
+[visual]
+enabled = false
+threshold = 0.1  # 10% difference threshold
+baseline_dir = "tests/visual-baselines"

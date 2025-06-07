@@ -1,0 +1,56 @@
+[package]
+name = "loco-platform-tests"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# Workspace dependencies
+shared = { path = "../shared" }
+tokio = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+uuid = { workspace = true }
+anyhow = { workspace = true }
+chrono = { workspace = true }
+
+# Testing-specific dependencies
+fantoccini = { workspace = true }
+wasm-bindgen-test = { workspace = true }
+tokio-test = { workspace = true }
+futures = { workspace = true }
+
+# HTTP client for API testing
+reqwest = { workspace = true }
+
+# Additional testing utilities
+rand = { workspace = true }
+tempfile = "3.10"
+pretty_assertions = "1.4"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[[test]]
+name = "integration_tests"
+path = "tests/integration_tests.rs"
+
+[[test]]
+name = "e2e_tests"
+path = "tests/e2e_tests.rs"
+
+[[test]]
+name = "wasm_tests"
+path = "tests/wasm_tests.rs"
+
+[dev-dependencies]
+wasm-bindgen-test = { workspace = true }
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+wasm-bindgen = { workspace = true }
+web-sys = { workspace = true }
+js-sys = { workspace = true }
+console_error_panic_hook = { workspace = true }
+getrandom = { workspace = true }
+
+[target.'cfg(target_arch = "wasm32")'.dev-dependencies]
+wasm-bindgen-test = { workspace = true }

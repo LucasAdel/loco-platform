@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loco Platform - My Profile</title>
+    <link rel="stylesheet" href="modern-design-system.css">
+    <link rel="stylesheet" href="soft-corners-fix.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="responsive-fix.css">
+    <style>
+        .glass {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        @media (max-width: 768px) {
+            .mobile-nav { display: none; }
+            .mobile-menu-btn { display: block; }
+            .mobile-menu.active { display: block; }
+            .profile-grid { grid-template-columns: 1fr; }
+            .tab-nav { flex-wrap: wrap; }
+            .tab-button { flex: 1; min-width: 120px; }
+        }
+        @media (min-width: 769px) {
+            .mobile-menu { display: none !important; }
+            .mobile-menu-btn { display: none; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white shadow-sm glass">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <h1 class="text-2xl font-bold text-gray-900">Loco Platform</h1>
+                </div>
+                <nav class="mobile-nav flex space-x-8 items-center">
+                    <a href="dashboard.html" class="text-gray-700 hover:text-blue-600">Dashboard</a>
+                    <a href="jobs.html" class="text-gray-700 hover:text-blue-600">Jobs</a>
+                    <a href="map.html" class="text-gray-700 hover:text-blue-600">Map</a>
+                    <a href="profile.html" class="text-blue-600 font-medium">Profile</a>
+                    <a href="admin.html" class="text-gray-700 hover:text-blue-600 protected-content" style="display:none;">Admin</a>
+                    
+                    <!-- Authentication Links -->
+                    <span class="user-info text-gray-700 text-sm" style="display:none;"></span>
+                    <a href="login.html" class="auth-login text-gray-700 hover:text-blue-600">Login</a>
+                    <button onclick="handleLogout()" class="auth-logout text-gray-700 hover:text-blue-600" style="display:none;">Logout</button>
+                </nav>
+                <button class="mobile-menu-btn md:hidden" onclick="toggleMobileMenu()">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="mobile-menu hidden bg-white shadow-lg md:hidden">
+        <div class="px-4 py-2 space-y-2">
+            <a href="dashboard.html" class="block py-2 text-gray-700">Dashboard</a>
+            <a href="jobs.html" class="block py-2 text-gray-700">Jobs</a>
+            <a href="map.html" class="block py-2 text-gray-700">Map</a>
+            <a href="profile.html" class="block py-2 text-blue-600 font-medium">Profile</a>
+            <a href="admin.html" class="block py-2 text-gray-700">Admin</a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="profile-grid grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Left Sidebar - Profile Overview -->
+            <div class="lg:col-span-1">
+                <div class="bg-white rounded-lg shadow p-6 glass">
+                    <div class="text-center">
+                        <!-- Profile Picture -->
+                        <div class="relative inline-block">
+                            <img 
+                                id="profile-picture" 
+                                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 150 150'%3E%3Crect width='150' height='150' fill='%23e0e0e0'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23999' font-family='Arial' font-size='16'%3EProfile%3C/text%3E%3C/svg%3E" 
+                                alt="Profile Picture" 
+                                class="w-32 h-32 rounded-full object-cover border-4 border-white shadow-lg"
+                            >
+                            <button onclick="uploadProfilePicture()" class="absolute bottom-0 right-0 bg-blue-600 text-white rounded-full p-2 hover:bg-blue-700 transition-colors">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                </svg>
+                            </button>
+                        </div>
+                        
+                        <h2 class="mt-4 text-2xl font-bold text-gray-900" id="profile-name">Dr. Sarah Johnson</h2>
+                        <p class="text-gray-600" id="profile-title">Senior Pharmacist</p>
+                        <p class="text-sm text-gray-500 mt-1" id="profile-location">Sydney, NSW</p>
+                        
+                        <!-- Stats -->
+                        <div class="grid grid-cols-3 gap-4 mt-6 pt-6 border-t">
+                            <div class="text-center">
+                                <p class="text-2xl font-bold text-blue-600">12</p>
+                                <p class="text-xs text-gray-500">Applications</p>
+                            </div>
+                            <div class="text-center">
+                                <p class="text-2xl font-bold text-green-600">3</p>
+                                <p class="text-xs text-gray-500">Interviews</p>
+                            </div>
+                            <div class="text-center">
+                                <p class="text-2xl font-bold text-purple-600">85%</p>
+                                <p class="text-xs text-gray-500">Profile</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="mt-6 bg-white rounded-lg shadow p-6 glass">
+                    <h3 class="text-lg font-semibold mb-4">Quick Actions</h3>
+                    <div class="space-y-3">
+                        <button onclick="downloadResume()" class="w-full flex items-center px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+                            <svg class="w-4 h-4 mr-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                            Download Resume
+                        </button>
+                        <button onclick="viewApplications()" class="w-full flex items-center px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+                            <svg class="w-4 h-4 mr-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                            </svg>
+                            View Applications
+                        </button>
+                        <button onclick="window.location.href='jobs.html'" class="w-full flex items-center px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+                            <svg class="w-4 h-4 mr-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                            Browse Jobs
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content Area -->
+            <div class="lg:col-span-2">
+                <!-- Profile Tabs -->
+                <div class="bg-white rounded-lg shadow glass">
+                    <div class="border-b border-gray-200">
+                        <nav class="tab-nav flex">
+                            <button onclick="showTab('personal')" class="tab-button active px-6 py-4 text-sm font-medium border-b-2 border-blue-600 text-blue-600">
+                                Personal Information
+                            </button>
+                            <button onclick="showTab('professional')" class="tab-button px-6 py-4 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700">
+                                Professional Details
+                            </button>
+                            <button onclick="showTab('preferences')" class="tab-button px-6 py-4 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700">
+                                Job Preferences
+                            </button>
+                            <button onclick="showTab('documents')" class="tab-button px-6 py-4 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700">
+                                Documents
+                            </button>
+                        </nav>
+                    </div>
+
+                    <!-- Tab Content -->
+                    <div class="p-6">
+                        <!-- Personal Information Tab -->
+                        <div id="personal-tab" class="tab-content">
+                            <form id="personal-form" onsubmit="savePersonalInfo(event)">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">First Name</label>
+                                        <input type="text" name="firstName" value="Sarah" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
+                                        <input type="text" name="lastName" value="Johnson" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                                        <input type="email" name="email" value="sarah.johnson@email.com" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Phone</label>
+                                        <input type="tel" name="phone" value="+61 400 123 456" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    </div>
+                                    <div class="md:col-span-2">
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Address</label>
+                                        <textarea name="address" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">123 Pharmacy Street
+Sydney NSW 2000</textarea>
+                                    </div>
+                                </div>
+                                <div class="mt-6">
+                                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">
+                                        Save Changes
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Professional Details Tab -->
+                        <div id="professional-tab" class="tab-content hidden">
+                            <form id="professional-form" onsubmit="saveProfessionalInfo(event)">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Registration Number</label>
+                                        <input type="text" name="registrationNumber" value="PHM12345" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Years of Experience</label>
+                                        <select name="experience" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                            <option value="1-2">1-2 years</option>
+                                            <option value="3-5">3-5 years</option>
+                                            <option value="6-10" selected>6-10 years</option>
+                                            <option value="10+">10+ years</option>
+                                        </select>
+                                    </div>
+                                    <div class="md:col-span-2">
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Specializations</label>
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                                            <label class="flex items-center">
+                                                <input type="checkbox" checked class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                                <span class="ml-2 text-sm">Clinical Pharmacy</span>
+                                            </label>
+                                            <label class="flex items-center">
+                                                <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                                <span class="ml-2 text-sm">Hospital Pharmacy</span>
+                                            </label>
+                                            <label class="flex items-center">
+                                                <input type="checkbox" checked class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                                <span class="ml-2 text-sm">Community Pharmacy</span>
+                                            </label>
+                                            <label class="flex items-center">
+                                                <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                                <span class="ml-2 text-sm">Industrial Pharmacy</span>
+                                            </label>
+                                            <label class="flex items-center">
+                                                <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                                <span class="ml-2 text-sm">Regulatory Affairs</span>
+                                            </label>
+                                            <label class="flex items-center">
+                                                <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                                <span class="ml-2 text-sm">Research</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="md:col-span-2">
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Bio/Summary</label>
+                                        <textarea name="bio" rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">Experienced pharmacist with over 8 years in community and clinical settings. Specialized in medication management and patient counseling. Passionate about improving patient outcomes through evidence-based pharmaceutical care.</textarea>
+                                    </div>
+                                </div>
+                                <div class="mt-6">
+                                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">
+                                        Save Changes
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Job Preferences Tab -->
+                        <div id="preferences-tab" class="tab-content hidden">
+                            <form id="preferences-form" onsubmit="savePreferences(event)">
+                                <div class="space-y-6">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Preferred Job Types</label>
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                            <label class="flex items-center">
+                                                <input type="checkbox" checked class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                                <span class="ml-2 text-sm">Full-time</span>
+                                            </label>
+                                            <label class="flex items-center">
+                                                <input type="checkbox" checked class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                                <span class="ml-2 text-sm">Part-time</span>
+                                            </label>
+                                            <label class="flex items-center">
+                                                <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                                <span class="ml-2 text-sm">Contract</span>
+                                            </label>
+                                            <label class="flex items-center">
+                                                <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                                <span class="ml-2 text-sm">Casual</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Preferred Locations</label>
+                                        <input type="text" name="preferredLocations" value="Sydney, Melbourne" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter cities or regions">
+                                    </div>
+                                    
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-2">Minimum Salary (AUD)</label>
+                                            <input type="number" name="minSalary" value="90000" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-2">Maximum Commute (km)</label>
+                                            <input type="number" name="maxCommute" value="25" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        </div>
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="flex items-center">
+                                            <input type="checkbox" checked class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                            <span class="ml-2 text-sm">Receive email alerts for matching jobs</span>
+                                        </label>
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="flex items-center">
+                                            <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                            <span class="ml-2 text-sm">Open to remote work opportunities</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-6">
+                                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">
+                                        Save Preferences
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Documents Tab -->
+                        <div id="documents-tab" class="tab-content hidden">
+                            <div class="space-y-6">
+                                <div>
+                                    <h3 class="text-lg font-medium text-gray-900 mb-4">Upload Documents</h3>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors cursor-pointer" onclick="document.getElementById('resume-upload').click()">
+                                            <input type="file" id="resume-upload" class="hidden" accept=".pdf,.doc,.docx" onchange="handleFileUpload(event, 'resume')">
+                                            <svg class="w-12 h-12 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                            </svg>
+                                            <p class="text-sm text-gray-600">Upload Resume/CV</p>
+                                            <p class="text-xs text-gray-400">PDF, DOC, DOCX up to 10MB</p>
+                                        </div>
+                                        
+                                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors cursor-pointer" onclick="document.getElementById('cover-letter-upload').click()">
+                                            <input type="file" id="cover-letter-upload" class="hidden" accept=".pdf,.doc,.docx" onchange="handleFileUpload(event, 'cover-letter')">
+                                            <svg class="w-12 h-12 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                                            </svg>
+                                            <p class="text-sm text-gray-600">Upload Cover Letter</p>
+                                            <p class="text-xs text-gray-400">PDF, DOC, DOCX up to 10MB</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Uploaded Documents -->
+                                <div>
+                                    <h3 class="text-lg font-medium text-gray-900 mb-4">Your Documents</h3>
+                                    <div class="space-y-3">
+                                        <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                                            <div class="flex items-center">
+                                                <svg class="w-8 h-8 text-red-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                                </svg>
+                                                <div>
+                                                    <p class="font-medium text-gray-900">Sarah_Johnson_Resume.pdf</p>
+                                                    <p class="text-sm text-gray-500">Uploaded 2 days ago • 1.2 MB</p>
+                                                </div>
+                                            </div>
+                                            <div class="flex space-x-2">
+                                                <button class="text-blue-600 hover:text-blue-800 text-sm">Download</button>
+                                                <button class="text-red-600 hover:text-red-800 text-sm">Delete</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Success/Error Messages -->
+    <div id="message" class="fixed top-4 right-4 hidden">
+        <div class="bg-white rounded-lg shadow-lg p-4 max-w-sm">
+            <p id="message-text" class="text-sm"></p>
+        </div>
+    </div>
+
+    <!-- Supabase Client -->
+    <script src="js/supabase-client.js"></script>
+    
+    <script>
+        // Initialize page with auth check
+        document.addEventListener('DOMContentLoaded', () => {
+            onSupabaseReady(async () => {
+                // Check if user is authenticated
+                const isAuth = await SupabaseUtils.requireAuth();
+                if (isAuth) {
+                    await loadUserProfile();
+                }
+            });
+        });
+
+        // Load user profile data
+        async function loadUserProfile() {
+            try {
+                const user = await SupabaseAuth.getCurrentUser();
+                if (user) {
+                    // Update profile information from user metadata
+                    const metadata = user.user_metadata || {};
+                    
+                    // Update form fields with user data
+                    if (metadata.firstName) {
+                        document.querySelector('input[name="firstName"]').value = metadata.firstName;
+                    }
+                    if (metadata.lastName) {
+                        document.querySelector('input[name="lastName"]').value = metadata.lastName;
+                    }
+                    if (user.email) {
+                        document.querySelector('input[name="email"]').value = user.email;
+                    }
+                    if (metadata.phone) {
+                        document.querySelector('input[name="phone"]').value = metadata.phone;
+                    }
+                    
+                    // Update profile display
+                    const profileName = document.getElementById('profile-name');
+                    if (profileName && metadata.firstName && metadata.lastName) {
+                        profileName.textContent = `${metadata.firstName} ${metadata.lastName}`;
+                    }
+                    
+                    SupabaseUtils.showToast('Profile loaded successfully', 'success');
+                }
+            } catch (error) {
+                console.error('Error loading profile:', error);
+                SupabaseUtils.showToast('Error loading profile data', 'error');
+            }
+        }
+
+        // Handle logout
+        async function handleLogout() {
+            try {
+                const result = await SupabaseAuth.signOut();
+                if (result.success) {
+                    SupabaseUtils.showToast('Logged out successfully!', 'success');
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 1000);
+                } else {
+                    throw new Error(result.error);
+                }
+            } catch (error) {
+                console.error('Logout error:', error);
+                SupabaseUtils.showToast('Error logging out. Please try again.', 'error');
+            }
+        }
+
+        // Tab functionality
+        function showTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.add('hidden');
+            });
+            
+            // Remove active class from all tab buttons
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active', 'border-blue-600', 'text-blue-600');
+                button.classList.add('border-transparent', 'text-gray-500');
+            });
+            
+            // Show selected tab
+            document.getElementById(tabName + '-tab').classList.remove('hidden');
+            
+            // Add active class to clicked button
+            event.target.classList.add('active', 'border-blue-600', 'text-blue-600');
+            event.target.classList.remove('border-transparent', 'text-gray-500');
+        }
+
+        // Form handlers with Supabase integration
+        async function savePersonalInfo(event) {
+            event.preventDefault();
+            
+            const form = event.target;
+            const formData = new FormData(form);
+            
+            try {
+                const result = await SupabaseAuth.updateProfile({
+                    firstName: formData.get('firstName'),
+                    lastName: formData.get('lastName'),
+                    phone: formData.get('phone'),
+                    address: formData.get('address')
+                });
+                
+                if (result.success) {
+                    SupabaseUtils.showToast('Personal information updated successfully!', 'success');
+                } else {
+                    throw new Error(result.error);
+                }
+            } catch (error) {
+                console.error('Error updating profile:', error);
+                SupabaseUtils.showToast('Error updating profile. Please try again.', 'error');
+            }
+        }
+
+        async function saveProfessionalInfo(event) {
+            event.preventDefault();
+            
+            const form = event.target;
+            const formData = new FormData(form);
+            
+            // Get selected specializations
+            const specializations = Array.from(form.querySelectorAll('input[type="checkbox"]:checked'))
+                .map(checkbox => checkbox.nextElementSibling.textContent.trim());
+            
+            try {
+                const result = await SupabaseAuth.updateProfile({
+                    registrationNumber: formData.get('registrationNumber'),
+                    experience: formData.get('experience'),
+                    bio: formData.get('bio'),
+                    specializations: specializations
+                });
+                
+                if (result.success) {
+                    SupabaseUtils.showToast('Professional details updated successfully!', 'success');
+                } else {
+                    throw new Error(result.error);
+                }
+            } catch (error) {
+                console.error('Error updating professional info:', error);
+                SupabaseUtils.showToast('Error updating professional details. Please try again.', 'error');
+            }
+        }
+
+        async function savePreferences(event) {
+            event.preventDefault();
+            
+            const form = event.target;
+            const formData = new FormData(form);
+            
+            // Get selected job types
+            const jobTypes = Array.from(form.querySelectorAll('input[type="checkbox"]:checked'))
+                .map(checkbox => checkbox.nextElementSibling.textContent.trim());
+            
+            try {
+                const result = await SupabaseAuth.updateProfile({
+                    preferredLocations: formData.get('preferredLocations'),
+                    minSalary: formData.get('minSalary'),
+                    maxCommute: formData.get('maxCommute'),
+                    preferredJobTypes: jobTypes,
+                    emailAlerts: form.querySelector('input[type="checkbox"][value="emailAlerts"]')?.checked,
+                    openToRemote: form.querySelector('input[type="checkbox"][value="openToRemote"]')?.checked
+                });
+                
+                if (result.success) {
+                    SupabaseUtils.showToast('Job preferences saved successfully!', 'success');
+                } else {
+                    throw new Error(result.error);
+                }
+            } catch (error) {
+                console.error('Error updating preferences:', error);
+                SupabaseUtils.showToast('Error updating preferences. Please try again.', 'error');
+            }
+        }
+
+        function handleFileUpload(event, type) {
+            const file = event.target.files[0];
+            if (file) {
+                showMessage(`${type.replace('-', ' ')} uploaded successfully!`, 'success');
+            }
+        }
+
+        function uploadProfilePicture() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.onchange = function(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        document.getElementById('profile-picture').src = e.target.result;
+                        showMessage('Profile picture updated!', 'success');
+                    };
+                    reader.readAsDataURL(file);
+                }
+            };
+            input.click();
+        }
+
+        function downloadResume() {
+            showMessage('Resume download started!', 'info');
+            // In production, this would download the actual file
+        }
+
+        function viewApplications() {
+            window.location.href = 'applications.html';
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('active');
+            menu.classList.toggle('hidden');
+        }
+
+        function showMessage(text, type = 'info') {
+            const messageEl = document.getElementById('message');
+            const messageText = document.getElementById('message-text');
+            
+            messageText.textContent = text;
+            messageEl.classList.remove('hidden');
+            
+            // Style based on type
+            const messageBox = messageEl.querySelector('div');
+            messageBox.className = 'bg-white rounded-lg shadow-lg p-4 max-w-sm';
+            
+            if (type === 'error') {
+                messageBox.classList.add('border-l-4', 'border-red-500');
+                messageText.className = 'text-sm text-red-700';
+            } else if (type === 'success') {
+                messageBox.classList.add('border-l-4', 'border-green-500');
+                messageText.className = 'text-sm text-green-700';
+            } else {
+                messageBox.classList.add('border-l-4', 'border-blue-500');
+                messageText.className = 'text-sm text-blue-700';
+            }
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                messageEl.classList.add('hidden');
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

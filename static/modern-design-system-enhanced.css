@@ -1,0 +1,621 @@
+/**
+ * Loco Platform - Enhanced Modern Design System 2025
+ * Improved UI/UX with soft corners and best practices
+ * Focus on accessibility, usability, and visual consistency
+ */
+
+/* Import base modern design system */
+@import url('modern-design-system.css');
+
+/* Enhanced Form Input Styles with Soft Corners */
+.form-input,
+.glass-input,
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="tel"],
+input[type="number"],
+input[type="search"],
+input[type="url"],
+input[type="date"],
+input[type="time"],
+select,
+textarea {
+  /* Soft corners - best practice for modern UI */
+  border-radius: 12px !important;
+  
+  /* Enhanced glass morphism */
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  
+  /* Comfortable padding */
+  padding: 14px 18px;
+  
+  /* Typography */
+  font-family: var(--font-family-sans);
+  font-size: 16px; /* Prevents zoom on mobile */
+  line-height: 1.5;
+  color: white;
+  
+  /* Smooth transitions */
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* Remove default styling */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  
+  /* Full width by default */
+  width: 100%;
+  
+  /* Subtle shadow for depth */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Focus states with better accessibility */
+.form-input:focus,
+.glass-input:focus,
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: rgba(59, 130, 246, 0.6);
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: 
+    0 0 0 3px rgba(59, 130, 246, 0.2),
+    0 4px 16px rgba(59, 130, 246, 0.1);
+  transform: translateY(-1px);
+}
+
+/* Hover states */
+.form-input:hover:not(:focus),
+.glass-input:hover:not(:focus),
+input:hover:not(:focus),
+select:hover:not(:focus),
+textarea:hover:not(:focus) {
+  border-color: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Placeholder styling */
+::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 400;
+}
+
+/* Enhanced Label Styling */
+.form-label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+  letter-spacing: 0.025em;
+}
+
+/* Form Group Container */
+.form-group {
+  margin-bottom: 24px;
+  position: relative;
+}
+
+/* Enhanced Floating Labels */
+.form-floating {
+  position: relative;
+}
+
+.form-floating input,
+.form-floating select,
+.form-floating textarea {
+  padding-top: 24px;
+  padding-bottom: 10px;
+}
+
+.form-floating label {
+  position: absolute;
+  top: 50%;
+  left: 18px;
+  transform: translateY(-50%);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 16px;
+  background: transparent;
+  padding: 0 4px;
+}
+
+.form-floating input:focus ~ label,
+.form-floating input:not(:placeholder-shown) ~ label,
+.form-floating select:focus ~ label,
+.form-floating select:not([value=""]) ~ label,
+.form-floating textarea:focus ~ label,
+.form-floating textarea:not(:placeholder-shown) ~ label {
+  top: 12px;
+  transform: translateY(0);
+  font-size: 12px;
+  color: rgba(59, 130, 246, 0.9);
+  background: linear-gradient(to bottom, transparent 40%, rgba(17, 24, 39, 0.95) 40%);
+}
+
+/* Error States */
+.form-input.error,
+input.error,
+select.error,
+textarea.error {
+  border-color: rgba(239, 68, 68, 0.5);
+  background: rgba(239, 68, 68, 0.05);
+}
+
+.form-input.error:focus,
+input.error:focus,
+select.error:focus,
+textarea.error:focus {
+  border-color: rgba(239, 68, 68, 0.7);
+  box-shadow: 
+    0 0 0 3px rgba(239, 68, 68, 0.2),
+    0 4px 16px rgba(239, 68, 68, 0.1);
+}
+
+.form-error {
+  display: block;
+  margin-top: 6px;
+  font-size: 13px;
+  color: #ef4444;
+  font-weight: 500;
+}
+
+/* Success States */
+.form-input.success,
+input.success,
+select.success,
+textarea.success {
+  border-color: rgba(16, 185, 129, 0.5);
+  background: rgba(16, 185, 129, 0.05);
+}
+
+/* Disabled States */
+.form-input:disabled,
+input:disabled,
+select:disabled,
+textarea:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+/* Enhanced Select Styling */
+select {
+  cursor: pointer;
+  padding-right: 40px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='rgba(255,255,255,0.6)' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  background-size: 12px;
+}
+
+/* Enhanced Textarea */
+textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+/* Form Input Icons */
+.input-icon-wrapper {
+  position: relative;
+}
+
+.input-icon {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(255, 255, 255, 0.5);
+  pointer-events: none;
+  transition: color 0.3s ease;
+}
+
+.input-icon.left {
+  left: 16px;
+}
+
+.input-icon.right {
+  right: 16px;
+}
+
+.input-icon-wrapper input {
+  padding-left: 44px;
+}
+
+.input-icon-wrapper input:focus ~ .input-icon {
+  color: rgba(59, 130, 246, 0.8);
+}
+
+/* Enhanced Buttons with Soft Corners */
+.btn,
+.glass-button,
+button {
+  border-radius: 12px !important;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 500;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+/* Primary Button */
+.btn-primary {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  border: none;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+}
+
+/* Secondary Button */
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+/* Button Sizes */
+.btn-sm {
+  padding: 8px 16px;
+  font-size: 14px;
+  border-radius: 8px !important;
+}
+
+.btn-lg {
+  padding: 16px 32px;
+  font-size: 18px;
+  border-radius: 16px !important;
+}
+
+/* Card Improvements */
+.card,
+.glass-card,
+.modern-card {
+  border-radius: 20px !important;
+  padding: 24px;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card:hover,
+.glass-card:hover,
+.modern-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 
+    0 12px 48px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+/* Enhanced Search Box */
+.search-box {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+}
+
+.search-input {
+  padding-left: 48px !important;
+  padding-right: 120px !important;
+  height: 56px;
+  font-size: 16px;
+  border-radius: 28px !important;
+}
+
+.search-icon {
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 20px;
+}
+
+.search-button {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 10px 20px;
+  border-radius: 20px !important;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  border: none;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.search-button:hover {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  transform: translateY(-50%) scale(1.05);
+}
+
+/* Enhanced Checkbox and Radio */
+.form-check {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+  cursor: pointer;
+}
+
+.form-check input[type="checkbox"],
+.form-check input[type="radio"] {
+  width: 20px;
+  height: 20px;
+  margin-right: 12px;
+  cursor: pointer;
+  position: relative;
+  appearance: none;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease;
+}
+
+.form-check input[type="checkbox"] {
+  border-radius: 6px;
+}
+
+.form-check input[type="radio"] {
+  border-radius: 50%;
+}
+
+.form-check input:checked {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  border-color: transparent;
+}
+
+.form-check input[type="checkbox"]:checked::after {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.form-check input[type="radio"]:checked::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 8px;
+  height: 8px;
+  background: white;
+  border-radius: 50%;
+}
+
+.form-check-label {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 15px;
+  user-select: none;
+}
+
+/* Enhanced Toggle Switch */
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 56px;
+  height: 28px;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.2);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 28px;
+}
+
+.toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: 4px;
+  bottom: 4px;
+  background: white;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.toggle-switch input:checked + .toggle-slider {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+}
+
+.toggle-switch input:checked + .toggle-slider:before {
+  transform: translateX(28px);
+}
+
+/* Responsive Improvements */
+@media (max-width: 768px) {
+  .form-input,
+  .glass-input,
+  input,
+  select,
+  textarea {
+    font-size: 16px; /* Prevents zoom on iOS */
+    padding: 12px 16px;
+  }
+  
+  .btn {
+    width: 100%;
+    padding: 14px 24px;
+  }
+  
+  .card,
+  .glass-card,
+  .modern-card {
+    padding: 20px;
+    border-radius: 16px !important;
+  }
+}
+
+/* Accessibility Improvements */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+  .form-input,
+  .glass-input,
+  input,
+  select,
+  textarea {
+    border-width: 2px;
+    border-color: white;
+  }
+  
+  .form-input:focus,
+  input:focus,
+  select:focus,
+  textarea:focus {
+    outline: 3px solid white;
+    outline-offset: 2px;
+  }
+}
+
+/* Dark Mode Specific Adjustments */
+@media (prefers-color-scheme: dark) {
+  .form-input,
+  .glass-input,
+  input,
+  select,
+  textarea {
+    background: rgba(0, 0, 0, 0.3);
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+  
+  .form-input:focus,
+  input:focus,
+  select:focus,
+  textarea:focus {
+    background: rgba(0, 0, 0, 0.4);
+  }
+}
+
+/* Beautiful Enhanced Stat Cards */
+.stat-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 24px;
+  padding: 1.75rem;
+  box-shadow: 0 12px 32px rgba(31, 38, 135, 0.1);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at top right, rgba(107, 134, 214, 0.1) 0%, transparent 50%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 16px 40px rgba(31, 38, 135, 0.15);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.stat-card:hover::before {
+  opacity: 1;
+}
+
+/* Beautiful Gradient Overlays */
+.gradient-overlay-soft {
+  background: linear-gradient(135deg, rgba(107, 134, 214, 0.1) 0%, rgba(155, 127, 211, 0.1) 100%);
+}
+
+.gradient-overlay-mint {
+  background: linear-gradient(135deg, rgba(125, 216, 192, 0.1) 0%, rgba(168, 218, 220, 0.1) 100%);
+}
+
+.gradient-overlay-peach {
+  background: linear-gradient(135deg, rgba(255, 196, 163, 0.1) 0%, rgba(255, 206, 180, 0.1) 100%);
+}
+
+/* Beautiful Text Colors */
+.text-soft-white {
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.text-soft-gray {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.text-primary-soft {
+  color: #8fa9e6;
+}
+
+.text-accent-mint {
+  color: #7dd8c0;
+}
+
+.text-accent-peach {
+  color: #ffc4a3;
+}

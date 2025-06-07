@@ -195,7 +195,7 @@ pub mod tenant_context {
     use super::*;
     
     /// Extract tenant ID from JWT claims
-    pub fn extract_tenant_id(token: &str) -> Result<Uuid, String> {
+    pub fn extract_tenant_id(_token: &str) -> Result<Uuid, String> {
         // In production, decode JWT and extract tenant_id
         // This is a placeholder implementation
         Err("JWT decoding not implemented".to_string())

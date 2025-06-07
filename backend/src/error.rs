@@ -34,6 +34,9 @@ pub enum AppError {
     
     #[error("Internal server error: {0}")]
     Internal(String),
+    
+    #[error("Configuration error: {0}")]
+    Configuration(String),
 }
 
 // Conversion from shared AppError to backend AppError
@@ -82,6 +85,10 @@ impl IntoResponse for AppError {
             AppError::Internal(msg) => {
                 tracing::error!("Internal error: {}", msg);
                 (StatusCode::INTERNAL_SERVER_ERROR, "Internal server error".to_string())
+            }
+            AppError::Configuration(msg) => {
+                tracing::error!("Configuration error: {}", msg);
+                (StatusCode::INTERNAL_SERVER_ERROR, "Service configuration error".to_string())
             }
         };
 

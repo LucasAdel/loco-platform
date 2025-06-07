@@ -78,7 +78,7 @@ pub async fn liveness_check() -> impl IntoResponse {
 }
 
 /// Check database connectivity
-async fn check_database_health(db: &DatabaseConnection) -> String {
+async fn check_database_health(_db: &DatabaseConnection) -> String {
     // For now, assume database is healthy if we have a connection
     // In production, you'd ping the database
     if let Ok(_) = std::env::var("DATABASE_URL") {

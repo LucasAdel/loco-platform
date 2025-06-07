@@ -68,4 +68,4 @@ echo "  run help         # Show help"
 echo
 echo "Servers will be available at:"
 echo "  Frontend: http://localhost:8080"
-echo "  Backend:  http://localhost:3000"
+echo "  Backend:  http://localhost:3070"

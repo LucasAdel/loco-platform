@@ -107,13 +107,13 @@ pub fn JobDetail() -> impl IntoView {
                                     </div>
                                 </div>
                             </div>
-                        },
+                        }.into_view(),
                         Some(Err(_)) => view! {
                             <Alert variant=AlertVariant::Error>
                                 "Failed to load job details. Please try again later."
                             </Alert>
-                        },
-                        None => view! { <div></div> },
+                        }.into_view(),
+                        None => view! { <div></div> }.into_view(),
                     }
                 }}
             </Suspense>

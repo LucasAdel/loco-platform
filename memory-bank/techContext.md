@@ -260,7 +260,7 @@ REDIS_URL=redis://localhost:6379
 
 # Server
 HOST=0.0.0.0
-PORT=3000
+PORT=3070
 ENVIRONMENT=development
 
 # Security
@@ -283,8 +283,8 @@ ENABLE_DEMO_MODE=true
 LEPTOS_OUTPUT_NAME=loco-platform
 LEPTOS_SITE_ROOT=target/site
 LEPTOS_SITE_PKG_DIR=pkg
-LEPTOS_SITE_ADDR=127.0.0.1:3000
-LEPTOS_RELOAD_PORT=3001
+LEPTOS_SITE_ADDR=127.0.0.1:3070
+LEPTOS_RELOAD_PORT=3080
 
 # Tauri Configuration (Desktop)
 TAURI_PLATFORM=desktop
@@ -571,7 +571,7 @@ RUN apt-get update && apt-get install -y \
 COPY --from=builder /app/target/release/backend /usr/local/bin/
 COPY --from=builder /app/frontend/dist /usr/share/loco/static
 
-EXPOSE 3000
+EXPOSE 3070
 CMD ["backend"]
 ```
 

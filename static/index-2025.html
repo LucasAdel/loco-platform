@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loco Platform - Australia's Premier Pharmacy Job Marketplace</title>
+    <link rel="stylesheet" href="modern-design-system-2025.css">
+    <link rel="stylesheet" href="soft-corners-fix.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom animations and effects */
+        .hero-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            background-size: 200% 200%;
+            animation: gradientShift 15s ease infinite;
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .text-reveal {
+            animation: textReveal 0.8s ease-out forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        
+        @keyframes textReveal {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .slide-in-left {
+            animation: slideInLeft 0.6s ease-out forwards;
+            opacity: 0;
+            transform: translateX(-50px);
+        }
+        
+        @keyframes slideInLeft {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .scale-in {
+            animation: scaleIn 0.5s ease-out forwards;
+            opacity: 0;
+            transform: scale(0.9);
+        }
+        
+        @keyframes scaleIn {
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        /* Stagger animation delays */
+        .delay-100 { animation-delay: 0.1s; }
+        .delay-200 { animation-delay: 0.2s; }
+        .delay-300 { animation-delay: 0.3s; }
+        .delay-400 { animation-delay: 0.4s; }
+        .delay-500 { animation-delay: 0.5s; }
+        .delay-600 { animation-delay: 0.6s; }
+        
+        /* Particle effect */
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            animation: particleFloat 10s infinite linear;
+        }
+        
+        @keyframes particleFloat {
+            from {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            to {
+                transform: translateY(-100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+        
+        /* Interactive hover effects */
+        .hover-lift {
+            transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+        
+        .hover-lift:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Glow effect */
+        .glow-effect {
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.5),
+                        0 0 40px rgba(102, 126, 234, 0.3),
+                        0 0 60px rgba(102, 126, 234, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-black text-white overflow-x-hidden">
+    <!-- Neural Background -->
+    <div class="neural-background"></div>
+    
+    <!-- Animated Particles -->
+    <div id="particles-container" class="fixed inset-0 pointer-events-none z-0"></div>
+    
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 quantum-card border-t-0 border-x-0">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <div class="flex items-center space-x-3 text-reveal">
+                    <div class="w-10 h-10 rounded-xl hero-gradient flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
+                        </svg>
+                    </div>
+                    <span class="text-2xl font-bold holographic-text">LOCO</span>
+                </div>
+                
+                <div class="hidden md:flex items-center space-x-8 text-reveal delay-200">
+                    <a href="#features" class="hover:text-blue-400 transition-colors">Features</a>
+                    <a href="#how-it-works" class="hover:text-blue-400 transition-colors">How It Works</a>
+                    <a href="#testimonials" class="hover:text-blue-400 transition-colors">Testimonials</a>
+                    <a href="#pricing" class="hover:text-blue-400 transition-colors">Pricing</a>
+                </div>
+                
+                <div class="flex items-center space-x-4 text-reveal delay-300">
+                    <a href="/login.html" class="hover:text-blue-400 transition-colors">Sign In</a>
+                    <a href="/register.html" class="neural-button">
+                        Get Started
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Hero Section -->
+    <section class="min-h-screen flex items-center justify-center relative pt-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+            <h1 class="text-6xl md:text-7xl lg:text-8xl font-black mb-6 text-reveal">
+                Find Your Perfect
+                <span class="block holographic-text">Pharmacy Role</span>
+            </h1>
+            
+            <p class="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto text-reveal delay-200">
+                Australia's premier platform connecting pharmacy professionals with their dream careers. 
+                Powered by AI, designed for excellence.
+            </p>
+            
+            <div class="flex flex-col sm:flex-row gap-4 justify-center mb-12 text-reveal delay-300">
+                <a href="/jobs.html" class="neural-button px-8 py-4 text-lg">
+                    Browse 500+ Jobs
+                </a>
+                <a href="/register.html" class="px-8 py-4 text-lg border-2 border-gray-600 rounded-xl hover:border-blue-400 transition-all hover-lift">
+                    Post a Job - Free
+                </a>
+            </div>
+            
+            <!-- Stats -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+                <div class="quantum-card p-6 hover-lift scale-in delay-400">
+                    <div class="text-4xl font-bold text-gradient mb-2">10,000+</div>
+                    <div class="text-gray-400">Active Professionals</div>
+                </div>
+                <div class="quantum-card p-6 hover-lift scale-in delay-500">
+                    <div class="text-4xl font-bold text-gradient mb-2">2,500+</div>
+                    <div class="text-gray-400">Partner Pharmacies</div>
+                </div>
+                <div class="quantum-card p-6 hover-lift scale-in delay-600">
+                    <div class="text-4xl font-bold text-gradient mb-2">98%</div>
+                    <div class="text-gray-400">Success Rate</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Floating shapes -->
+        <div class="morph-shape w-96 h-96 -top-48 -right-48"></div>
+        <div class="morph-shape w-64 h-64 -bottom-32 -left-32" style="animation-delay: 5s;"></div>
+    </section>
+    
+    <!-- Features Section -->
+    <section id="features" class="py-20 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-5xl font-bold text-center mb-16">
+                <span class="holographic-text">Revolutionary Features</span>
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- AI Matching -->
+                <div class="quantum-card p-8 hover-lift group">
+                    <div class="w-16 h-16 rounded-2xl hero-gradient flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4">AI-Powered Matching</h3>
+                    <p class="text-gray-400">Our neural network analyses your skills and preferences to find perfect job matches instantly.</p>
+                </div>
+                
+                <!-- Real-time Updates -->
+                <div class="quantum-card p-8 hover-lift group">
+                    <div class="w-16 h-16 rounded-2xl bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4">Real-time Updates</h3>
+                    <p class="text-gray-400">Get instant notifications when new opportunities match your profile. Never miss out.</p>
+                </div>
+                
+                <!-- Smart Analytics -->
+                <div class="quantum-card p-8 hover-lift group">
+                    <div class="w-16 h-16 rounded-2xl bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4">Smart Analytics</h3>
+                    <p class="text-gray-400">Track your application success, salary trends, and market insights with powerful dashboards.</p>
+                </div>
+                
+                <!-- Map Search -->
+                <div class="quantum-card p-8 hover-lift group">
+                    <div class="w-16 h-16 rounded-2xl bg-gradient-to-r from-green-500 to-teal-500 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4">Interactive Map Search</h3>
+                    <p class="text-gray-400">Visualise opportunities near you with our advanced mapping technology and commute calculator.</p>
+                </div>
+                
+                <!-- Instant Apply -->
+                <div class="quantum-card p-8 hover-lift group">
+                    <div class="w-16 h-16 rounded-2xl bg-gradient-to-r from-orange-500 to-red-500 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4">One-Click Apply</h3>
+                    <p class="text-gray-400">Apply to multiple positions instantly with your saved profile. No repetitive forms.</p>
+                </div>
+                
+                <!-- Security -->
+                <div class="quantum-card p-8 hover-lift group">
+                    <div class="w-16 h-16 rounded-2xl bg-gradient-to-r from-indigo-500 to-purple-500 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4">Bank-Level Security</h3>
+                    <p class="text-gray-400">Your data is protected with military-grade encryption and Australian privacy compliance.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- How It Works -->
+    <section id="how-it-works" class="py-20 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-5xl font-bold text-center mb-16">
+                How <span class="holographic-text">Loco</span> Works
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
+                <!-- Step connectors -->
+                <div class="hidden md:block absolute top-1/2 left-1/4 right-1/4 h-0.5 bg-gradient-to-r from-blue-500 to-purple-500 transform -translate-y-1/2"></div>
+                
+                <!-- Step 1 -->
+                <div class="relative z-10">
+                    <div class="quantum-card p-8 text-center hover-lift">
+                        <div class="w-20 h-20 rounded-full hero-gradient flex items-center justify-center mx-auto mb-6 text-3xl font-bold">
+                            1
+                        </div>
+                        <h3 class="text-2xl font-bold mb-4">Create Your Profile</h3>
+                        <p class="text-gray-400">Tell us about your experience, qualifications, and career goals in just 2 minutes.</p>
+                    </div>
+                </div>
+                
+                <!-- Step 2 -->
+                <div class="relative z-10">
+                    <div class="quantum-card p-8 text-center hover-lift">
+                        <div class="w-20 h-20 rounded-full hero-gradient flex items-center justify-center mx-auto mb-6 text-3xl font-bold">
+                            2
+                        </div>
+                        <h3 class="text-2xl font-bold mb-4">Get Matched</h3>
+                        <p class="text-gray-400">Our AI instantly matches you with relevant opportunities from top pharmacies.</p>
+                    </div>
+                </div>
+                
+                <!-- Step 3 -->
+                <div class="relative z-10">
+                    <div class="quantum-card p-8 text-center hover-lift">
+                        <div class="w-20 h-20 rounded-full hero-gradient flex items-center justify-center mx-auto mb-6 text-3xl font-bold">
+                            3
+                        </div>
+                        <h3 class="text-2xl font-bold mb-4">Land Your Dream Job</h3>
+                        <p class="text-gray-400">Apply with one click and track your applications. It's that simple!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Testimonials -->
+    <section id="testimonials" class="py-20 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-5xl font-bold text-center mb-16">
+                What <span class="holographic-text">Professionals</span> Say
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Testimonial 1 -->
+                <div class="quantum-card p-8 hover-lift">
+                    <div class="flex items-center mb-6">
+                        <img src="https://i.pravatar.cc/150?img=1" alt="Sarah Chen" class="w-16 h-16 rounded-full mr-4">
+                        <div>
+                            <h4 class="font-bold">Sarah Chen</h4>
+                            <p class="text-gray-400">Senior Pharmacist, Sydney</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-300 italic">"Found my dream role in just 3 days! The AI matching is incredibly accurate. Loco understood exactly what I was looking for."</p>
+                    <div class="flex mt-4">
+                        <span class="text-yellow-400">★★★★★</span>
+                    </div>
+                </div>
+                
+                <!-- Testimonial 2 -->
+                <div class="quantum-card p-8 hover-lift">
+                    <div class="flex items-center mb-6">
+                        <img src="https://i.pravatar.cc/150?img=2" alt="Michael Thompson" class="w-16 h-16 rounded-full mr-4">
+                        <div>
+                            <h4 class="font-bold">Michael Thompson</h4>
+                            <p class="text-gray-400">Pharmacy Owner, Melbourne</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-300 italic">"As an employer, Loco has transformed our hiring. Quality candidates, zero hassle. Worth every penny!"</p>
+                    <div class="flex mt-4">
+                        <span class="text-yellow-400">★★★★★</span>
+                    </div>
+                </div>
+                
+                <!-- Testimonial 3 -->
+                <div class="quantum-card p-8 hover-lift">
+                    <div class="flex items-center mb-6">
+                        <img src="https://i.pravatar.cc/150?img=3" alt="Emma Wilson" class="w-16 h-16 rounded-full mr-4">
+                        <div>
+                            <h4 class="font-bold">Emma Wilson</h4>
+                            <p class="text-gray-400">Locum Pharmacist, Brisbane</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-300 italic">"The flexibility Loco offers is amazing. I can manage my schedule and find locum work instantly. Game changer!"</p>
+                    <div class="flex mt-4">
+                        <span class="text-yellow-400">★★★★★</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- CTA Section -->
+    <section class="py-20 relative">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="quantum-card p-12 glow-effect">
+                <h2 class="text-4xl md:text-5xl font-bold mb-6">
+                    Ready to Transform Your
+                    <span class="block holographic-text">Pharmacy Career?</span>
+                </h2>
+                <p class="text-xl text-gray-300 mb-8">
+                    Join thousands of pharmacy professionals already using Loco to advance their careers.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="/register.html" class="neural-button px-8 py-4 text-lg">
+                        Start Free Today
+                    </a>
+                    <a href="/jobs.html" class="px-8 py-4 text-lg border-2 border-gray-600 rounded-xl hover:border-blue-400 transition-all hover-lift">
+                        Browse Jobs First
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer class="py-12 border-t border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="w-10 h-10 rounded-xl hero-gradient flex items-center justify-center">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
+                            </svg>
+                        </div>
+                        <span class="text-2xl font-bold">LOCO</span>
+                    </div>
+                    <p class="text-gray-400">Australia's premier pharmacy job marketplace.</p>
+                </div>
+                
+                <div>
+                    <h4 class="font-bold mb-4">Platform</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="/jobs.html" class="hover:text-white transition-colors">Browse Jobs</a></li>
+                        <li><a href="/map.html" class="hover:text-white transition-colors">Job Map</a></li>
+                        <li><a href="/dashboard.html" class="hover:text-white transition-colors">Dashboard</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Mobile App</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-bold mb-4">Resources</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-white transition-colors">Career Guide</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Salary Calculator</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Blog</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Help Center</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-bold mb-4">Company</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-white transition-colors">About Us</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Privacy Policy</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Terms of Service</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="mt-12 pt-8 border-t border-gray-800 text-center text-gray-400">
+                <p>&copy; 2025 Loco Platform. Made with ❤️ in Australia 🦘</p>
+            </div>
+        </div>
+    </footer>
+    
+    <script>
+        // Create floating particles
+        const particlesContainer = document.getElementById('particles-container');
+        const particleCount = 50;
+        
+        for (let i = 0; i < particleCount; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.animationDelay = Math.random() * 10 + 's';
+            particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
+            particlesContainer.appendChild(particle);
+        }
+        
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+        
+        // Add intersection observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+        
+        // Observe all sections
+        document.querySelectorAll('section').forEach(section => {
+            section.style.opacity = '0';
+            section.style.transform = 'translateY(20px)';
+            section.style.transition = 'all 0.8s cubic-bezier(0.23, 1, 0.32, 1)';
+            observer.observe(section);
+        });
+    </script>
+</body>
+</html>

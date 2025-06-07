@@ -57,7 +57,25 @@
       "Bash(RUSTFLAGS=\"-C lto=off\" cargo build --package backend --target x86_64-apple-darwin)",
       "Bash(RUSTFLAGS=\"-C lto=off\" cargo build --package backend --target aarch64-apple-darwin)",
       "Bash(./run start)",
-      "Bash(./run stop)"
+      "Bash(./run stop)",
+      "Bash(git push:*)",
+      "Bash(rustc --version)",
+      "Bash(cargo --version)",
+      "Bash(./run-static)",
+      "Bash(echo)",
+      "Bash(supabase:*)",
+      "Bash(brew update:*)",
+      "Bash(brew upgrade:*)",
+      "Bash(npm search:*)",
+      "Bash(claude mcp add supabase:*)",
+      "Bash(python:*)",
+      "Bash(true)",
+      "Bash(sed:*)",
+      "Bash(claude:*)",
+      "Bash(log show:*)",
+      "Bash(cat:*)",
+      "Bash(trunk build:*)",
+      "Bash(bash run stop)"
     ],
     "deny": []
   }

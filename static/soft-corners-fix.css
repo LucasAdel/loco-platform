@@ -1,0 +1,178 @@
+/**
+ * Soft Corners Fix - Ensure all form elements have 12px border radius
+ * Australian English - Loco Platform
+ */
+
+/* Apply soft corners to all input types */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="tel"],
+input[type="url"],
+input[type="search"],
+input[type="date"],
+input[type="time"],
+input[type="datetime-local"],
+input[type="month"],
+input[type="week"],
+input[type="color"],
+textarea,
+select,
+button,
+.btn,
+.button,
+.form-control,
+.input,
+.select,
+.textarea {
+    border-radius: 12px !important;
+    transition: all 0.3s ease;
+}
+
+/* Ensure file inputs also have soft corners */
+input[type="file"] {
+    border-radius: 12px !important;
+    padding: 8px 12px;
+}
+
+/* Apply to custom form elements */
+.custom-input,
+.custom-select,
+.custom-textarea,
+.custom-button {
+    border-radius: 12px !important;
+}
+
+/* Fix for grouped inputs */
+.input-group > input:first-child,
+.input-group > select:first-child,
+.input-group > button:first-child {
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+    border-top-left-radius: 12px !important;
+    border-bottom-left-radius: 12px !important;
+}
+
+.input-group > input:last-child,
+.input-group > select:last-child,
+.input-group > button:last-child {
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
+    border-top-right-radius: 12px !important;
+    border-bottom-right-radius: 12px !important;
+}
+
+/* Cards and containers should also have soft corners */
+.card,
+.panel,
+.box,
+.container-soft,
+.modal-content,
+.dropdown-menu,
+.popover,
+.tooltip-inner {
+    border-radius: 12px !important;
+}
+
+/* Fix for specific form components */
+.form-group input,
+.form-group select,
+.form-group textarea {
+    border-radius: 12px !important;
+}
+
+/* Search bars specifically */
+.search-bar,
+.search-input,
+input[type="search"] {
+    border-radius: 12px !important;
+    padding: 10px 16px;
+}
+
+/* Buttons hover state should maintain border radius */
+button:hover,
+.btn:hover,
+.button:hover {
+    border-radius: 12px !important;
+}
+
+/* Fix for chips and tags */
+.chip,
+.tag,
+.badge {
+    border-radius: 12px !important;
+}
+
+/* Dropdown items */
+.dropdown-item {
+    border-radius: 8px !important;
+    margin: 2px 4px;
+}
+
+/* Modal and dialog boxes */
+.modal,
+.dialog,
+.alert,
+.notification {
+    border-radius: 12px !important;
+}
+
+/* Navigation pills */
+.nav-pills .nav-link {
+    border-radius: 12px !important;
+}
+
+/* Tab panels */
+.tab-content {
+    border-radius: 12px !important;
+}
+
+/* Code blocks and pre elements */
+pre,
+code,
+.code-block {
+    border-radius: 8px !important;
+}
+
+/* Tables */
+.table-container,
+.table-wrapper {
+    border-radius: 12px !important;
+    overflow: hidden;
+}
+
+/* Pagination */
+.pagination .page-link {
+    border-radius: 8px !important;
+    margin: 0 2px;
+}
+
+/* Progress bars */
+.progress {
+    border-radius: 12px !important;
+}
+
+.progress-bar {
+    border-radius: 12px !important;
+}
+
+/* Custom scrollbar for consistency */
+::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+}
+
+::-webkit-scrollbar-track {
+    border-radius: 12px;
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    border-radius: 12px;
+    background: #888;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}

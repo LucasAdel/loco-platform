@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loco Platform - Job Details</title>
+    <link rel="stylesheet" href="modern-design-system.css">
+    <link rel="stylesheet" href="soft-corners-fix.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .glass {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        @media (max-width: 768px) {
+            .mobile-nav { display: none; }
+            .mobile-menu-btn { display: block; }
+            .mobile-menu.active { display: block; }
+            .job-detail-grid { grid-template-columns: 1fr; }
+            .job-key-info { grid-template-columns: 1fr; }
+        }
+        @media (min-width: 769px) {
+            .mobile-menu { display: none !important; }
+            .mobile-menu-btn { display: none; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white shadow-sm glass">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <h1 class="text-2xl font-bold text-gray-900">Loco Platform</h1>
+                </div>
+                <nav class="mobile-nav flex space-x-8 items-center">
+                    <a href="dashboard.html" class="text-gray-700 hover:text-blue-600">Dashboard</a>
+                    <a href="jobs.html" class="text-gray-700 hover:text-blue-600">Jobs</a>
+                    <a href="map.html" class="text-gray-700 hover:text-blue-600">Map</a>
+                    <a href="profile.html" class="text-gray-700 hover:text-blue-600">Profile</a>
+                    <a href="admin.html" class="text-gray-700 hover:text-blue-600 protected-content" style="display:none;">Admin</a>
+                    
+                    <!-- Authentication Links -->
+                    <span class="user-info text-gray-700 text-sm" style="display:none;"></span>
+                    <a href="login.html" class="auth-login text-gray-700 hover:text-blue-600">Login</a>
+                    <button onclick="handleLogout()" class="auth-logout text-gray-700 hover:text-blue-600" style="display:none;">Logout</button>
+                </nav>
+                <button class="mobile-menu-btn md:hidden" onclick="toggleMobileMenu()">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="mobile-menu hidden bg-white shadow-lg md:hidden">
+        <div class="px-4 py-2 space-y-2">
+            <a href="dashboard.html" class="block py-2 text-gray-700">Dashboard</a>
+            <a href="jobs.html" class="block py-2 text-gray-700">Jobs</a>
+            <a href="map.html" class="block py-2 text-gray-700">Map</a>
+            <a href="profile.html" class="block py-2 text-gray-700">Profile</a>
+            <a href="admin.html" class="block py-2 text-gray-700">Admin</a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Breadcrumb -->
+        <div class="mb-6">
+            <nav class="flex" aria-label="Breadcrumb">
+                <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                    <li class="inline-flex items-center">
+                        <a href="jobs.html" class="text-gray-700 hover:text-blue-600">Jobs</a>
+                    </li>
+                    <li>
+                        <div class="flex items-center">
+                            <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="ml-1 md:ml-2 text-gray-500" id="job-title-breadcrumb">Job Details</span>
+                        </div>
+                    </li>
+                </ol>
+            </nav>
+        </div>
+
+        <div class="job-detail-grid grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Main Job Details -->
+            <div class="lg:col-span-2">
+                <div class="bg-white rounded-lg shadow p-8 glass">
+                    <!-- Job Header -->
+                    <div class="flex justify-between items-start mb-6">
+                        <div>
+                            <h1 id="job-title" class="text-3xl font-bold text-gray-900 mb-2">Senior Pharmacist</h1>
+                            <div class="flex items-center text-gray-600 mb-4">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                                </svg>
+                                <span id="company-name">Central Pharmacy Group</span>
+                            </div>
+                        </div>
+                        <span id="urgent-badge" class="hidden inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">
+                            Urgent Hiring
+                        </span>
+                    </div>
+
+                    <!-- Key Information -->
+                    <div class="job-key-info grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 p-6 bg-gray-50 rounded-lg">
+                        <div class="text-center">
+                            <div class="flex items-center justify-center mb-2">
+                                <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                            <p class="text-sm text-gray-500">Salary</p>
+                            <p id="salary-range" class="text-lg font-semibold text-gray-900">$120,000 - $140,000</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="flex items-center justify-center mb-2">
+                                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                </svg>
+                            </div>
+                            <p class="text-sm text-gray-500">Location</p>
+                            <p id="job-location" class="text-lg font-semibold text-gray-900">Sydney CBD, NSW</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="flex items-center justify-center mb-2">
+                                <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                            <p class="text-sm text-gray-500">Type</p>
+                            <p id="job-type" class="text-lg font-semibold text-gray-900">Full-time</p>
+                        </div>
+                    </div>
+
+                    <!-- Job Description -->
+                    <div class="mb-8">
+                        <h2 class="text-xl font-semibold text-gray-900 mb-4">Job Description</h2>
+                        <div id="job-description" class="prose max-w-none text-gray-700">
+                            <p>We are seeking an experienced Senior Pharmacist to join our dynamic team at Central Pharmacy Group. This is an excellent opportunity for a dedicated professional looking to advance their career in a supportive and innovative environment.</p>
+                            
+                            <p>As a Senior Pharmacist, you will play a crucial role in ensuring the safe and effective delivery of pharmaceutical care to our patients. You will work collaboratively with our healthcare team to provide expert advice on medication therapy and contribute to the overall success of our pharmacy operations.</p>
+                        </div>
+                    </div>
+
+                    <!-- Key Responsibilities -->
+                    <div class="mb-8">
+                        <h2 class="text-xl font-semibold text-gray-900 mb-4">Key Responsibilities</h2>
+                        <ul id="responsibilities" class="list-disc list-inside space-y-2 text-gray-700">
+                            <li>Dispense medications and provide patient counseling</li>
+                            <li>Conduct medication reviews and therapy management</li>
+                            <li>Supervise and mentor junior pharmacy staff</li>
+                            <li>Ensure compliance with pharmaceutical regulations</li>
+                            <li>Collaborate with healthcare professionals</li>
+                            <li>Maintain accurate patient records and documentation</li>
+                        </ul>
+                    </div>
+
+                    <!-- Requirements -->
+                    <div class="mb-8">
+                        <h2 class="text-xl font-semibold text-gray-900 mb-4">Requirements</h2>
+                        <ul id="requirements" class="list-disc list-inside space-y-2 text-gray-700">
+                            <li>Bachelor of Pharmacy or equivalent qualification</li>
+                            <li>Current AHPRA registration</li>
+                            <li>Minimum 5 years of community pharmacy experience</li>
+                            <li>Strong leadership and communication skills</li>
+                            <li>Knowledge of pharmaceutical software systems</li>
+                            <li>Commitment to continuing professional development</li>
+                        </ul>
+                    </div>
+
+                    <!-- Benefits -->
+                    <div class="mb-8">
+                        <h2 class="text-xl font-semibold text-gray-900 mb-4">What We Offer</h2>
+                        <ul id="benefits" class="list-disc list-inside space-y-2 text-gray-700">
+                            <li>Competitive salary package</li>
+                            <li>Professional development opportunities</li>
+                            <li>Flexible working arrangements</li>
+                            <li>Comprehensive health insurance</li>
+                            <li>Supportive team environment</li>
+                            <li>Career progression opportunities</li>
+                        </ul>
+                    </div>
+
+                    <!-- Company Information -->
+                    <div class="border-t pt-8">
+                        <h2 class="text-xl font-semibold text-gray-900 mb-4">About Central Pharmacy Group</h2>
+                        <p class="text-gray-700">Central Pharmacy Group is one of Australia's leading pharmacy networks, committed to providing exceptional healthcare services to communities across the country. With over 50 locations nationwide, we pride ourselves on our innovative approach to pharmacy practice and our dedication to improving patient outcomes.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="lg:col-span-1">
+                <!-- Application Card -->
+                <div class="bg-white rounded-lg shadow p-6 glass mb-6">
+                    <div class="text-center">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Apply for this Position</h3>
+                        <button onclick="applyForJob()" class="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium mb-3">
+                            Apply Now
+                        </button>
+                        <button onclick="saveJob()" class="w-full border border-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-50 transition-colors text-sm">
+                            Save Job
+                        </button>
+                    </div>
+                    
+                    <div class="mt-6 pt-6 border-t">
+                        <div class="flex justify-between text-sm text-gray-500 mb-2">
+                            <span>Applications:</span>
+                            <span id="application-count">12</span>
+                        </div>
+                        <div class="flex justify-between text-sm text-gray-500 mb-2">
+                            <span>Views:</span>
+                            <span id="view-count">156</span>
+                        </div>
+                        <div class="flex justify-between text-sm text-gray-500">
+                            <span>Posted:</span>
+                            <span id="posted-date">3 days ago</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Share -->
+                <div class="bg-white rounded-lg shadow p-6 glass mb-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Share this Job</h3>
+                    <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
+                        <button onclick="shareJob('linkedin')" class="flex-1 bg-blue-600 text-white py-2 px-3 rounded text-sm hover:bg-blue-700 transition-colors">
+                            LinkedIn
+                        </button>
+                        <button onclick="shareJob('email')" class="flex-1 bg-gray-600 text-white py-2 px-3 rounded text-sm hover:bg-gray-700 transition-colors">
+                            Email
+                        </button>
+                        <button onclick="copyJobLink()" class="flex-1 bg-green-600 text-white py-2 px-3 rounded text-sm hover:bg-green-700 transition-colors">
+                            Copy Link
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Similar Jobs -->
+                <div class="bg-white rounded-lg shadow p-6 glass">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Similar Jobs</h3>
+                    <div class="space-y-4">
+                        <div class="border-b border-gray-200 pb-3">
+                            <h4 class="font-medium text-gray-900 hover:text-blue-600 cursor-pointer">Clinical Pharmacist</h4>
+                            <p class="text-sm text-gray-500">Royal Melbourne Hospital</p>
+                            <p class="text-sm text-gray-600">$110,000 - $130,000</p>
+                        </div>
+                        <div class="border-b border-gray-200 pb-3">
+                            <h4 class="font-medium text-gray-900 hover:text-blue-600 cursor-pointer">Pharmacy Manager</h4>
+                            <p class="text-sm text-gray-500">Terry White Chemmart</p>
+                            <p class="text-sm text-gray-600">$130,000 - $150,000</p>
+                        </div>
+                        <div>
+                            <h4 class="font-medium text-gray-900 hover:text-blue-600 cursor-pointer">Locum Pharmacist</h4>
+                            <p class="text-sm text-gray-500">Amcal Pharmacy</p>
+                            <p class="text-sm text-gray-600">$65/hour</p>
+                        </div>
+                    </div>
+                    <button onclick="window.location.href='jobs.html'" class="w-full mt-4 text-blue-600 hover:text-blue-700 text-sm font-medium">
+                        View All Similar Jobs →
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Application Modal -->
+    <div id="application-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl p-8 max-w-md w-full mx-4">
+            <h3 class="text-xl font-semibold text-gray-900 mb-4">Apply for Senior Pharmacist</h3>
+            <form id="application-form" onsubmit="submitApplication(event)">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Cover Letter</label>
+                    <textarea 
+                        name="coverLetter" 
+                        rows="4" 
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="Tell us why you're interested in this position..."
+                        required
+                    ></textarea>
+                </div>
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Resume</label>
+                    <input 
+                        type="file" 
+                        name="resume" 
+                        accept=".pdf,.doc,.docx"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        required
+                    >
+                </div>
+                <div class="flex justify-end space-x-3">
+                    <button type="button" onclick="closeApplicationModal()" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors">
+                        Cancel
+                    </button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                        Submit Application
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Success/Error Messages -->
+    <div id="message" class="fixed top-4 right-4 hidden">
+        <div class="bg-white rounded-lg shadow-lg p-4 max-w-sm">
+            <p id="message-text" class="text-sm"></p>
+        </div>
+    </div>
+
+    <!-- Supabase Client -->
+    <script src="js/supabase-client.js"></script>
+    
+    <script>
+        // Load job details when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            onSupabaseReady(() => {
+                loadJobDetails();
+                initializeAuth();
+            });
+        });
+
+        // Initialize authentication state
+        async function initializeAuth() {
+            try {
+                const user = await SupabaseAuth.getCurrentUser();
+                // Auth state will be handled by the Supabase client automatically
+            } catch (error) {
+                console.error('Error initializing auth:', error);
+            }
+        }
+
+        // Handle logout
+        async function handleLogout() {
+            try {
+                const result = await SupabaseAuth.signOut();
+                if (result.success) {
+                    SupabaseUtils.showToast('Logged out successfully!', 'success');
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 1000);
+                } else {
+                    throw new Error(result.error);
+                }
+            } catch (error) {
+                console.error('Logout error:', error);
+                SupabaseUtils.showToast('Error logging out. Please try again.', 'error');
+            }
+        }
+
+        function getJobIdFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('id');
+        }
+
+        async function loadJobDetails() {
+            const jobId = getJobIdFromUrl();
+            if (!jobId) {
+                // Show sample data if no ID provided
+                showSampleJobData();
+                return;
+            }
+
+            try {
+                const response = await fetch(`http://localhost:3070/api/jobs/${jobId}`);
+                if (response.ok) {
+                    const job = await response.json();
+                    displayJobDetails(job);
+                } else {
+                    showSampleJobData();
+                }
+            } catch (error) {
+                console.error('Error loading job:', error);
+                showSampleJobData();
+            }
+        }
+
+        function showSampleJobData() {
+            const sampleJob = {
+                id: "sample-job-1",
+                title: "Senior Pharmacist",
+                company: "Central Pharmacy Group",
+                location: "Sydney CBD, NSW",
+                job_type: "FullTime",
+                salary_range_start: 120000,
+                salary_range_end: 140000,
+                is_urgent: false,
+                description: "We are seeking an experienced Senior Pharmacist to join our dynamic team...",
+                applications_count: 12,
+                views_count: 156,
+                created_at: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString()
+            };
+            displayJobDetails(sampleJob);
+        }
+
+        function displayJobDetails(job) {
+            document.getElementById('job-title').textContent = job.title;
+            document.getElementById('job-title-breadcrumb').textContent = job.title;
+            document.getElementById('company-name').textContent = job.company;
+            document.getElementById('job-location').textContent = job.location;
+            document.getElementById('job-type').textContent = formatJobType(job.job_type);
+            document.getElementById('application-count').textContent = job.applications_count || 0;
+            document.getElementById('view-count').textContent = job.views_count || 0;
+            document.getElementById('posted-date').textContent = formatDate(job.created_at);
+
+            if (job.salary_range_start && job.salary_range_end) {
+                document.getElementById('salary-range').textContent = 
+                    `$${job.salary_range_start.toLocaleString()} - $${job.salary_range_end.toLocaleString()}`;
+            }
+
+            if (job.is_urgent) {
+                document.getElementById('urgent-badge').classList.remove('hidden');
+            }
+
+            if (job.description) {
+                document.getElementById('job-description').innerHTML = `<p>${job.description}</p>`;
+            }
+
+            // Update page title
+            document.title = `${job.title} - ${job.company} | Loco Platform`;
+        }
+
+        function formatJobType(type) {
+            const types = {
+                'FullTime': 'Full-time',
+                'PartTime': 'Part-time',
+                'Contract': 'Contract',
+                'Casual': 'Casual',
+                'Internship': 'Internship'
+            };
+            return types[type] || type;
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diff = now - date;
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            
+            if (days === 0) return 'Today';
+            if (days === 1) return 'Yesterday';
+            if (days < 7) return `${days} days ago`;
+            if (days < 30) return `${Math.floor(days / 7)} weeks ago`;
+            return `${Math.floor(days / 30)} months ago`;
+        }
+
+        function applyForJob() {
+            document.getElementById('application-modal').classList.remove('hidden');
+            document.getElementById('application-modal').classList.add('flex');
+        }
+
+        function closeApplicationModal() {
+            document.getElementById('application-modal').classList.add('hidden');
+            document.getElementById('application-modal').classList.remove('flex');
+        }
+
+        async function submitApplication(event) {
+            event.preventDefault();
+            
+            try {
+                // Check if user is authenticated
+                const user = await SupabaseAuth.getCurrentUser();
+                if (!user) {
+                    SupabaseUtils.showToast('Please log in to apply for jobs', 'warning');
+                    window.location.href = 'login.html';
+                    return;
+                }
+                
+                const form = event.target;
+                const formData = new FormData(form);
+                const jobId = getJobIdFromUrl() || 'sample-job-1';
+                
+                const applicationData = {
+                    cover_letter: formData.get('coverLetter'),
+                    // In production, handle file upload for resume
+                    status: 'pending'
+                };
+                
+                // Submit application via Supabase
+                const result = await SupabaseDB.applyForJob(jobId, applicationData);
+                
+                if (result.success) {
+                    SupabaseUtils.showToast('Application submitted successfully!', 'success');
+                    closeApplicationModal();
+                    
+                    // Update application count
+                    const currentCount = parseInt(document.getElementById('application-count').textContent);
+                    document.getElementById('application-count').textContent = currentCount + 1;
+                } else {
+                    throw new Error(result.error);
+                }
+                
+            } catch (error) {
+                console.error('Error submitting application:', error);
+                SupabaseUtils.showToast('Error submitting application. Please try again.', 'error');
+            }
+        }
+
+        async function saveJob() {
+            try {
+                // Check if user is authenticated
+                const user = await SupabaseAuth.getCurrentUser();
+                if (!user) {
+                    SupabaseUtils.showToast('Please log in to save jobs', 'warning');
+                    window.location.href = 'login.html';
+                    return;
+                }
+                
+                const jobId = getJobIdFromUrl() || 'sample-job-1';
+                
+                // In production, implement job saving functionality
+                // For now, just show success message
+                SupabaseUtils.showToast('Job saved to your profile!', 'success');
+                
+            } catch (error) {
+                console.error('Error saving job:', error);
+                SupabaseUtils.showToast('Error saving job. Please try again.', 'error');
+            }
+        }
+
+        function shareJob(platform) {
+            const jobTitle = document.getElementById('job-title').textContent;
+            const jobUrl = window.location.href;
+            
+            if (platform === 'linkedin') {
+                const url = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(jobUrl)}`;
+                window.open(url, '_blank');
+            } else if (platform === 'email') {
+                const subject = `Check out this job: ${jobTitle}`;
+                const body = `I thought you might be interested in this position:\n\n${jobTitle}\n${jobUrl}`;
+                window.open(`mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
+            }
+        }
+
+        function copyJobLink() {
+            navigator.clipboard.writeText(window.location.href).then(() => {
+                showMessage('Job link copied to clipboard!', 'success');
+            }).catch(() => {
+                showMessage('Failed to copy link', 'error');
+            });
+        }
+
+        function showMessage(text, type = 'info') {
+            // Use Supabase toast system for consistent UI
+            SupabaseUtils.showToast(text, type);
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('active');
+            menu.classList.toggle('hidden');
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('application-modal').addEventListener('click', function(event) {
+            if (event.target === this) {
+                closeApplicationModal();
+            }
+        });
+    </script>
+</body>
+</html>

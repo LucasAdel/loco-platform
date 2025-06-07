@@ -7,9 +7,9 @@ edition = "2021"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-leptos = { workspace = true, features = ["hydrate"] }
-leptos_meta = { workspace = true, features = ["hydrate"] }
-leptos_router = { workspace = true, features = ["hydrate"] }
+leptos = { workspace = true, features = ["csr", "serde"] }
+leptos_meta = { workspace = true, features = ["csr"] }
+leptos_router = { workspace = true, features = ["csr"] }
 leptos_axum = { workspace = true, optional = true }
 
 # Core dependencies
@@ -88,7 +88,7 @@ site-pkg-dir = "pkg"
 # Assets source dir
 assets-dir = "assets"
 # JS output dir
-site-addr = "127.0.0.1:3001"
+site-addr = "127.0.0.1:3080"
 reload-port = 3002
 browserquery = "defaults"
 watch = false

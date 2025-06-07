@@ -43,8 +43,8 @@ This directory contains convenient scripts to run your Loco Platform development
 
 ### `start` (default)
 Starts both frontend and backend servers:
-- **Backend**: http://localhost:3000 (Axum/Rust)
-- **Frontend**: http://localhost:8080 (Dioxus/WASM)
+- **Backend**: http://localhost:3070 (Axum/Rust)
+- **Frontend**: http://localhost:3080 (Dioxus/WASM)
 
 ### `stop`
 Gracefully stops all running servers and cleans up processes.
@@ -94,13 +94,13 @@ Displays usage information and available commands.
 ## Server Details
 
 ### Backend Server (Axum)
-- **URL**: http://localhost:3000
+- **URL**: http://localhost:3070
 - **Technology**: Rust + Axum framework
 - **Features**: RESTful API, WebSocket support, database integration
 - **Log file**: `backend.log`
 
 ### Frontend Server (Dioxus)
-- **URL**: http://localhost:8080
+- **URL**: http://localhost:3080
 - **Technology**: Rust + Dioxus (compiles to WebAssembly)
 - **Features**: Hot reload, modern UI, real-time updates
 - **Log file**: `frontend.log`
@@ -108,7 +108,7 @@ Displays usage information and available commands.
 ## Troubleshooting
 
 ### Port Already in Use
-The script automatically detects and kills processes using required ports (3000, 8080).
+The script automatically detects and kills processes using required ports (3070, 3080).
 
 ### Build Errors
 Check the respective log files:
@@ -131,12 +131,12 @@ chmod +x run setup-alias.sh
 The scripts support these environment variables:
 
 - `RUST_LOG`: Set logging level (default: debug)
-- `FRONTEND_PORT`: Frontend port (default: 8080)
-- `BACKEND_PORT`: Backend port (default: 3000)
+- `FRONTEND_PORT`: Frontend port (default: 3080)
+- `BACKEND_PORT`: Backend port (default: 3070)
 
 Example:
 ```bash
-RUST_LOG=info FRONTEND_PORT=3001 run
+RUST_LOG=info FRONTEND_PORT=3080 run
 ```
 
 ## Development Workflow
@@ -196,5 +196,5 @@ When adding new features to the scripts:
 For issues with the run scripts:
 1. Check the log files first
 2. Ensure all dependencies are installed (Rust, Dioxus CLI)
-3. Verify ports 3000 and 8080 are available
+3. Verify ports 3070 and 3080 are available
 4. Try running individual components manually for debugging

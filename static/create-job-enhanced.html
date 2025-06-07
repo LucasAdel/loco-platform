@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loco Platform - Post a Job</title>
+    <link rel="stylesheet" href="modern-design-system.css">
+    <link rel="stylesheet" href="soft-corners-fix.css">
+    <link rel="stylesheet" href="modern-design-system-enhanced.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="responsive-fix.css">
+    <style>
+        /* Multi-step form specific styles */
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 40px;
+            position: relative;
+        }
+        
+        .step-indicator::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.2);
+            z-index: 0;
+        }
+        
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .step-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .step.active .step-number {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            border-color: transparent;
+            color: white;
+            transform: scale(1.1);
+        }
+        
+        .step.completed .step-number {
+            background: #10b981;
+            border-color: transparent;
+            color: white;
+        }
+        
+        .step-label {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 500;
+        }
+        
+        .step.active .step-label {
+            color: white;
+        }
+        
+        .form-step {
+            display: none;
+            animation: fadeInUp 0.5s ease;
+        }
+        
+        .form-step.active {
+            display: block;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Rich text editor styles */
+        .rich-editor {
+            min-height: 200px;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 12px;
+            color: white;
+            font-family: inherit;
+            line-height: 1.6;
+        }
+        
+        .rich-editor:focus {
+            outline: none;
+            border-color: rgba(59, 130, 246, 0.6);
+            background: rgba(255, 255, 255, 0.12);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+        
+        .editor-toolbar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+        
+        .editor-btn {
+            padding: 6px 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 6px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .editor-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .editor-btn.active {
+            background: rgba(59, 130, 246, 0.3);
+        }
+        
+        /* Preview card */
+        .preview-card {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 20px;
+            padding: 24px;
+            margin-top: 24px;
+        }
+        
+        .preview-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            background: rgba(59, 130, 246, 0.2);
+            color: #60a5fa;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Mobile Menu Button -->
+    <button class="mobile-menu-btn" id="mobile-menu-btn">
+        <svg class="heroicon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+    </button>
+
+    <!-- Mobile Overlay -->
+    <div class="mobile-overlay" id="mobile-overlay"></div>
+
+    <!-- Modern Collapsible Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="/index.html" class="sidebar-logo">
+                <i class="fas fa-briefcase-medical"></i>
+                <span class="logo-text">Loco Platform</span>
+            </a>
+            <button class="sidebar-toggle" id="sidebar-toggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">Main</div>
+                <a href="/dashboard.html" class="nav-item">
+                    <div class="nav-item-icon"><i class="fas fa-th-large"></i></div>
+                    <span class="nav-item-text">Dashboard</span>
+                </a>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Jobs</div>
+                <a href="/jobs.html" class="nav-item">
+                    <div class="nav-item-icon"><i class="fas fa-briefcase"></i></div>
+                    <span class="nav-item-text">Browse Jobs</span>
+                </a>
+                <a href="/create-job-enhanced.html" class="nav-item active">
+                    <div class="nav-item-icon"><i class="fas fa-plus-circle"></i></div>
+                    <span class="nav-item-text">Post Job</span>
+                </a>
+            </div>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container-fluid" style="max-width: 1000px; margin: 0 auto;">
+            <!-- Page Header -->
+            <div class="page-header fade-in-up">
+                <h1 class="page-title">Post a New Job</h1>
+                <p class="page-subtitle">Create a compelling job listing to attract top pharmacy professionals</p>
+            </div>
+
+            <!-- Multi-step Form -->
+            <div class="card glass-card">
+                <!-- Step Indicator -->
+                <div class="step-indicator">
+                    <div class="step active" data-step="1">
+                        <div class="step-number">1</div>
+                        <div class="step-label">Basic Info</div>
+                    </div>
+                    <div class="step" data-step="2">
+                        <div class="step-number">2</div>
+                        <div class="step-label">Requirements</div>
+                    </div>
+                    <div class="step" data-step="3">
+                        <div class="step-number">3</div>
+                        <div class="step-label">Compensation</div>
+                    </div>
+                    <div class="step" data-step="4">
+                        <div class="step-number">4</div>
+                        <div class="step-label">Schedule</div>
+                    </div>
+                    <div class="step" data-step="5">
+                        <div class="step-number">5</div>
+                        <div class="step-label">Description</div>
+                    </div>
+                    <div class="step" data-step="6">
+                        <div class="step-number">6</div>
+                        <div class="step-label">Preview</div>
+                    </div>
+                </div>
+
+                <form id="createJobForm" onsubmit="handleSubmit(event)">
+                    <!-- Step 1: Basic Information -->
+                    <div class="form-step active" data-step="1">
+                        <h3 class="text-xl font-semibold mb-6">Basic Information</h3>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="jobTitle">Job Title</label>
+                            <div class="input-icon-wrapper">
+                                <i class="fas fa-briefcase input-icon left"></i>
+                                <input type="text" id="jobTitle" name="jobTitle" class="form-input" 
+                                       placeholder="e.g., Senior Clinical Pharmacist" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="pharmacyName">Pharmacy Name</label>
+                            <div class="input-icon-wrapper">
+                                <i class="fas fa-hospital input-icon left"></i>
+                                <input type="text" id="pharmacyName" name="pharmacyName" class="form-input" 
+                                       placeholder="e.g., Sydney Metro Pharmacy" required>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label" for="jobType">Job Type</label>
+                                    <select id="jobType" name="jobType" class="form-input" required>
+                                        <option value="">Select job type</option>
+                                        <option value="Pharmacist">Pharmacist</option>
+                                        <option value="PharmacyAssistant">Pharmacy Assistant</option>
+                                        <option value="PharmacyTechnician">Pharmacy Technician</option>
+                                        <option value="Intern">Pharmacy Intern</option>
+                                        <option value="Student">Pharmacy Student</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label" for="employmentType">Employment Type</label>
+                                    <select id="employmentType" name="employmentType" class="form-input" required>
+                                        <option value="">Select employment type</option>
+                                        <option value="full-time">Full-time</option>
+                                        <option value="part-time">Part-time</option>
+                                        <option value="casual">Casual</option>
+                                        <option value="contract">Contract</option>
+                                        <option value="locum">Locum</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="location">Location</label>
+                            <div class="input-icon-wrapper">
+                                <i class="fas fa-map-marker-alt input-icon left"></i>
+                                <input type="text" id="location" name="location" class="form-input" 
+                                       placeholder="e.g., Sydney CBD, NSW 2000" required>
+                            </div>
+                            <small class="form-text text-muted">Include suburb and postcode for better visibility</small>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="form-check">
+                                <input type="checkbox" id="urgentHiring" name="urgentHiring" value="true">
+                                <label class="form-check-label" for="urgentHiring">
+                                    <i class="fas fa-bolt text-warning mr-2"></i>
+                                    Mark as urgent hiring
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Requirements -->
+                    <div class="form-step" data-step="2">
+                        <h3 class="text-xl font-semibold mb-6">Requirements & Qualifications</h3>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Required Qualifications</label>
+                            <div id="qualificationsList" class="mb-3">
+                                <div class="qualification-item mb-2">
+                                    <div class="input-icon-wrapper">
+                                        <i class="fas fa-graduation-cap input-icon left"></i>
+                                        <input type="text" name="qualifications[]" class="form-input" 
+                                               placeholder="e.g., Bachelor of Pharmacy" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-secondary btn-sm" onclick="addQualification()">
+                                <i class="fas fa-plus mr-2"></i>Add Qualification
+                            </button>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Skills & Experience</label>
+                            <div id="skillsList" class="mb-3">
+                                <div class="skill-item mb-2">
+                                    <div class="input-icon-wrapper">
+                                        <i class="fas fa-star input-icon left"></i>
+                                        <input type="text" name="skills[]" class="form-input" 
+                                               placeholder="e.g., 3+ years hospital pharmacy experience">
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-secondary btn-sm" onclick="addSkill()">
+                                <i class="fas fa-plus mr-2"></i>Add Skill
+                            </button>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Registration Requirements</label>
+                            <div class="form-check mb-2">
+                                <input type="checkbox" id="ahpraRequired" name="ahpraRequired" value="true">
+                                <label class="form-check-label" for="ahpraRequired">
+                                    AHPRA Registration Required
+                                </label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input type="checkbox" id="vaccinationRequired" name="vaccinationRequired" value="true">
+                                <label class="form-check-label" for="vaccinationRequired">
+                                    COVID-19 Vaccination Required
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input type="checkbox" id="policeCheckRequired" name="policeCheckRequired" value="true">
+                                <label class="form-check-label" for="policeCheckRequired">
+                                    Police Check Required
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Compensation -->
+                    <div class="form-step" data-step="3">
+                        <h3 class="text-xl font-semibold mb-6">Compensation & Benefits</h3>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Hourly Rate Range (AUD)</label>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="input-icon-wrapper">
+                                        <i class="fas fa-dollar-sign input-icon left"></i>
+                                        <input type="number" id="hourlyRateMin" name="hourlyRateMin" 
+                                               class="form-input" placeholder="35" min="15" step="0.50">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="input-icon-wrapper">
+                                        <i class="fas fa-dollar-sign input-icon left"></i>
+                                        <input type="number" id="hourlyRateMax" name="hourlyRateMax" 
+                                               class="form-input" placeholder="65" min="15" step="0.50">
+                                    </div>
+                                </div>
+                            </div>
+                            <small class="form-text text-muted">Leave blank to show as "Competitive"</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Benefits Offered</label>
+                            <div class="benefits-grid">
+                                <div class="form-check">
+                                    <input type="checkbox" id="benefit1" name="benefits[]" value="Professional Development">
+                                    <label class="form-check-label" for="benefit1">
+                                        <i class="fas fa-graduation-cap mr-2"></i>Professional Development
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input type="checkbox" id="benefit2" name="benefits[]" value="Flexible Hours">
+                                    <label class="form-check-label" for="benefit2">
+                                        <i class="fas fa-clock mr-2"></i>Flexible Hours
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input type="checkbox" id="benefit3" name="benefits[]" value="Parking Provided">
+                                    <label class="form-check-label" for="benefit3">
+                                        <i class="fas fa-parking mr-2"></i>Parking Provided
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input type="checkbox" id="benefit4" name="benefits[]" value="Study Leave">
+                                    <label class="form-check-label" for="benefit4">
+                                        <i class="fas fa-book mr-2"></i>Study Leave
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input type="checkbox" id="benefit5" name="benefits[]" value="Health Insurance">
+                                    <label class="form-check-label" for="benefit5">
+                                        <i class="fas fa-heartbeat mr-2"></i>Health Insurance
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input type="checkbox" id="benefit6" name="benefits[]" value="Superannuation">
+                                    <label class="form-check-label" for="benefit6">
+                                        <i class="fas fa-piggy-bank mr-2"></i>Above Award Super
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="additionalBenefits">Additional Benefits</label>
+                            <textarea id="additionalBenefits" name="additionalBenefits" class="form-input" 
+                                      rows="3" placeholder="Describe any other benefits or perks..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Step 4: Schedule -->
+                    <div class="form-step" data-step="4">
+                        <h3 class="text-xl font-semibold mb-6">Work Schedule</h3>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label" for="startDate">Start Date</label>
+                                    <div class="input-icon-wrapper">
+                                        <i class="fas fa-calendar input-icon left"></i>
+                                        <input type="date" id="startDate" name="startDate" 
+                                               class="form-input" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label" for="duration">Duration</label>
+                                    <select id="duration" name="duration" class="form-input">
+                                        <option value="ongoing">Ongoing</option>
+                                        <option value="3-months">3 months</option>
+                                        <option value="6-months">6 months</option>
+                                        <option value="12-months">12 months</option>
+                                        <option value="custom">Custom</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Working Hours</label>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="input-icon-wrapper">
+                                        <i class="fas fa-sun input-icon left"></i>
+                                        <input type="time" id="startTime" name="startTime" 
+                                               class="form-input" placeholder="09:00">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="input-icon-wrapper">
+                                        <i class="fas fa-moon input-icon left"></i>
+                                        <input type="time" id="endTime" name="endTime" 
+                                               class="form-input" placeholder="17:00">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Working Days</label>
+                            <div class="weekday-selector">
+                                <label class="weekday-option">
+                                    <input type="checkbox" name="workDays[]" value="monday">
+                                    <span>Mon</span>
+                                </label>
+                                <label class="weekday-option">
+                                    <input type="checkbox" name="workDays[]" value="tuesday">
+                                    <span>Tue</span>
+                                </label>
+                                <label class="weekday-option">
+                                    <input type="checkbox" name="workDays[]" value="wednesday">
+                                    <span>Wed</span>
+                                </label>
+                                <label class="weekday-option">
+                                    <input type="checkbox" name="workDays[]" value="thursday">
+                                    <span>Thu</span>
+                                </label>
+                                <label class="weekday-option">
+                                    <input type="checkbox" name="workDays[]" value="friday">
+                                    <span>Fri</span>
+                                </label>
+                                <label class="weekday-option">
+                                    <input type="checkbox" name="workDays[]" value="saturday">
+                                    <span>Sat</span>
+                                </label>
+                                <label class="weekday-option">
+                                    <input type="checkbox" name="workDays[]" value="sunday">
+                                    <span>Sun</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="form-check">
+                                <input type="checkbox" id="flexibleSchedule" name="flexibleSchedule" value="true">
+                                <label class="form-check-label" for="flexibleSchedule">
+                                    <i class="fas fa-sync-alt mr-2"></i>
+                                    Flexible schedule available
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 5: Description -->
+                    <div class="form-step" data-step="5">
+                        <h3 class="text-xl font-semibold mb-6">Job Description</h3>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="jobSummary">Job Summary</label>
+                            <textarea id="jobSummary" name="jobSummary" class="form-input" rows="3" 
+                                      placeholder="Provide a brief overview of the role..." required></textarea>
+                            <small class="form-text text-muted">This will appear at the top of your job listing</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Detailed Description</label>
+                            <div class="editor-toolbar">
+                                <button type="button" class="editor-btn" onclick="formatText('bold')">
+                                    <i class="fas fa-bold"></i>
+                                </button>
+                                <button type="button" class="editor-btn" onclick="formatText('italic')">
+                                    <i class="fas fa-italic"></i>
+                                </button>
+                                <button type="button" class="editor-btn" onclick="formatText('insertUnorderedList')">
+                                    <i class="fas fa-list-ul"></i>
+                                </button>
+                                <button type="button" class="editor-btn" onclick="formatText('insertOrderedList')">
+                                    <i class="fas fa-list-ol"></i>
+                                </button>
+                            </div>
+                            <div id="jobDescription" class="rich-editor" contenteditable="true" 
+                                 placeholder="Describe the role, responsibilities, and what makes this opportunity special..."></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="applicationInstructions">Application Instructions</label>
+                            <textarea id="applicationInstructions" name="applicationInstructions" 
+                                      class="form-input" rows="3" 
+                                      placeholder="How should candidates apply? Include any specific requirements..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Step 6: Preview -->
+                    <div class="form-step" data-step="6">
+                        <h3 class="text-xl font-semibold mb-6">Preview Your Job Listing</h3>
+                        
+                        <div class="preview-card">
+                            <div class="preview-badge">PREVIEW</div>
+                            
+                            <div class="job-header mb-4">
+                                <h2 id="previewTitle" class="text-2xl font-bold mb-2">Job Title</h2>
+                                <div class="job-meta">
+                                    <span class="mr-4"><i class="fas fa-hospital mr-2"></i><span id="previewPharmacy">Pharmacy Name</span></span>
+                                    <span class="mr-4"><i class="fas fa-map-marker-alt mr-2"></i><span id="previewLocation">Location</span></span>
+                                    <span><i class="fas fa-briefcase mr-2"></i><span id="previewType">Job Type</span></span>
+                                </div>
+                            </div>
+
+                            <div class="job-section mb-4">
+                                <h4 class="font-semibold mb-2">Summary</h4>
+                                <p id="previewSummary" class="text-gray-300">Job summary will appear here...</p>
+                            </div>
+
+                            <div class="job-section mb-4">
+                                <h4 class="font-semibold mb-2">Compensation</h4>
+                                <p id="previewCompensation" class="text-gray-300">Hourly rate information...</p>
+                            </div>
+
+                            <div class="job-section mb-4">
+                                <h4 class="font-semibold mb-2">Requirements</h4>
+                                <ul id="previewRequirements" class="list-disc list-inside text-gray-300">
+                                    <li>Requirements will be listed here</li>
+                                </ul>
+                            </div>
+
+                            <div class="job-section">
+                                <h4 class="font-semibold mb-2">Benefits</h4>
+                                <ul id="previewBenefits" class="list-disc list-inside text-gray-300">
+                                    <li>Benefits will be listed here</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="form-group mt-4">
+                            <div class="form-check">
+                                <input type="checkbox" id="termsAccepted" name="termsAccepted" required>
+                                <label class="form-check-label" for="termsAccepted">
+                                    I confirm that all information is accurate and I agree to the 
+                                    <a href="#" class="text-blue-400 hover:underline">Terms of Service</a>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Navigation Buttons -->
+                    <div class="form-navigation mt-8">
+                        <button type="button" class="btn btn-secondary" id="prevBtn" onclick="changeStep(-1)">
+                            <i class="fas fa-arrow-left mr-2"></i>Previous
+                        </button>
+                        <button type="button" class="btn btn-primary" id="nextBtn" onclick="changeStep(1)">
+                            Next<i class="fas fa-arrow-right ml-2"></i>
+                        </button>
+                        <button type="submit" class="btn btn-primary" id="submitBtn" style="display: none;">
+                            <i class="fas fa-check mr-2"></i>Post Job
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let currentStep = 1;
+        const totalSteps = 6;
+
+        function showStep(step) {
+            // Update form steps
+            document.querySelectorAll('.form-step').forEach(el => {
+                el.classList.remove('active');
+            });
+            document.querySelector(`.form-step[data-step="${step}"]`).classList.add('active');
+
+            // Update step indicators
+            document.querySelectorAll('.step').forEach(el => {
+                const stepNum = parseInt(el.dataset.step);
+                el.classList.remove('active', 'completed');
+                if (stepNum < step) {
+                    el.classList.add('completed');
+                } else if (stepNum === step) {
+                    el.classList.add('active');
+                }
+            });
+
+            // Update navigation buttons
+            document.getElementById('prevBtn').style.display = step === 1 ? 'none' : 'inline-flex';
+            document.getElementById('nextBtn').style.display = step === totalSteps ? 'none' : 'inline-flex';
+            document.getElementById('submitBtn').style.display = step === totalSteps ? 'inline-flex' : 'none';
+
+            // Update preview if on last step
+            if (step === totalSteps) {
+                updatePreview();
+            }
+        }
+
+        function changeStep(direction) {
+            // Validate current step before moving forward
+            if (direction > 0 && !validateCurrentStep()) {
+                return;
+            }
+
+            currentStep += direction;
+            if (currentStep < 1) currentStep = 1;
+            if (currentStep > totalSteps) currentStep = totalSteps;
+            
+            showStep(currentStep);
+        }
+
+        function validateCurrentStep() {
+            const currentFormStep = document.querySelector(`.form-step[data-step="${currentStep}"]`);
+            const requiredFields = currentFormStep.querySelectorAll('[required]');
+            
+            let isValid = true;
+            requiredFields.forEach(field => {
+                if (!field.value.trim()) {
+                    field.classList.add('error');
+                    isValid = false;
+                } else {
+                    field.classList.remove('error');
+                }
+            });
+
+            if (!isValid) {
+                showNotification('Please fill in all required fields', 'error');
+            }
+
+            return isValid;
+        }
+
+        function addQualification() {
+            const container = document.getElementById('qualificationsList');
+            const newItem = document.createElement('div');
+            newItem.className = 'qualification-item mb-2';
+            newItem.innerHTML = `
+                <div class="input-icon-wrapper">
+                    <i class="fas fa-graduation-cap input-icon left"></i>
+                    <input type="text" name="qualifications[]" class="form-input" 
+                           placeholder="e.g., Bachelor of Pharmacy">
+                    <button type="button" class="btn-remove" onclick="removeItem(this)">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `;
+            container.appendChild(newItem);
+        }
+
+        function addSkill() {
+            const container = document.getElementById('skillsList');
+            const newItem = document.createElement('div');
+            newItem.className = 'skill-item mb-2';
+            newItem.innerHTML = `
+                <div class="input-icon-wrapper">
+                    <i class="fas fa-star input-icon left"></i>
+                    <input type="text" name="skills[]" class="form-input" 
+                           placeholder="e.g., 3+ years hospital pharmacy experience">
+                    <button type="button" class="btn-remove" onclick="removeItem(this)">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `;
+            container.appendChild(newItem);
+        }
+
+        function removeItem(button) {
+            button.closest('.qualification-item, .skill-item').remove();
+        }
+
+        function formatText(command) {
+            document.execCommand(command, false, null);
+            document.getElementById('jobDescription').focus();
+        }
+
+        function updatePreview() {
+            // Update title and basic info
+            document.getElementById('previewTitle').textContent = 
+                document.getElementById('jobTitle').value || 'Job Title';
+            document.getElementById('previewPharmacy').textContent = 
+                document.getElementById('pharmacyName').value || 'Pharmacy Name';
+            document.getElementById('previewLocation').textContent = 
+                document.getElementById('location').value || 'Location';
+            document.getElementById('previewType').textContent = 
+                document.getElementById('jobType').options[document.getElementById('jobType').selectedIndex].text || 'Job Type';
+            
+            // Update summary
+            document.getElementById('previewSummary').textContent = 
+                document.getElementById('jobSummary').value || 'Job summary will appear here...';
+            
+            // Update compensation
+            const minRate = document.getElementById('hourlyRateMin').value;
+            const maxRate = document.getElementById('hourlyRateMax').value;
+            let compensation = 'Competitive hourly rate';
+            if (minRate && maxRate) {
+                compensation = `$${minRate} - $${maxRate} per hour`;
+            } else if (minRate) {
+                compensation = `From $${minRate} per hour`;
+            }
+            document.getElementById('previewCompensation').textContent = compensation;
+            
+            // Update requirements
+            const qualifications = Array.from(document.querySelectorAll('input[name="qualifications[]"]'))
+                .map(input => input.value)
+                .filter(val => val);
+            const requirementsList = document.getElementById('previewRequirements');
+            requirementsList.innerHTML = qualifications.map(q => `<li>${q}</li>`).join('') || '<li>No requirements listed</li>';
+            
+            // Update benefits
+            const benefits = Array.from(document.querySelectorAll('input[name="benefits[]"]:checked'))
+                .map(input => input.value);
+            const benefitsList = document.getElementById('previewBenefits');
+            benefitsList.innerHTML = benefits.map(b => `<li>${b}</li>`).join('') || '<li>No benefits listed</li>';
+        }
+
+        function handleSubmit(event) {
+            event.preventDefault();
+            
+            if (!validateCurrentStep()) {
+                return;
+            }
+            
+            // Collect form data
+            const formData = new FormData(document.getElementById('createJobForm'));
+            const jobData = Object.fromEntries(formData);
+            
+            // Add rich text content
+            jobData.description = document.getElementById('jobDescription').innerHTML;
+            
+            // Show success message
+            showNotification('Job posted successfully!', 'success');
+            
+            // In a real app, this would send data to the server
+            console.log('Job data:', jobData);
+            
+            // Redirect after delay
+            setTimeout(() => {
+                window.location.href = '/jobs.html';
+            }, 2000);
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type} fade-in-up`;
+            notification.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'} mr-2"></i>
+                ${message}
+            `;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.classList.add('fade-out');
+                setTimeout(() => notification.remove(), 500);
+            }, 3000);
+        }
+
+        // Weekday selector functionality
+        document.querySelectorAll('.weekday-option input').forEach(input => {
+            input.addEventListener('change', function() {
+                this.parentElement.classList.toggle('selected', this.checked);
+            });
+        });
+
+        // Sidebar functionality
+        const sidebar = document.getElementById('sidebar');
+        const sidebarToggle = document.getElementById('sidebar-toggle');
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileOverlay = document.getElementById('mobile-overlay');
+
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+            localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
+        });
+
+        mobileMenuBtn.addEventListener('click', () => {
+            sidebar.classList.add('mobile-open');
+            mobileOverlay.classList.add('active');
+        });
+
+        mobileOverlay.addEventListener('click', () => {
+            sidebar.classList.remove('mobile-open');
+            mobileOverlay.classList.remove('active');
+        });
+
+        // Restore sidebar state
+        if (localStorage.getItem('sidebarCollapsed') === 'true') {
+            sidebar.classList.add('collapsed');
+        }
+
+        // Initialize
+        showStep(1);
+    </script>
+
+    <style>
+        /* Additional styles for form elements */
+        .btn-remove {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(239, 68, 68, 0.2);
+            border: none;
+            color: #ef4444;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-remove:hover {
+            background: rgba(239, 68, 68, 0.3);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+        }
+
+        .weekday-selector {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .weekday-option {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .weekday-option input {
+            position: absolute;
+            opacity: 0;
+        }
+
+        .weekday-option span {
+            display: block;
+            padding: 10px 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .weekday-option input:checked + span {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            border-color: transparent;
+            color: white;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 16px 24px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            font-weight: 500;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        .notification-success {
+            background: rgba(16, 185, 129, 0.2);
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+
+        .notification-error {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+
+        .fade-out {
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.5s ease;
+        }
+    </style>
+</body>
+</html>

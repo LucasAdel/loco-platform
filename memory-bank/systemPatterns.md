@@ -197,17 +197,81 @@ impl JobRepository {
 
 ## 🎨 Design Patterns
 
-### CSS Architecture
-- **Glass morphism effects** with backdrop-blur
-- **Australian colour palette** (blues, greens, gold)
-- **Accessibility-first** design with proper contrast
-- **Mobile-first responsive** design
+### Modern Design System (2025)
+- **Advanced Glass Morphism** with multi-layered backdrop effects
+- **Beautiful Modern Typography** using Inter font family
+- **Sophisticated Color System** with CSS custom properties
+- **Professional Sidebar Navigation** with collapse/expand functionality
+- **Micro-interactions** with smooth, delightful animations
+- **Heroicons Integration** alongside Font Awesome for rich iconography
+- **Consistent Design Language** across all static HTML pages
 
-### Component Design
-- **Consistent spacing** using Tailwind utilities
-- **Hover states** with smooth transitions
-- **Focus management** for keyboard navigation
-- **Loading states** with proper feedback
+### CSS Architecture
+```css
+/* Glass morphism with enhanced visibility */
+.sidebar {
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(20px);
+  border-right: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 4px 0 30px rgba(0, 0, 0, 0.2);
+}
+
+/* Fallback for browsers without backdrop-filter */
+@supports not (backdrop-filter: blur(20px)) {
+  .sidebar {
+    background: rgba(30, 41, 59, 0.95);
+  }
+}
+```
+
+### Modern Color Palette
+```css
+:root {
+  /* Primary Blues (Modern gradient spectrum) */
+  --primary-50: #f0f9ff;
+  --primary-100: #e0f2fe;
+  --primary-500: #0ea5e9;
+  --primary-900: #0c4a6e;
+  
+  /* Neutral Grays with warm undertones */
+  --gray-50: #fafaf9;
+  --gray-900: #1c1917;
+  
+  /* Glass morphism variables */
+  --glass-bg: rgba(255, 255, 255, 0.1);
+  --glass-border: rgba(255, 255, 255, 0.2);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+```
+
+### Component Design Patterns
+- **Glass Cards** with hover lift effects and shimmer animations
+- **Floating Action Buttons** with ripple effects
+- **Collapsible Sidebar** with smooth transitions and tooltips
+- **Modern Input Fields** with glass styling (glass-input class)
+- **Advanced Loading States** with pulse animations
+- **Interactive Dashboard** with real-time counters
+- **Glass Buttons** (glass-button, glass-button-secondary) with consistent styling
+- **Modern Card Components** (.modern-card) for job listings and content
+- **Glass Tables** for data display with modern styling
+
+### Animation System
+```css
+/* Modern easing curves */
+--ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+--ease-elastic: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+/* Micro-interactions */
+.bounce-in { animation: bounceIn 500ms var(--ease-bounce); }
+.fade-in-up { animation: fadeInUp 500ms var(--ease-out); }
+.slide-in-right { animation: slideInRight 500ms var(--ease-out); }
+```
+
+### Mobile-First Responsive Design
+- **Collapsible sidebar** transforms to overlay on mobile
+- **Touch-optimized** with 48px minimum touch targets
+- **Smooth scrolling** with momentum on mobile devices
+- **Progressive enhancement** for older browsers
 
 ## 🔄 Data Flow Patterns
 

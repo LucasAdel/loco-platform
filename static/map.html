@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loco Platform - Job Map</title>
+    <link rel="stylesheet" href="modern-design-system.css">
+    <link rel="stylesheet" href="soft-corners-fix.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href='https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css' rel='stylesheet' />
+    <script src='https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js'></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="js/interactive-map.js"></script>
+    <link rel="stylesheet" href="responsive-fix.css">
+    <style>
+        #map {
+            width: 100%;
+            height: 600px;
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+        }
+        .mapboxgl-popup {
+            max-width: 320px;
+        }
+        .mapboxgl-popup-content {
+            padding: 0;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+        .job-popup {
+            padding: 20px;
+        }
+        .marker {
+            transition: transform 0.2s ease;
+        }
+        .marker:hover {
+            transform: scale(1.2);
+        }
+        .user-marker {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 20px rgba(59, 130, 246, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Mobile Menu Button -->
+    <button class="mobile-menu-btn" id="mobile-menu-btn">
+        <svg class="heroicon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+    </button>
+
+    <!-- Mobile Overlay -->
+    <div class="mobile-overlay" id="mobile-overlay"></div>
+
+    <!-- Modern Collapsible Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="/index.html" class="sidebar-logo">
+                <svg class="heroicon-lg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349M3.75 21V9.349m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016c.896 0 1.7-.393 2.25-1.016a3.001 3.001 0 003.75.614m-16.5 0a3.001 3.001 0 01-.621-1.82m0 0a2.99 2.99 0 01.621-1.82m0 0L10.89 1.65h2.22l2.011 6.126M18 9.349a3.001 3.001 0 01-.621-1.82m0 0a2.99 2.99 0 01.621-1.82m0 0L15.11 1.65h-2.22l-2.011 6.126"/>
+                </svg>
+                <span class="logo-text">Loco Platform</span>
+            </a>
+            <button class="sidebar-toggle" id="sidebar-toggle">
+                <svg class="heroicon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>
+                </svg>
+            </button>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">Main</div>
+                <a href="/index.html" class="nav-item">
+                    <div class="nav-item-icon">
+                        <svg class="heroicon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/>
+                        </svg>
+                    </div>
+                    <span class="nav-item-text">Home</span>
+                    <div class="nav-tooltip">Home</div>
+                </a>
+                
+                <a href="/dashboard.html" class="nav-item">
+                    <div class="nav-item-icon">
+                        <svg class="heroicon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z"/>
+                        </svg>
+                    </div>
+                    <span class="nav-item-text">Dashboard</span>
+                    <div class="nav-tooltip">Dashboard</div>
+                </a>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Jobs</div>
+                <a href="/jobs.html" class="nav-item">
+                    <div class="nav-item-icon">
+                        <svg class="heroicon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 00.75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 00-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0112 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 01-.673-.38m0 0A2.18 2.18 0 013 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 013.413-.387m7.5 0V5.25A2.25 2.25 0 0013.5 3h-3a2.25 2.25 0 00-2.25 2.25v.894m7.5 0a48.667 48.667 0 00-7.5 0M12 12.75h.008v.008H12v-.008z"/>
+                        </svg>
+                    </div>
+                    <span class="nav-item-text">Browse Jobs</span>
+                    <div class="nav-tooltip">Browse Jobs</div>
+                </a>
+                
+                <a href="/map.html" class="nav-item active">
+                    <div class="nav-item-icon">
+                        <svg class="heroicon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/>
+                        </svg>
+                    </div>
+                    <span class="nav-item-text">Job Map</span>
+                    <div class="nav-tooltip">Job Map</div>
+                </a>
+
+                <a href="/create-job.html" class="nav-item">
+                    <div class="nav-item-icon">
+                        <svg class="heroicon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.5v15m7.5-7.5h-15"/>
+                        </svg>
+                    </div>
+                    <span class="nav-item-text">Post Job</span>
+                    <div class="nav-tooltip">Post Job</div>
+                </a>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Account</div>
+                <a href="/profile.html" class="nav-item">
+                    <div class="nav-item-icon">
+                        <svg class="heroicon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 9a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                    </div>
+                    <span class="nav-item-text">Profile</span>
+                    <div class="nav-tooltip">Profile</div>
+                </a>
+
+                <a href="/admin.html" class="nav-item">
+                    <div class="nav-item-icon">
+                        <svg class="heroicon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                    </div>
+                    <span class="nav-item-text">Admin</span>
+                    <div class="nav-tooltip">Admin</div>
+                </a>
+            </div>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-content px-4 sm:px-6 lg:px-8 py-8">
+        <div class="max-w-7xl mx-auto">
+            <!-- Page Header -->
+            <div class="mb-6 fade-in">
+                <h2 class="text-3xl font-bold text-white">Job Locations Map</h2>
+                <p class="mt-2 text-white/70">Explore pharmacy job opportunities across Australia</p>
+            </div>
+
+            <!-- Map Controls -->
+            <div class="modern-glass p-6 mb-6 fade-in-up">
+                <div class="flex flex-wrap gap-4">
+                    <div class="flex-1 min-w-[200px]">
+                        <label class="block text-sm font-medium text-white/80 mb-2">Search Location</label>
+                        <input 
+                            type="text" 
+                            id="location-search"
+                            placeholder="Enter suburb or city..." 
+                            class="glass-input w-full"
+                        >
+                    </div>
+                    <div class="min-w-[150px]">
+                        <label class="block text-sm font-medium text-white/80 mb-2">Radius</label>
+                        <select id="radius-filter" class="glass-input w-full">
+                            <option value="5">5 km</option>
+                            <option value="10" selected>10 km</option>
+                            <option value="25">25 km</option>
+                            <option value="50">50 km</option>
+                            <option value="100">100 km</option>
+                        </select>
+                    </div>
+                    <div class="flex items-end gap-2">
+                        <button onclick="searchLocation()" class="glass-button">
+                            <svg class="heroicon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                            Search
+                        </button>
+                        <button onclick="getCurrentLocation()" class="glass-button-secondary">
+                            <svg class="heroicon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/>
+                            </svg>
+                            My Location
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Map Container -->
+            <div class="modern-glass overflow-hidden mb-6 fade-in-up animation-delay-200">
+                <div id="map"></div>
+            </div>
+
+            <!-- Legend -->
+            <div class="modern-glass p-6 fade-in-up animation-delay-400">
+                <h3 class="font-semibold mb-4 text-white">Legend</h3>
+                <div class="flex flex-wrap gap-6 text-sm">
+                    <div class="flex items-center">
+                        <div class="w-4 h-4 bg-green-500 rounded-full mr-2"></div>
+                        <span class="text-white/80">Regular Jobs</span>
+                    </div>
+                    <div class="flex items-center">
+                        <div class="w-4 h-4 bg-red-500 rounded-full mr-2"></div>
+                        <span class="text-white/80">Urgent Jobs</span>
+                    </div>
+                    <div class="flex items-center">
+                        <div class="w-4 h-4 bg-blue-500 rounded-full mr-2"></div>
+                        <span class="text-white/80">Your Location</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Job List Sidebar (Hidden on mobile by default) -->
+            <div id="job-list" class="hidden mt-6 modern-glass p-6 fade-in-up animation-delay-600">
+                <h3 class="font-semibold mb-4 text-white">Jobs in Selected Area</h3>
+                <div id="map-jobs-list" class="space-y-3 max-h-96 overflow-y-auto">
+                    <!-- Jobs will be populated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Supabase Client -->
+    <script src="js/supabase-client.js"></script>
+    
+    <script>
+        // Initialize sidebar functionality
+        function initializeSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const sidebarToggle = document.getElementById('sidebar-toggle');
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const mobileOverlay = document.getElementById('mobile-overlay');
+            
+            // Sidebar collapse/expand
+            sidebarToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('collapsed');
+                
+                // Update toggle icon
+                const icon = sidebarToggle.querySelector('svg');
+                if (sidebar.classList.contains('collapsed')) {
+                    icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>';
+                } else {
+                    icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>';
+                }
+            });
+            
+            // Mobile menu functionality
+            mobileMenuBtn.addEventListener('click', function() {
+                sidebar.classList.toggle('mobile-open');
+                mobileOverlay.classList.toggle('active');
+            });
+            
+            // Close mobile menu when clicking overlay
+            mobileOverlay.addEventListener('click', function() {
+                sidebar.classList.remove('mobile-open');
+                mobileOverlay.classList.remove('active');
+            });
+            
+            // Close mobile menu when clicking nav item
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    if (window.innerWidth <= 768) {
+                        sidebar.classList.remove('mobile-open');
+                        mobileOverlay.classList.remove('active');
+                    }
+                });
+            });
+            
+            // Handle window resize
+            window.addEventListener('resize', function() {
+                if (window.innerWidth > 768) {
+                    sidebar.classList.remove('mobile-open');
+                    mobileOverlay.classList.remove('active');
+                }
+            });
+        }
+
+        // Initialize map with proper Mapbox token from environment
+        mapboxgl.accessToken = 'pk.eyJ1IjoiaGVhbHRocGFnZXMiLCJhIjoiY204cGduaWxxMGF0cDJxcG5jeG03ZXRheiJ9.zfIAdS9mexKP1RNSDEI4Og';
+        
+        let map;
+        let markers = [];
+        let userLocationMarker;
+
+        // Initialize map centered on Australia
+        function initMap() {
+            try {
+                map = new mapboxgl.Map({
+                    container: 'map',
+                    style: 'mapbox://styles/mapbox/dark-v11', // Dark theme to match our design
+                    center: [133.7751, -25.2744], // Center of Australia
+                    zoom: 4
+                });
+
+                map.addControl(new mapboxgl.NavigationControl());
+
+                // Load jobs when map is ready
+                map.on('load', () => {
+                    loadMapJobs();
+                });
+
+                // Handle map errors
+                map.on('error', (e) => {
+                    console.error('Map error:', e.error);
+                    showMapFallback();
+                });
+            } catch (error) {
+                console.error('Failed to initialize map:', error);
+                showMapFallback();
+            }
+        }
+
+        // Show fallback when map fails to load
+        function showMapFallback() {
+            const mapContainer = document.getElementById('map');
+            mapContainer.innerHTML = `
+                <div class="flex items-center justify-center h-full modern-glass rounded-xl">
+                    <div class="text-center p-8">
+                        <div class="text-6xl mb-4">🗺️</div>
+                        <h3 class="text-xl font-semibold text-white mb-2">Map Temporarily Unavailable</h3>
+                        <p class="text-white/70 mb-4">Unable to load interactive map. This usually resolves quickly.</p>
+                        <button onclick="location.reload()" class="glass-button">
+                            Try Again
+                        </button>
+                    </div>
+                </div>
+            `;
+            loadMapJobs(); // Still load job data
+        }
+
+        // Load jobs and display on map
+        async function loadMapJobs() {
+            try {
+                // Try Supabase first
+                const result = await SupabaseDB.getJobs({ limit: 100 });
+                
+                if (result.success && result.data.length > 0) {
+                    displayJobsOnMap(result.data);
+                    showToast('✅ Live job data loaded from Supabase', 'success');
+                    return;
+                }
+                
+                // Fallback to REST API
+                const response = await fetch('http://localhost:3070/api/jobs?limit=100');
+                const data = await response.json();
+                
+                displayJobsOnMap(data.jobs || []);
+                showToast('📡 Job data loaded from API', 'info');
+            } catch (error) {
+                console.error('Error loading jobs for map:', error);
+                // Use fallback data when API is unavailable
+                const fallbackJobs = getFallbackMapJobs();
+                displayJobsOnMap(fallbackJobs);
+                showToast('🔄 Showing demo job data', 'warning');
+            }
+        }
+
+        // Fallback jobs data for map demo
+        function getFallbackMapJobs() {
+            return [
+                {
+                    id: 'map-demo-1',
+                    title: 'Senior Pharmacist',
+                    company: 'Sydney Pharmacy Group',
+                    location: 'Sydney',
+                    is_urgent: false,
+                    salary_range_start: 120000,
+                    salary_range_end: 140000
+                },
+                {
+                    id: 'map-demo-2',
+                    title: 'Locum Pharmacist',
+                    company: 'Melbourne Community Pharmacy',
+                    location: 'Melbourne',
+                    is_urgent: true,
+                    salary_range_start: 55000,
+                    salary_range_end: 75000
+                },
+                {
+                    id: 'map-demo-3',
+                    title: 'Hospital Pharmacist',
+                    company: 'Brisbane General Hospital',
+                    location: 'Brisbane',
+                    is_urgent: false,
+                    salary_range_start: 90000,
+                    salary_range_end: 110000
+                },
+                {
+                    id: 'map-demo-4',
+                    title: 'Pharmacist Manager',
+                    company: 'Perth Pharmacy Chain',
+                    location: 'Perth',
+                    is_urgent: false,
+                    salary_range_start: 130000,
+                    salary_range_end: 150000
+                }
+            ];
+        }
+
+        // Display jobs as markers on the map
+        function displayJobsOnMap(jobs) {
+            // Clear existing markers
+            markers.forEach(marker => marker.remove());
+            markers = [];
+
+            // Sample coordinates for major Australian cities (in production, use real job coordinates)
+            const cityCoords = {
+                'Sydney': [151.2093, -33.8688],
+                'Melbourne': [144.9631, -37.8136],
+                'Brisbane': [153.0251, -27.4698],
+                'Perth': [115.8605, -31.9505],
+                'Adelaide': [138.6007, -34.9285],
+                'Hobart': [147.3272, -42.8821],
+                'Darwin': [130.8456, -12.4634],
+                'Canberra': [149.1300, -35.2809]
+            };
+
+            jobs.forEach((job, index) => {
+                // Use job location or random city for demo
+                const cities = Object.keys(cityCoords);
+                const city = job.location || cities[index % cities.length];
+                const coords = cityCoords[city] || cityCoords['Sydney'];
+                
+                // Add some randomness to prevent overlap
+                const lng = coords[0] + (Math.random() - 0.5) * 0.1;
+                const lat = coords[1] + (Math.random() - 0.5) * 0.1;
+
+                // Create custom marker
+                const el = document.createElement('div');
+                el.className = 'marker';
+                el.style.width = '30px';
+                el.style.height = '30px';
+                el.style.borderRadius = '50%';
+                el.style.border = '3px solid white';
+                el.style.boxShadow = '0 2px 8px rgba(0,0,0,0.5)';
+                el.style.cursor = 'pointer';
+                el.style.backgroundColor = job.is_urgent ? '#ef4444' : '#10b981';
+
+                // Create marker
+                const marker = new mapboxgl.Marker(el)
+                    .setLngLat([lng, lat])
+                    .setPopup(createJobPopup(job))
+                    .addTo(map);
+
+                markers.push(marker);
+            });
+        }
+
+        // Create popup content for job
+        function createJobPopup(job) {
+            const content = `
+                <div class="job-popup">
+                    <h3 class="font-semibold text-lg mb-2">${job.title}</h3>
+                    <p class="text-gray-600 text-sm mb-2">${job.company || 'Company Name'}</p>
+                    <p class="text-gray-500 text-sm mb-3">${job.location || 'Location'}</p>
+                    ${job.salary_range_start ? `
+                        <p class="text-green-600 font-medium mb-3">
+                            $${job.salary_range_start.toLocaleString()} - $${job.salary_range_end.toLocaleString()}
+                        </p>
+                    ` : ''}
+                    <button onclick="viewJob('${job.id}')" class="bg-gradient-to-r from-primary-500 to-primary-600 text-white px-3 py-2 rounded-lg text-sm hover:from-primary-600 hover:to-primary-700 w-full transition-all">
+                        View Details
+                    </button>
+                </div>
+            `;
+
+            return new mapboxgl.Popup({ offset: 25 }).setHTML(content);
+        }
+
+        // Get user's current location
+        function getCurrentLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const lng = position.coords.longitude;
+                        const lat = position.coords.latitude;
+                        
+                        // Remove existing user marker if any
+                        if (userLocationMarker) {
+                            userLocationMarker.remove();
+                        }
+
+                        // Create user location marker
+                        const el = document.createElement('div');
+                        el.className = 'user-marker';
+                        el.style.width = '20px';
+                        el.style.height = '20px';
+                        el.style.borderRadius = '50%';
+                        el.style.border = '3px solid white';
+                        el.style.backgroundColor = '#3b82f6';
+                        el.style.boxShadow = '0 0 0 10px rgba(59, 130, 246, 0.2)';
+
+                        userLocationMarker = new mapboxgl.Marker(el)
+                            .setLngLat([lng, lat])
+                            .addTo(map);
+
+                        // Center map on user location
+                        map.flyTo({
+                            center: [lng, lat],
+                            zoom: 11,
+                            essential: true
+                        });
+                    },
+                    (error) => {
+                        showToast('Unable to get your location. Please enable location services.', 'error');
+                    }
+                );
+            } else {
+                showToast('Geolocation is not supported by your browser.', 'error');
+            }
+        }
+
+        // Search for a location
+        function searchLocation() {
+            const location = document.getElementById('location-search').value;
+            if (!location) return;
+
+            // In production, use a geocoding service
+            // For demo, we'll use predefined coordinates
+            const cityCoords = {
+                'sydney': [151.2093, -33.8688],
+                'melbourne': [144.9631, -37.8136],
+                'brisbane': [153.0251, -27.4698],
+                'perth': [115.8605, -31.9505],
+                'adelaide': [138.6007, -34.9285]
+            };
+
+            const coords = cityCoords[location.toLowerCase()];
+            if (coords) {
+                map.flyTo({
+                    center: coords,
+                    zoom: 11,
+                    essential: true
+                });
+            } else {
+                showToast('Location not found. Try Sydney, Melbourne, Brisbane, Perth, or Adelaide.', 'warning');
+            }
+        }
+
+        function viewJob(jobId) {
+            window.location.href = `job-detail.html?id=${jobId}`;
+        }
+
+        // Toast notification system - modern glass design
+        function showToast(message, type = 'info', duration = 4000) {
+            const toast = document.createElement('div');
+            toast.className = `fixed bottom-4 right-4 z-50 max-w-sm transform translate-x-full transition-transform duration-300 ease-in-out`;
+            
+            let bgClass = 'modern-glass';
+            let borderColor = 'border-blue-500';
+            let textColor = 'text-blue-400';
+            let icon = '💡';
+            
+            switch (type) {
+                case 'success':
+                    borderColor = 'border-green-500';
+                    textColor = 'text-green-400';
+                    icon = '✅';
+                    break;
+                case 'warning':
+                    borderColor = 'border-yellow-500';
+                    textColor = 'text-yellow-400';
+                    icon = '⚠️';
+                    break;
+                case 'error':
+                    borderColor = 'border-red-500';
+                    textColor = 'text-red-400';
+                    icon = '❌';
+                    break;
+            }
+            
+            toast.innerHTML = `
+                <div class="${bgClass} px-4 py-3 rounded-lg border-l-4 ${borderColor} flex items-center">
+                    <span class="mr-2">${icon}</span>
+                    <span class="text-sm ${textColor}">${message}</span>
+                    <button onclick="this.parentElement.parentElement.remove()" class="ml-3 text-white/50 hover:text-white">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(toast);
+            
+            // Animate in from right
+            setTimeout(() => {
+                toast.classList.remove('translate-x-full');
+            }, 100);
+            
+            // Auto-remove after duration
+            setTimeout(() => {
+                toast.classList.add('translate-x-full');
+                setTimeout(() => {
+                    if (document.body.contains(toast)) {
+                        document.body.removeChild(toast);
+                    }
+                }, 300);
+            }, duration);
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeSidebar();
+            initMap();
+        });
+    </script>
+</body>
+</html>

@@ -54,7 +54,7 @@ cat > ../dist/desktop/run.sh << 'EOF'
 # Set environment variables
 export RUST_LOG=info
 export DATABASE_URL=${DATABASE_URL:-"postgresql://localhost/loco_platform"}
-export BIND_ADDRESS=${BIND_ADDRESS:-"127.0.0.1:3000"}
+export BIND_ADDRESS=${BIND_ADDRESS:-"127.0.0.1:3070"}
 
 # Run the application
 ./loco-platform

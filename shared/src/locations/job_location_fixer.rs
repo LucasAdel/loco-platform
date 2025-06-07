@@ -1,4 +1,4 @@
-use crate::types::{Job, JobId};
+use crate::types::Job;
 use super::suburb_coordinates::{
     get_location_with_fallback,
     is_valid_adelaide_location,

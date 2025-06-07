@@ -3,516 +3,477 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Loco Platform - Australian Pharmacy Jobs</title>
+    <title>Loco Platform - Modern Job Discovery Platform</title>
+    <link rel="stylesheet" href="modern-design-system.css">
+    <link rel="stylesheet" href="soft-corners-fix.css">
+    <link rel="stylesheet" href="modern-design-system-enhanced.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root {
-            --primary-color: #2D5A3D;
-            --secondary-color: #006994;
-            --accent-color: #FFB81C;
-            --text-primary: #2C2C2C;
-            --text-secondary: #64748B;
-            --background: #F8FAFC;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--background);
-            color: var(--text-primary);
+        .hero-section {
             min-height: 100vh;
-        }
-
-        .sidebar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 250px;
-            height: 100vh;
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-            border-right: 1px solid rgba(0, 0, 0, 0.1);
-            padding: 1rem;
-            z-index: 1000;
-        }
-
-        .sidebar h1 {
-            color: var(--primary-color);
-            margin-bottom: 2rem;
-            font-size: 1.25rem;
-            font-weight: 600;
-        }
-
-        .sidebar nav ul {
-            list-style: none;
-        }
-
-        .sidebar nav ul li {
-            margin-bottom: 0.5rem;
-        }
-
-        .sidebar nav ul li button {
-            width: 100%;
-            padding: 0.75rem 1rem;
-            background: none;
-            border: none;
-            text-align: left;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background-color 0.2s;
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-        }
-
-        .sidebar nav ul li button:hover {
-            background-color: rgba(45, 90, 61, 0.1);
-            color: var(--primary-color);
-        }
-
-        .main-content {
-            margin-left: 250px;
-            padding: 2rem;
-            min-height: 100vh;
-        }
-
-        .page-content {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .job-card {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .job-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-
-        .job-card h3 {
-            color: var(--primary-color);
-            margin-bottom: 0.5rem;
-            font-size: 1.1rem;
-        }
-
-        .job-card p {
-            color: var(--text-secondary);
-            margin-bottom: 0.75rem;
-        }
-
-        .job-meta {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            margin-bottom: 1rem;
-        }
-
-        .job-actions {
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        .btn {
-            padding: 0.5rem 1rem;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.85rem;
-            transition: background-color 0.2s;
-        }
-
-        .btn-primary {
-            background-color: var(--primary-color);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background-color: #245a39;
-        }
-
-        .btn-secondary {
-            background-color: transparent;
-            color: var(--primary-color);
-            border: 1px solid var(--primary-color);
-        }
-
-        .btn-secondary:hover {
-            background-color: var(--primary-color);
-            color: white;
-        }
-
-        .search-container {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .search-input {
-            width: 100%;
-            padding: 0.75rem 1rem;
-            border: 1px solid rgba(0, 0, 0, 0.2);
-            border-radius: 8px;
-            font-size: 1rem;
-            background: rgba(255, 255, 255, 0.8);
-        }
-
-        .map-container {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-top: 2rem;
-            height: 300px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--text-secondary);
+            position: relative;
+            overflow: hidden;
         }
-
-        .hidden {
-            display: none;
+        
+        .hero-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            z-index: 1;
         }
-
+        
+        .hero-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 30% 70%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 30%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .hero-container {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--space-8);
+        }
+        
+        .hero-title {
+            font-size: clamp(2.5rem, 8vw, 5rem);
+            font-weight: 800;
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 50%, #e2e8f0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: var(--space-6);
+            line-height: 1.1;
+            animation: fadeInUp 1s ease-out;
+        }
+        
+        .hero-subtitle {
+            font-size: clamp(1.1rem, 3vw, 1.5rem);
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: var(--space-8);
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            animation: fadeInUp 1s ease-out 0.2s both;
+        }
+        
+        .hero-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-4);
+            justify-content: center;
+            margin-bottom: var(--space-12);
+            animation: fadeInUp 1s ease-out 0.4s both;
+        }
+        
+        .hero-button {
+            padding: var(--space-4) var(--space-8);
+            font-size: var(--text-lg);
+            font-weight: 600;
+            border-radius: var(--radius-xl);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+            transition: all var(--duration-300) var(--ease-out);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-button.primary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+        }
+        
+        .hero-button.secondary {
+            background: transparent;
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .hero-button:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-xl);
+        }
+        
+        .hero-button.primary:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .hero-button.secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .features-preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--space-6);
+            margin-top: var(--space-8);
+            animation: fadeInUp 1s ease-out 0.6s both;
+        }
+        
+        .feature-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: var(--radius-2xl);
+            padding: var(--space-6);
+            text-align: center;
+            transition: all var(--duration-300) var(--ease-out);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-4px);
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: var(--shadow-2xl);
+        }
+        
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: var(--space-4);
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .feature-title {
+            font-size: var(--text-lg);
+            font-weight: 600;
+            color: white;
+            margin-bottom: var(--space-2);
+        }
+        
+        .feature-description {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: var(--text-sm);
+            line-height: 1.6;
+        }
+        
+        .floating-elements {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+        }
+        
+        .floating-circle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            animation: floatRandom 8s ease-in-out infinite;
+        }
+        
+        .circle-1 {
+            width: 100px;
+            height: 100px;
+            top: 20%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+        
+        .circle-2 {
+            width: 150px;
+            height: 150px;
+            top: 60%;
+            right: 15%;
+            animation-delay: 2s;
+        }
+        
+        .circle-3 {
+            width: 80px;
+            height: 80px;
+            top: 80%;
+            left: 20%;
+            animation-delay: 4s;
+        }
+        
+        @keyframes floatRandom {
+            0%, 100% { 
+                transform: translateY(0px) translateX(0px) rotate(0deg);
+                opacity: 0.3;
+            }
+            25% { 
+                transform: translateY(-20px) translateX(10px) rotate(90deg);
+                opacity: 0.6;
+            }
+            50% { 
+                transform: translateY(-10px) translateX(-10px) rotate(180deg);
+                opacity: 0.4;
+            }
+            75% { 
+                transform: translateY(10px) translateX(5px) rotate(270deg);
+                opacity: 0.7;
+            }
+        }
+        
+        .status-indicator {
+            position: fixed;
+            top: var(--space-6);
+            right: var(--space-6);
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+            padding: var(--space-2) var(--space-4);
+            border-radius: var(--radius-full);
+            font-size: var(--text-sm);
+            font-weight: 500;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            animation: pulse 2s infinite;
+        }
+        
+        .status-indicator::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: #10b981;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: var(--space-2);
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+        
+        /* Mobile Responsiveness */
         @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-                transition: transform 0.3s;
-            }
-
-            .sidebar.open {
-                transform: translateX(0);
-            }
-
-            .main-content {
-                margin-left: 0;
-            }
-
-            .job-meta {
+            .hero-actions {
                 flex-direction: column;
-                gap: 0.5rem;
+                align-items: center;
+            }
+            
+            .hero-button {
+                width: 100%;
+                max-width: 300px;
+                justify-content: center;
+            }
+            
+            .features-preview {
+                grid-template-columns: 1fr;
+                gap: var(--space-4);
+            }
+            
+            .floating-circle {
+                display: none;
             }
         }
     </style>
 </head>
 <body>
-    <div class="sidebar">
-        <h1>Lo.Co Platform</h1>
-        <p style="color: var(--text-secondary); font-size: 0.8rem; margin-bottom: 2rem;">Australian Pharmacy Jobs</p>
+    <div class="hero-section">
+        <div class="hero-bg"></div>
         
-        <nav>
-            <ul>
-                <li><button onclick="showPage('home')">🏠 Home</button></li>
-                <li><button onclick="showPage('jobs')">💼 Jobs</button></li>
-                <li><button onclick="showPage('map')">🗺️ Map</button></li>
-                <li><button onclick="showPage('forum')">💬 Forum</button></li>
-                <li><button onclick="showPage('profile')">👤 Profile</button></li>
-                <li><button onclick="showPage('notifications')">🔔 Notifications</button></li>
-                <li><button onclick="showPage('availability')">📅 Availability</button></li>
-                <li><button onclick="showPage('admin')">⚙️ Admin Panel</button></li>
-                <li><button onclick="showPage('connect')">🔗 Lo.Co Connect</button></li>
-            </ul>
-        </nav>
+        <div class="floating-elements">
+            <div class="floating-circle circle-1"></div>
+            <div class="floating-circle circle-2"></div>
+            <div class="floating-circle circle-3"></div>
+        </div>
+        
+        <div class="hero-container">
+            <h1 class="hero-title">
+                Loco Platform
+            </h1>
+            
+            <p class="hero-subtitle">
+                Discover opportunities, connect with employers, and advance your career with Australia's most modern job platform. Experience the future of professional networking.
+            </p>
+            
+            <div class="hero-actions">
+                <a href="/dashboard.html" class="hero-button primary">
+                    <i class="fas fa-rocket"></i>
+                    Explore Dashboard
+                </a>
+                <a href="/jobs.html" class="hero-button secondary">
+                    <i class="fas fa-briefcase"></i>
+                    Browse Jobs
+                </a>
+                <a href="/map.html" class="hero-button secondary">
+                    <i class="fas fa-map-marked-alt"></i>
+                    View Map
+                </a>
+            </div>
+            
+            <div class="features-preview">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h3 class="feature-title">AI-Powered Matching</h3>
+                    <p class="feature-description">
+                        Intelligent job recommendations based on your skills, experience, and career goals.
+                    </p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-globe-oceania"></i>
+                    </div>
+                    <h3 class="feature-title">Australia-Focused</h3>
+                    <p class="feature-description">
+                        Designed specifically for the Australian job market with local insights and data.
+                    </p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <h3 class="feature-title">Real-Time Updates</h3>
+                    <p class="feature-description">
+                        Live job notifications and instant updates on application status and opportunities.
+                    </p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3 class="feature-title">Privacy First</h3>
+                    <p class="feature-description">
+                        Your data is protected with enterprise-grade security and privacy controls.
+                    </p>
+                </div>
+            </div>
+        </div>
     </div>
-
-    <main class="main-content">
-        <!-- Home Page -->
-        <div id="home-page" class="page-content">
-            <h1>Welcome to Loco Platform</h1>
-            <p>Your premier destination for Australian pharmacy jobs</p>
-        </div>
-
-        <!-- Jobs Page -->
-        <div id="jobs-page" class="page-content hidden">
-            <div class="search-container">
-                <input 
-                    type="text" 
-                    class="search-input" 
-                    placeholder="Search for address, suburb or postcode..."
-                    data-testid="jobs-search-input"
-                    onkeyup="searchJobs(this.value)"
-                >
-            </div>
-
-            <h2>Available Jobs</h2>
-            <div class="loading" data-testid="loading" id="jobs-loading" style="display: none;">
-                Loading jobs...
-            </div>
-            <div class="jobs-container" data-testid="jobs-container" id="jobs-container">
-                <!-- Jobs will be loaded dynamically -->
-            </div>
-
-            <div class="map-container" data-testid="map-container">
-                <div>
-                    <h3>Interactive Map</h3>
-                    <p>API-powered job locations</p>
-                    <p>📍 Adelaide</p>
-                    <p>🗺️</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Map Page -->
-        <div id="map-page" class="page-content hidden">
-            <h2>Job Map</h2>
-            <div class="map-container" data-testid="map-container" id="map">
-                <div>
-                    <h3>Interactive Map View</h3>
-                    <p>Map visualization coming soon...</p>
-                    <p>🗺️ Explore pharmacy jobs across Australia</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Forum Page -->
-        <div id="forum-page" class="page-content hidden">
-            <h2>Professional Forum</h2>
-            <p>Connect with other pharmacy professionals</p>
-            <p>Forum features coming soon...</p>
-            <div class="loading" data-testid="loading" style="display: none;">Loading forum...</div>
-        </div>
-
-        <!-- Profile Page -->
-        <div id="profile-page" class="page-content hidden">
-            <h2>Your Profile</h2>
-            <p>Manage your professional profile and preferences</p>
-            <p>Profile management coming soon...</p>
-            <div class="loading" data-testid="loading" style="display: none;">Loading profile...</div>
-        </div>
-
-        <!-- Notifications Page -->
-        <div id="notifications-page" class="page-content hidden">
-            <h2>Notifications</h2>
-            <p>Stay updated with job alerts and messages</p>
-            <p>Notification system coming soon...</p>
-            <div class="loading" data-testid="loading" style="display: none;">Loading notifications...</div>
-        </div>
-
-        <!-- Availability Page -->
-        <div id="availability-page" class="page-content hidden">
-            <h2>Availability Management</h2>
-            <p>Set your schedule and availability preferences</p>
-            <p>Availability features coming soon...</p>
-            <div class="loading" data-testid="loading" style="display: none;">Loading availability...</div>
-        </div>
-
-        <!-- Admin Page -->
-        <div id="admin-page" class="page-content hidden">
-            <h2>Admin Dashboard</h2>
-            <p>Administrative tools and analytics</p>
-            <p>Admin features coming soon...</p>
-            <div class="loading" data-testid="loading" style="display: none;">Loading admin dashboard...</div>
-        </div>
-
-        <!-- Connect Page -->
-        <div id="connect-page" class="page-content hidden">
-            <h2>Lo.Co Connect</h2>
-            <p>Network with professionals and expand your connections</p>
-            <p>Connect features coming soon...</p>
-            <div class="loading" data-testid="loading" style="display: none;">Loading connect...</div>
-        </div>
-    </main>
-
+    
+    <div class="status-indicator">
+        System Online
+    </div>
+    
     <script>
-        function showPage(pageId) {
-            console.log('Showing page:', pageId);
+        // Modern entrance animations
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add staggered animations to feature cards
+            const featureCards = document.querySelectorAll('.feature-card');
+            featureCards.forEach((card, index) => {
+                card.style.animationDelay = `${0.8 + (index * 0.1)}s`;
+                card.classList.add('fade-in-up');
+            });
             
-            // Hide all pages
-            const pages = document.querySelectorAll('.page-content');
-            pages.forEach(page => page.classList.add('hidden'));
-            
-            // Show selected page
-            const targetPage = document.getElementById(pageId + '-page');
-            if (targetPage) {
-                targetPage.classList.remove('hidden');
-                console.log('Page found and shown:', pageId);
-            } else {
-                console.log('Page not found:', pageId, 'showing home instead');
-                // Fallback to home if page not found
-                const homePage = document.getElementById('home-page');
-                if (homePage) {
-                    homePage.classList.remove('hidden');
+            // Auto-redirect after 5 seconds (optional)
+            setTimeout(() => {
+                if (window.location.pathname === '/' || window.location.pathname === '/index.html') {
+                    // Uncomment to enable auto-redirect
+                    // window.location.href = '/dashboard.html';
                 }
+            }, 10000);
+            
+            // Add interactive particles on mouse move
+            document.addEventListener('mousemove', function(e) {
+                if (window.innerWidth > 768) {
+                    createParticle(e.clientX, e.clientY);
+                }
+            });
+            
+            function createParticle(x, y) {
+                const particle = document.createElement('div');
+                particle.style.cssText = `
+                    position: fixed;
+                    width: 4px;
+                    height: 4px;
+                    background: rgba(255, 255, 255, 0.6);
+                    border-radius: 50%;
+                    pointer-events: none;
+                    z-index: 999;
+                    left: ${x}px;
+                    top: ${y}px;
+                    animation: particleFade 1s ease-out forwards;
+                `;
+                
+                document.body.appendChild(particle);
+                
+                setTimeout(() => {
+                    particle.remove();
+                }, 1000);
             }
             
-            // Update URL without reload
-            if (pageId !== 'home') {
-                window.history.pushState({}, '', '/' + pageId);
-            } else {
-                window.history.pushState({}, '', '/');
-            }
-        }
-
-        // Handle browser back/forward
-        window.addEventListener('popstate', function() {
-            const path = window.location.pathname.substring(1) || 'home';
-            showPage(path);
+            // Add CSS for particle animation
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes particleFade {
+                    0% { 
+                        opacity: 1; 
+                        transform: scale(1) translateY(0); 
+                    }
+                    100% { 
+                        opacity: 0; 
+                        transform: scale(0.3) translateY(-30px); 
+                    }
+                }
+            `;
+            document.head.appendChild(style);
         });
-
-        // Initialize page based on URL immediately
-        function initializePage() {
-            const path = window.location.pathname.substring(1) || 'home';
-            console.log('Initializing page from URL:', path);
-            showPage(path);
-        }
-
-        // Initialize when DOM is ready
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initializePage);
-        } else {
-            // DOM already loaded
-            initializePage();
-        }
-
-        // API Integration
-        const API_BASE = 'http://localhost:3000/api';
-        let currentJobs = [];
-
-        async function fetchJobs(search = '', location = '', type = '') {
-            const loading = document.getElementById('jobs-loading');
-            const container = document.getElementById('jobs-container');
-            
-            if (loading) loading.style.display = 'block';
-            
-            try {
-                const params = new URLSearchParams();
-                if (search) params.append('search', search);
-                if (location) params.append('location', location);
-                if (type) params.append('type', type);
+        
+        // Enhanced button interactions
+        document.querySelectorAll('.hero-button').forEach(button => {
+            button.addEventListener('click', function(e) {
+                // Create ripple effect
+                const ripple = document.createElement('span');
+                const rect = this.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const x = e.clientX - rect.left - size / 2;
+                const y = e.clientY - rect.top - size / 2;
                 
-                const response = await fetch(`${API_BASE}/jobs?${params}`);
-                const data = await response.json();
+                ripple.style.cssText = `
+                    position: absolute;
+                    width: ${size}px;
+                    height: ${size}px;
+                    left: ${x}px;
+                    top: ${y}px;
+                    background: rgba(255, 255, 255, 0.3);
+                    border-radius: 50%;
+                    transform: scale(0);
+                    animation: ripple 0.6s ease-out;
+                    pointer-events: none;
+                `;
                 
-                currentJobs = data.jobs || [];
-                displayJobs(currentJobs);
+                this.appendChild(ripple);
                 
-                if (loading) loading.style.display = 'none';
-            } catch (error) {
-                console.error('Error fetching jobs:', error);
-                if (loading) loading.style.display = 'none';
-                displayError('Failed to load jobs. Please try again.');
-            }
-        }
-
-        function displayJobs(jobs) {
-            const container = document.getElementById('jobs-container');
-            if (!container) return;
-            
-            if (jobs.length === 0) {
-                container.innerHTML = '<p>No jobs found matching your criteria.</p>';
-                return;
-            }
-            
-            container.innerHTML = jobs.map(job => `
-                <div class="job-card" data-job-id="${job.id}">
-                    <h3>${job.title}${job.urgent ? ' <span style="color: red;">(Urgent)</span>' : ''}</h3>
-                    <p>${job.company}</p>
-                    <div class="job-meta">
-                        <span>${job.salary_display}</span>
-                        <span>📍 ${job.location}</span>
-                        <span>📅 ${job.job_type}</span>
-                        <span>👁️ ${job.views_count} views</span>
-                        <span>📝 ${job.applications_count} applications</span>
-                    </div>
-                    <div class="job-actions">
-                        <button class="btn btn-primary" onclick="viewJobDetail('${job.id}')">View Details</button>
-                        <button class="btn btn-secondary" onclick="viewOnMap('${job.id}')">View on Map</button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function displayError(message) {
-            const container = document.getElementById('jobs-container');
-            if (container) {
-                container.innerHTML = `<div style="color: red; padding: 1rem;">${message}</div>`;
-            }
-        }
-
-        function searchJobs(query) {
-            // Debounce search
-            clearTimeout(window.searchTimeout);
-            window.searchTimeout = setTimeout(() => {
-                fetchJobs(query);
-            }, 300);
-        }
-
-        function viewJobDetail(jobId) {
-            console.log('Viewing job detail:', jobId);
-            // Would navigate to job detail page
-            alert(`View job details for job ${jobId}`);
-        }
-
-        function viewOnMap(jobId) {
-            console.log('Viewing job on map:', jobId);
-            showPage('map');
-        }
-
-        // Load data when pages are shown
-        function showPage(pageId) {
-            console.log('Showing page:', pageId);
-            
-            // Hide all pages
-            const pages = document.querySelectorAll('.page-content');
-            pages.forEach(page => page.classList.add('hidden'));
-            
-            // Show selected page
-            const targetPage = document.getElementById(pageId + '-page');
-            if (targetPage) {
-                targetPage.classList.remove('hidden');
-                console.log('Page found and shown:', pageId);
-                
-                // Load data for specific pages
-                if (pageId === 'jobs') {
-                    fetchJobs();
-                }
-            } else {
-                console.log('Page not found:', pageId, 'showing home instead');
-                // Fallback to home if page not found
-                const homePage = document.getElementById('home-page');
-                if (homePage) {
-                    homePage.classList.remove('hidden');
-                }
-            }
-            
-            // Update URL without reload
-            if (pageId !== 'home') {
-                window.history.pushState({}, '', '/' + pageId);
-            } else {
-                window.history.pushState({}, '', '/');
-            }
-        }
-
-        // Add mobile menu toggle functionality
-        function toggleMobileMenu() {
-            const sidebar = document.querySelector('.sidebar');
-            sidebar.classList.toggle('open');
-        }
-
-        // Close mobile menu when clicking outside
-        document.addEventListener('click', function(event) {
-            const sidebar = document.querySelector('.sidebar');
-            const isClickInsideSidebar = sidebar.contains(event.target);
-            
-            if (!isClickInsideSidebar && window.innerWidth <= 768) {
-                sidebar.classList.remove('open');
-            }
+                setTimeout(() => ripple.remove(), 600);
+            });
         });
+        
+        // Add ripple animation CSS
+        const rippleStyle = document.createElement('style');
+        rippleStyle.textContent = `
+            @keyframes ripple {
+                to {
+                    transform: scale(2);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(rippleStyle);
     </script>
 </body>
 </html>

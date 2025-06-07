@@ -72,7 +72,7 @@ A professional pharmacy job marketplace built with Rust, Dioxus, and modern web 
    ```bash
    cd backend
    cargo run
-   # Backend runs on http://localhost:3000
+   # Backend runs on http://localhost:3070
    ```
    
    **Terminal 2 - Frontend:**

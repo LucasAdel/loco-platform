@@ -1,21 +1,16 @@
 {
   "name": "loco-platform-e2e-tests",
   "version": "1.0.0",
-  "description": "End-to-end tests for Loco Platform using Playwright",
-  "private": true,
+  "description": "End-to-end tests for Loco Platform",
   "scripts": {
     "test": "playwright test",
     "test:headed": "playwright test --headed",
     "test:debug": "playwright test --debug",
+    "test:report": "playwright show-report",
     "test:ui": "playwright test --ui",
-    "test:codegen": "playwright codegen http://localhost:8080",
-    "install-browsers": "playwright install",
-    "report": "playwright show-report"
+    "install:browsers": "playwright install --with-deps"
   },
   "devDependencies": {
-    "@playwright/test": "^1.52.0"
-  },
-  "engines": {
-    "node": ">=16"
+    "@playwright/test": "^1.40.1"
   }
 }

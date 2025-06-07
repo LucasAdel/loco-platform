@@ -396,7 +396,7 @@ impl AustralianState {
 }
 
 /// Job types specific to Australian pharmacy sector
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Hash)]
 pub enum JobType {
     /// Pharmacy intern (pre-registration)
     Intern,

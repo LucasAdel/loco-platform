@@ -2,7 +2,7 @@ use leptos::*;
 use leptos_router::*;
 
 /// Breadcrumb item
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct BreadcrumbItem {
     pub label: String,
     pub href: Option<String>,

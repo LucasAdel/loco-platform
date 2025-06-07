@@ -19,7 +19,7 @@ impl Config {
             supabase_anon_key: std::env::var("SUPABASE_ANON_KEY")
                 .unwrap_or_else(|_| "your-anon-key".to_string()),
             api_url: std::env::var("API_URL")
-                .unwrap_or_else(|_| "http://localhost:3000".to_string()),
+                .unwrap_or_else(|_| "http://localhost:3070".to_string()),
             app_env: std::env::var("APP_ENV")
                 .unwrap_or_else(|_| "development".to_string()),
         }

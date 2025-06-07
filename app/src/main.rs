@@ -1,63 +1,83 @@
-#[cfg(feature = "ssr")]
-#[tokio::main]
-async fn main() {
-    use axum::Router;
-    use leptos::*;
-    use leptos_axum::{generate_route_list, LeptosRoutes};
-    use loco_app::*;
-    use tracing::*;
-    use tracing_subscriber;
+use leptos::*;
+use wasm_bindgen::prelude::*;
 
-    // Set up tracing
-    tracing_subscriber::fmt::init();
-
-    // Setting get_configuration(None) means we'll be using cargo-leptos's env values
-    // For deployment these variables are:
-    // <https://github.com/leptos-rs/start-axum#executing-a-server-on-a-remote-machine-without-the-toolchain>
-    // Alternately a file can be specified such as Some("Cargo.toml")
-    // The file would need to be included with the executable when moved to deployment
-    let conf = get_configuration(None).await.unwrap();
-    let leptos_options = conf.leptos_options;
-    let addr = leptos_options.site_addr;
-    let routes = generate_route_list(App);
-
-    info!("🦀 Starting Loco Platform frontend server");
-    info!("🌐 Frontend listening on http://{}", &addr);
-
-    // Build our application with a route
-    let app = Router::new()
-        .leptos_routes(&leptos_options, routes, App)
-        .fallback(leptos_axum::file_and_error_handler(shell))
-        .with_state(leptos_options);
-
-    // Run the server
-    let listener = tokio::net::TcpListener::bind(&addr).await.unwrap();
-    info!("✅ Frontend server ready");
-    axum::serve(listener, app.into_make_service())
-        .await
-        .unwrap();
+#[wasm_bindgen(start)]
+pub fn main() {
+    console_error_panic_hook::set_once();
+    mount_to_body(|| view! { <App /> });
 }
 
-#[cfg(feature = "ssr")]
-fn shell(options: leptos::LeptosOptions) -> impl leptos::IntoView {
+#[component]
+fn App() -> impl IntoView {
     view! {
-        <!DOCTYPE html>
-        <html lang="en">
-            <head>
-                <meta charset="utf-8"/>
-                <meta name="viewport" content="width=device-width, initial-scale=1"/>
-                <AutoReload options=options.clone() />
-                <HydrationScripts options/>
-                <MetaTags/>
-            </head>
-            <body>
-                <App/>
-            </body>
-        </html>
+        <div class="min-h-screen bg-gray-50">
+            <header class="bg-white shadow">
+                <div class="max-w-7xl mx-auto px-4 py-6">
+                    <h1 class="text-3xl font-bold text-gray-900">"Loco Platform"</h1>
+                </div>
+            </header>
+            <main class="max-w-7xl mx-auto px-4 py-8">
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h2 class="text-2xl font-semibold mb-4">"Welcome to Loco Platform"</h2>
+                    <p class="text-gray-600 mb-4">
+                        "Your comprehensive pharmacy job platform for Australia"
+                    </p>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <Card title="Jobs" count=42 color="blue" />
+                        <Card title="Applications" count=7 color="green" />
+                        <Card title="Companies" count=15 color="purple" />
+                    </div>
+                </div>
+                <ApiTest />
+            </main>
+        </div>
     }
 }
 
-#[cfg(not(feature = "ssr"))]
-pub fn main() {
-    // This is not needed for the leptos CSR.
+#[component]
+fn Card(title: &'static str, count: i32, color: &'static str) -> impl IntoView {
+    let bg_class = format!("bg-{}-100", color);
+    let text_class = format!("text-{}-800", color);
+    
+    view! {
+        <div class=format!("p-6 rounded-lg {}", bg_class)>
+            <h3 class=format!("text-lg font-medium {}", text_class)>{title}</h3>
+            <p class=format!("text-3xl font-bold {}", text_class)>{count}</p>
+        </div>
+    }
+}
+
+#[component]
+fn ApiTest() -> impl IntoView {
+    let (data, set_data) = create_signal("Click to test API".to_string());
+    
+    let test_api = move |_| {
+        spawn_local(async move {
+            match gloo_net::http::Request::get("http://localhost:3070/api/health")
+                .send()
+                .await
+            {
+                Ok(resp) => {
+                    match resp.text().await {
+                        Ok(text) => set_data.set(format!("API Response: {}", text)),
+                        Err(e) => set_data.set(format!("Error reading response: {}", e)),
+                    }
+                }
+                Err(e) => set_data.set(format!("API Error: {}", e)),
+            }
+        });
+    };
+    
+    view! {
+        <div class="mt-8 bg-white rounded-lg shadow p-6">
+            <h3 class="text-xl font-semibold mb-4">"API Test"</h3>
+            <button 
+                on:click=test_api
+                class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+            >
+                "Test Backend API"
+            </button>
+            <p class="mt-4 text-gray-600">{data}</p>
+        </div>
+    }
 }

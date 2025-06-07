@@ -1,0 +1,22 @@
+# Trunk configuration for Leptos app
+
+[build]
+target = "index.html"
+dist = "dist"
+
+[watch]
+watch = ["src", "Cargo.toml", "index.html"]
+ignore = ["dist"]
+
+[serve]
+address = "127.0.0.1"
+port = 3080
+open = false
+
+[[proxy]]
+rewrite = "/api/"
+backend = "http://127.0.0.1:3070/"
+
+[clean]
+dist = "dist"
+cargo = true

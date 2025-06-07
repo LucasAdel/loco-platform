@@ -2,20 +2,7 @@ use leptos::*;
 use leptos_meta::*;
 use leptos_router::*;
 
-#[cfg(feature = "hydrate")]
-use wasm_bindgen::prelude::wasm_bindgen;
-
-#[cfg(feature = "ssr")]
-pub use leptos_axum::*;
-
-#[cfg(feature = "hydrate")]
-#[wasm_bindgen]
-pub fn hydrate() {
-    use tracing_subscriber;
-    console_error_panic_hook::set_once();
-    tracing_subscriber::fmt::init();
-    leptos::mount_to_body(App);
-}
+use wasm_bindgen::prelude::*;
 
 pub mod api;
 pub mod auth;

@@ -140,11 +140,11 @@ sudo systemctl start postgresql
 
 ### Port Already in Use
 ```bash
-# Backend defaults to port 3000
-# Frontend defaults to port 8080
+# Backend defaults to port 3070
+# Frontend defaults to port 3080
 
 # Change in .env or use different port:
-PORT=3001 cargo run -p backend
+PORT=3070 cargo run -p backend
 ```
 
 ### WASM Target Missing

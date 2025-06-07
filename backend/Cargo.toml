@@ -41,6 +41,11 @@ reqwest = { version = "0.11", features = ["json"] }
 # Rate limiting
 tower_governor = "0.1"
 
+# WebSocket support
+tokio-tungstenite = "0.21"
+futures-util = "0.3"
+lazy_static = "1.4"
+
 # Validation
 validator = { version = "0.18", features = ["derive"] }
 
@@ -52,4 +57,5 @@ num-traits = "0.2"
 async-trait = "0.1"
 url = "2.4"
 rand = "0.8"
+regex = "1.10"
 migration = { path = "../migrations" }

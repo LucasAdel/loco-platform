@@ -6,6 +6,7 @@ pub fn Button(
     #[prop(optional)] variant: ButtonVariant,
     #[prop(optional)] size: ButtonSize,
     #[prop(optional)] disabled: bool,
+    #[prop(optional)] class: &'static str,
     #[prop(optional)] on_click: Option<Callback<ev::MouseEvent>>,
 ) -> impl IntoView {
     let base_classes = "inline-flex items-center justify-center font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2";
@@ -29,7 +30,7 @@ pub fn Button(
         "cursor-pointer"
     };
     
-    let classes = format!("{} {} {} {}", base_classes, variant_classes, size_classes, disabled_classes);
+    let classes = format!("{} {} {} {} {}", base_classes, variant_classes, size_classes, disabled_classes, class);
     
     view! {
         <button

@@ -1,0 +1,59 @@
+#!/bin/bash
+
+# Simple static server for immediate dashboard access
+set -e
+
+# Colors
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+YELLOW='\033[1;33m'
+NC='\033[0m'
+
+echo -e "${BLUE}🚀 Starting Loco Platform (Static Mode)${NC}"
+
+# Kill existing processes
+pkill -f "cargo.*backend" || true
+pkill -f "python.*3080" || true
+sleep 1
+
+# Start backend
+echo -e "${BLUE}Starting backend server...${NC}"
+cd backend
+RUST_LOG=debug cargo run > ../backend.log 2>&1 &
+BACKEND_PID=$!
+cd ..
+echo -e "${GREEN}Backend started (PID: $BACKEND_PID)${NC}"
+
+# Start static server
+echo -e "${BLUE}Starting static dashboard server...${NC}"
+cd static
+python3 -m http.server 3080 > ../frontend.log 2>&1 &
+FRONTEND_PID=$!
+cd ..
+echo -e "${GREEN}Frontend started (PID: $FRONTEND_PID)${NC}"
+
+# Wait a moment
+sleep 3
+
+echo -e "${GREEN}✅ Both servers are running!${NC}"
+echo -e "  Backend API: ${BLUE}http://localhost:3070${NC}"
+echo -e "  Dashboard:   ${BLUE}http://localhost:3080/dashboard.html${NC}"
+
+# Open browser
+case "$(uname -s)" in
+    Darwin) open "http://localhost:3080/dashboard.html" ;;
+    Linux) xdg-open "http://localhost:3080/dashboard.html" ;;
+esac
+
+echo -e "${YELLOW}Press Ctrl+C to stop${NC}"
+
+# Cleanup on exit
+cleanup() {
+    echo -e "\n${YELLOW}Shutting down...${NC}"
+    kill $BACKEND_PID 2>/dev/null || true
+    kill $FRONTEND_PID 2>/dev/null || true
+    exit 0
+}
+
+trap cleanup INT TERM
+wait

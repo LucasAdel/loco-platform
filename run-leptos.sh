@@ -43,16 +43,16 @@ check_port() {
 cleanup_ports() {
     print_status "Cleaning up existing processes..."
     
-    # Kill processes on frontend port (3000)
-    if check_port 3000; then
-        print_warning "Killing existing process on port 3000"
-        lsof -ti:3000 | xargs kill -9 2>/dev/null || true
+    # Kill processes on frontend port (3080)
+    if check_port 3080; then
+        print_warning "Killing existing process on port 3080"
+        lsof -ti:3080 | xargs kill -9 2>/dev/null || true
     fi
     
-    # Kill processes on backend port (8080)
-    if check_port 8080; then
-        print_warning "Killing existing process on port 8080"
-        lsof -ti:8080 | xargs kill -9 2>/dev/null || true
+    # Kill processes on backend port (3070)
+    if check_port 3070; then
+        print_warning "Killing existing process on port 3070"
+        lsof -ti:3070 | xargs kill -9 2>/dev/null || true
     fi
     
     sleep 2
@@ -75,7 +75,7 @@ start_backend() {
     echo $BACKEND_PID > ../backend.pid
     
     cd ..
-    print_success "Backend server starting on http://localhost:8080 (PID: $BACKEND_PID)"
+    print_success "Backend server starting on http://localhost:3070 (PID: $BACKEND_PID)"
 }
 
 # Function to start Leptos frontend
@@ -96,7 +96,7 @@ start_leptos() {
     echo $FRONTEND_PID > ../frontend.pid
     cd ..
     
-    print_success "Leptos server starting on http://localhost:3000 (PID: $FRONTEND_PID)"
+    print_success "Leptos server starting on http://localhost:3080 (PID: $FRONTEND_PID)"
 }
 
 # Function to wait for servers to be ready
@@ -106,7 +106,7 @@ wait_for_servers() {
     # Wait for backend (max 30 seconds)
     backend_ready=false
     for i in {1..30}; do
-        if check_port 8080; then
+        if check_port 3070; then
             backend_ready=true
             break
         fi
@@ -116,7 +116,7 @@ wait_for_servers() {
     # Wait for frontend (max 60 seconds - compilation takes time)
     frontend_ready=false
     for i in {1..60}; do
-        if check_port 3000; then
+        if check_port 3080; then
             frontend_ready=true
             break
         fi
@@ -125,23 +125,23 @@ wait_for_servers() {
     
     # Report status
     if $backend_ready; then
-        print_success "Backend server is ready on http://localhost:8080"
+        print_success "Backend server is ready on http://localhost:3070"
     else
         print_warning "Backend server may still be starting. Check backend.log for details."
     fi
     
     if $frontend_ready; then
-        print_success "Leptos server is ready on http://localhost:3000"
+        print_success "Leptos server is ready on http://localhost:3080"
         print_status "Opening browser..."
         # Open browser based on OS
         case "$(uname -s)" in
-            Darwin)  open "http://localhost:3000" ;;
-            Linux)   xdg-open "http://localhost:3000" ;;
-            CYGWIN*|MINGW*) start "http://localhost:3000" ;;
+            Darwin)  open "http://localhost:3080" ;;
+            Linux)   xdg-open "http://localhost:3080" ;;
+            CYGWIN*|MINGW*) start "http://localhost:3080" ;;
         esac
     else
         print_warning "Leptos server may still be compiling. Check frontend.log for details."
-        print_status "You can manually open http://localhost:3000 when ready."
+        print_status "You can manually open http://localhost:3080 when ready."
     fi
 }
 
@@ -195,8 +195,8 @@ start_servers() {
     wait_for_servers
     
     print_status "Development environment is ready!"
-    print_status "  Frontend (Leptos): http://localhost:3000"
-    print_status "  Backend (Axum):    http://localhost:8080"
+    print_status "  Frontend (Leptos): http://localhost:3080"
+    print_status "  Backend (Axum):    http://localhost:3070"
     print_status "Press Ctrl+C to stop all servers"
     
     # Keep script running and handle Ctrl+C

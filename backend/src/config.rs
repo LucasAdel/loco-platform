@@ -43,17 +43,17 @@ impl Config {
             log_level: std::env::var("LOG_LEVEL")
                 .unwrap_or_else(|_| "debug".to_string()),
             api_url: std::env::var("API_URL")
-                .unwrap_or_else(|_| "http://localhost:3000".to_string()),
+                .unwrap_or_else(|_| "http://localhost:3070".to_string()),
             frontend_url: std::env::var("FRONTEND_URL")
-                .unwrap_or_else(|_| "http://localhost:8080".to_string()),
+                .unwrap_or_else(|_| "http://localhost:3080".to_string()),
             app_version: std::env::var("APP_VERSION")
                 .unwrap_or_else(|_| "0.1.0".to_string()),
             host: std::env::var("HOST")
                 .unwrap_or_else(|_| "0.0.0.0".to_string()),
             port: std::env::var("PORT")
-                .unwrap_or_else(|_| "3000".to_string())
+                .unwrap_or_else(|_| "3070".to_string())
                 .parse()
-                .unwrap_or(3000),
+                .unwrap_or(3070),
         })
     }
     

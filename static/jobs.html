@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loco Platform - Jobs</title>
+    <link rel="stylesheet" href="modern-design-system.css">
+    <link rel="stylesheet" href="modern-design-system-enhanced.css">
+    <link rel="stylesheet" href="soft-corners-fix.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="responsive-fix.css">
+</head>
+<body>
+    <!-- Mobile Menu Button -->
+    <button class="mobile-menu-btn" id="mobile-menu-btn">
+        <svg class="heroicon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+    </button>
+
+    <!-- Mobile Overlay -->
+    <div class="mobile-overlay" id="mobile-overlay"></div>
+
+    <!-- Modern Collapsible Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="/index.html" class="sidebar-logo">
+                <svg class="heroicon-lg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349M3.75 21V9.349m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016c.896 0 1.7-.393 2.25-1.016a3.001 3.001 0 003.75.614m-16.5 0a3.001 3.001 0 01-.621-1.82m0 0a2.99 2.99 0 01.621-1.82m0 0L10.89 1.65h2.22l2.011 6.126M18 9.349a3.001 3.001 0 01-.621-1.82m0 0a2.99 2.99 0 01.621-1.82m0 0L15.11 1.65h-2.22l-2.011 6.126"/>
+                </svg>
+                <span class="logo-text">Loco Platform</span>
+            </a>
+            <button class="sidebar-toggle" id="sidebar-toggle">
+                <svg class="heroicon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>
+                </svg>
+            </button>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">Main</div>
+                <a href="/index.html" class="nav-item">
+                    <div class="nav-item-icon">
+                        <svg class="heroicon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/>
+                        </svg>
+                    </div>
+                    <span class="nav-item-text">Home</span>
+                    <div class="nav-tooltip">Home</div>
+                </a>
+                
+                <a href="/dashboard.html" class="nav-item">
+                    <div class="nav-item-icon">
+                        <svg class="heroicon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z"/>
+                        </svg>
+                    </div>
+                    <span class="nav-item-text">Dashboard</span>
+                    <div class="nav-tooltip">Dashboard</div>
+                </a>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Jobs</div>
+                <a href="/jobs.html" class="nav-item active">
+                    <div class="nav-item-icon">
+                        <svg class="heroicon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 00.75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 00-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0112 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 01-.673-.38m0 0A2.18 2.18 0 013 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 013.413-.387m7.5 0V5.25A2.25 2.25 0 0013.5 3h-3a2.25 2.25 0 00-2.25 2.25v.894m7.5 0a48.667 48.667 0 00-7.5 0M12 12.75h.008v.008H12v-.008z"/>
+                        </svg>
+                    </div>
+                    <span class="nav-item-text">Browse Jobs</span>
+                    <div class="nav-tooltip">Browse Jobs</div>
+                </a>
+                
+                <a href="/map.html" class="nav-item">
+                    <div class="nav-item-icon">
+                        <svg class="heroicon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/>
+                        </svg>
+                    </div>
+                    <span class="nav-item-text">Job Map</span>
+                    <div class="nav-tooltip">Job Map</div>
+                </a>
+
+                <a href="/create-job.html" class="nav-item">
+                    <div class="nav-item-icon">
+                        <svg class="heroicon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.5v15m7.5-7.5h-15"/>
+                        </svg>
+                    </div>
+                    <span class="nav-item-text">Post Job</span>
+                    <div class="nav-tooltip">Post Job</div>
+                </a>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Account</div>
+                <a href="/profile.html" class="nav-item">
+                    <div class="nav-item-icon">
+                        <svg class="heroicon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 9a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                    </div>
+                    <span class="nav-item-text">Profile</span>
+                    <div class="nav-tooltip">Profile</div>
+                </a>
+
+                <a href="/admin.html" class="nav-item">
+                    <div class="nav-item-icon">
+                        <svg class="heroicon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                    </div>
+                    <span class="nav-item-text">Admin</span>
+                    <div class="nav-tooltip">Admin</div>
+                </a>
+            </div>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-content px-4 sm:px-6 lg:px-8 py-8">
+        <div class="max-w-7xl mx-auto">
+            <!-- Page Header -->
+            <div class="modern-glass p-8 mb-8 text-center bounce-in">
+                <h1 class="text-4xl font-bold text-white mb-4">Find Your Perfect Job</h1>
+                <p class="text-lg text-white/80 mb-6">Browse thousands of opportunities across Australia</p>
+                <div class="flex justify-center gap-4 flex-wrap">
+                    <button class="glass-button" onclick="showAllJobs()">
+                        <svg class="heroicon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/>
+                        </svg>
+                        All Jobs
+                    </button>
+                    <button class="glass-button" onclick="showUrgentJobs()">
+                        <svg class="heroicon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/>
+                        </svg>
+                        Urgent
+                    </button>
+                    <button class="glass-button" onclick="showRemoteJobs()">
+                        <svg class="heroicon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/>
+                        </svg>
+                        Remote
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex flex-col lg:flex-row gap-8">
+                <!-- Filters Sidebar -->
+                <aside class="lg:w-64 filters-sidebar">
+                    <div class="modern-glass p-6 fade-in-up">
+                    <h3 class="text-lg font-semibold mb-4 text-white">Filters</h3>
+                    
+                    <!-- Location Filter -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-white/80 mb-2">Location</label>
+                        <select id="location-filter" class="glass-input w-full">
+                            <option value="">All Locations</option>
+                            <option value="Sydney">Sydney</option>
+                            <option value="Melbourne">Melbourne</option>
+                            <option value="Brisbane">Brisbane</option>
+                            <option value="Perth">Perth</option>
+                            <option value="Adelaide">Adelaide</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Job Type Filter -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-white/80 mb-2">Job Type</label>
+                        <div class="space-y-2">
+                            <label class="flex items-center text-white/70 hover:text-white cursor-pointer">
+                                <input type="checkbox" value="FullTime" class="job-type-filter rounded text-blue-600 mr-2">
+                                <span class="text-sm">Full-time</span>
+                            </label>
+                            <label class="flex items-center text-white/70 hover:text-white cursor-pointer">
+                                <input type="checkbox" value="PartTime" class="job-type-filter rounded text-blue-600 mr-2">
+                                <span class="text-sm">Part-time</span>
+                            </label>
+                            <label class="flex items-center text-white/70 hover:text-white cursor-pointer">
+                                <input type="checkbox" value="Contract" class="job-type-filter rounded text-blue-600 mr-2">
+                                <span class="text-sm">Contract</span>
+                            </label>
+                            <label class="flex items-center text-white/70 hover:text-white cursor-pointer">
+                                <input type="checkbox" value="Casual" class="job-type-filter rounded text-blue-600 mr-2">
+                                <span class="text-sm">Casual</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Salary Range -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-white/80 mb-2">Salary Range</label>
+                        <input type="number" id="min-salary" placeholder="Min" class="glass-input w-full mb-2">
+                        <input type="number" id="max-salary" placeholder="Max" class="glass-input w-full">
+                    </div>
+                    
+                    <div class="flex flex-col sm:flex-row gap-2">
+                        <button onclick="applyFilters()" class="glass-button flex-1">
+                            Apply Filters
+                        </button>
+                        <button onclick="clearFilters()" class="glass-button-secondary flex-1">
+                            Clear
+                        </button>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Jobs List -->
+            <div class="flex-1">
+                <!-- Search Bar -->
+                <div class="modern-glass p-4 mb-6">
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <input 
+                            type="text" 
+                            id="search-input"
+                            placeholder="Search jobs by title, company, or keywords..." 
+                            class="glass-input flex-1"
+                        >
+                        <button onclick="searchJobs()" class="glass-button whitespace-nowrap">
+                            <svg class="heroicon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                            Search
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Results Info -->
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-bold text-white">Available Jobs</h2>
+                    <div class="flex items-center space-x-4">
+                        <div id="realtime-status" class="flex items-center text-sm">
+                            <div id="ws-indicator" class="w-2 h-2 rounded-full bg-gray-400 mr-2"></div>
+                            <span id="ws-status-text" class="text-white/70">Connecting...</span>
+                        </div>
+                        <span id="results-count" class="text-sm text-white/70">Loading...</span>
+                    </div>
+                </div>
+
+                <!-- Jobs Grid -->
+                <div id="jobs-container" class="space-y-4">
+                    <!-- Loading skeleton -->
+                    <div class="loading">
+                        <div class="modern-glass p-6">
+                            <div class="animate-pulse">
+                                <div class="h-4 bg-white/20 rounded w-3/4 mb-2"></div>
+                                <div class="h-3 bg-white/20 rounded w-1/2 mb-4"></div>
+                                <div class="h-3 bg-white/20 rounded w-full mb-2"></div>
+                                <div class="h-3 bg-white/20 rounded w-full"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                <div id="pagination" class="mt-8 flex justify-center gap-2">
+                    <!-- Pagination buttons will be added here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Supabase Client -->
+    <script src="js/supabase-client.js"></script>
+    
+    <script>
+        let currentPage = 1;
+        let totalJobs = 0;
+        const jobsPerPage = 10;
+        let websocket = null;
+        let jobsData = [];
+
+        // Load jobs on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeSidebar();
+            
+            // Wait for Supabase to be ready before loading jobs
+            onSupabaseReady(() => {
+                loadJobs();
+                initializeAuth();
+            });
+            
+            // Initialize WebSocket separately as it doesn't depend on Supabase
+            initializeWebSocket();
+        });
+
+        // Initialize sidebar functionality
+        function initializeSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const sidebarToggle = document.getElementById('sidebar-toggle');
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const mobileOverlay = document.getElementById('mobile-overlay');
+            
+            // Sidebar collapse/expand
+            sidebarToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('collapsed');
+                
+                // Update toggle icon
+                const icon = sidebarToggle.querySelector('svg');
+                if (sidebar.classList.contains('collapsed')) {
+                    icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>';
+                } else {
+                    icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>';
+                }
+            });
+            
+            // Mobile menu functionality
+            mobileMenuBtn.addEventListener('click', function() {
+                sidebar.classList.toggle('mobile-open');
+                mobileOverlay.classList.toggle('active');
+            });
+            
+            // Close mobile menu when clicking overlay
+            mobileOverlay.addEventListener('click', function() {
+                sidebar.classList.remove('mobile-open');
+                mobileOverlay.classList.remove('active');
+            });
+            
+            // Close mobile menu when clicking nav item
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    if (window.innerWidth <= 768) {
+                        sidebar.classList.remove('mobile-open');
+                        mobileOverlay.classList.remove('active');
+                    }
+                });
+            });
+            
+            // Handle window resize
+            window.addEventListener('resize', function() {
+                if (window.innerWidth > 768) {
+                    sidebar.classList.remove('mobile-open');
+                    mobileOverlay.classList.remove('active');
+                }
+            });
+        }
+
+        // Initialize authentication state
+        async function initializeAuth() {
+            try {
+                const user = await SupabaseAuth.getCurrentUser();
+                // Auth state will be handled by the Supabase client automatically
+            } catch (error) {
+                console.error('Error initializing auth:', error);
+            }
+        }
+
+        async function loadJobs(page = 1, filters = {}) {
+            currentPage = page;
+            const container = document.getElementById('jobs-container');
+            container.innerHTML = '<div class="loading">Loading jobs...</div>';
+
+            try {
+                // Try Supabase first
+                const supabaseFilters = {
+                    page: page,
+                    limit: jobsPerPage,
+                    ...filters
+                };
+                
+                const result = await SupabaseDB.getJobs(supabaseFilters);
+                
+                if (result.success && result.data.length > 0) {
+                    displayJobs(result.data);
+                    updateResultsCount(result.data.length);
+                    updatePagination(result.data.length);
+                    
+                    // Show Supabase connection notice
+                    const notice = document.createElement('div');
+                    notice.className = 'modern-glass p-4 mb-4 border-l-4 border-green-500';
+                    notice.innerHTML = '<span class="text-green-400">✅ Live data from Supabase database</span>';
+                    container.insertBefore(notice, container.firstChild);
+                    return;
+                }
+                
+                // Fallback to REST API
+                const params = new URLSearchParams({
+                    page: page,
+                    limit: jobsPerPage,
+                    ...filters
+                });
+
+                const response = await fetch(`http://localhost:3070/api/jobs?${params}`);
+                const data = await response.json();
+                
+                displayJobs(data.jobs || []);
+                updateResultsCount(data.total_count || 0);
+                updatePagination(data.total_count || 0);
+                
+            } catch (error) {
+                console.error('Error loading jobs:', error);
+                // Use fallback data when both APIs are unavailable
+                const fallbackJobs = getFallbackJobs();
+                displayJobs(fallbackJobs);
+                updateResultsCount(fallbackJobs.length);
+                updatePagination(fallbackJobs.length);
+                
+                // Show fallback notice
+                const notice = document.createElement('div');
+                notice.className = 'modern-glass p-4 mb-4 border-l-4 border-yellow-500';
+                notice.innerHTML = '<span class="text-yellow-400">🔄 Showing demo data - Database temporarily unavailable</span>';
+                container.insertBefore(notice, container.firstChild);
+            }
+        }
+
+        // Fallback jobs data for demo/testing
+        function getFallbackJobs() {
+            return [
+                {
+                    id: 'demo-1',
+                    title: 'Senior Pharmacist',
+                    company: 'Sydney Pharmacy Group',
+                    location: 'Sydney CBD, NSW',
+                    job_type: 'FullTime',
+                    salary_range_start: 120000,
+                    salary_range_end: 140000,
+                    description: 'Leading role in busy city pharmacy. Excellent opportunity for experienced pharmacist looking to advance their career.',
+                    is_urgent: false,
+                    created_at: new Date().toISOString()
+                },
+                {
+                    id: 'demo-2',
+                    title: 'Locum Pharmacist',
+                    company: 'Melbourne Community Pharmacy',
+                    location: 'Melbourne, VIC',
+                    job_type: 'Contract',
+                    salary_range_start: 55000,
+                    salary_range_end: 75000,
+                    description: 'Flexible locum position available. Perfect for pharmacists seeking work-life balance.',
+                    is_urgent: true,
+                    created_at: new Date(Date.now() - 86400000).toISOString()
+                },
+                {
+                    id: 'demo-3',
+                    title: 'Hospital Pharmacist',
+                    company: 'Brisbane General Hospital',
+                    location: 'Brisbane, QLD',
+                    job_type: 'FullTime',
+                    salary_range_start: 90000,
+                    salary_range_end: 110000,
+                    description: 'Hospital pharmacy role focusing on clinical services and patient care.',
+                    is_urgent: false,
+                    created_at: new Date(Date.now() - 172800000).toISOString()
+                },
+                {
+                    id: 'demo-4',
+                    title: 'Pharmacist Manager',
+                    company: 'Perth Pharmacy Chain',
+                    location: 'Perth, WA',
+                    job_type: 'FullTime',
+                    salary_range_start: 130000,
+                    salary_range_end: 150000,
+                    description: 'Management opportunity for experienced pharmacist. Lead a team in growing pharmacy business.',
+                    is_urgent: false,
+                    created_at: new Date(Date.now() - 259200000).toISOString()
+                },
+                {
+                    id: 'demo-5',
+                    title: 'Graduate Pharmacist',
+                    company: 'Adelaide Family Pharmacy',
+                    location: 'Adelaide, SA',
+                    job_type: 'PartTime',
+                    salary_range_start: 65000,
+                    salary_range_end: 80000,
+                    description: 'Excellent opportunity for new graduate. Supportive environment with mentorship program.',
+                    is_urgent: false,
+                    created_at: new Date(Date.now() - 345600000).toISOString()
+                }
+            ];
+        }
+
+        function displayJobs(jobs) {
+            const container = document.getElementById('jobs-container');
+            
+            if (jobs.length === 0) {
+                container.innerHTML = `
+                    <div class="modern-glass p-8 text-center">
+                        <p class="text-white/70">No jobs found matching your criteria.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = jobs.map(job => `
+                <div class="modern-card" data-job-id="${job.id}" onclick="viewJob('${job.id}')">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h3 class="text-xl font-semibold text-white">${job.title}</h3>
+                            <p class="text-white/70">${job.company || 'Company Name'}</p>
+                        </div>
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+                            job.is_urgent ? 'bg-red-500/20 text-red-300' : 'bg-green-500/20 text-green-300'
+                        }">
+                            ${job.is_urgent ? 'Urgent' : 'Active'}
+                        </span>
+                    </div>
+                    
+                    <div class="flex flex-wrap gap-4 text-sm text-white/60 mb-4">
+                        <span class="flex items-center">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            </svg>
+                            ${job.location || 'Location not specified'}
+                        </span>
+                        <span class="flex items-center">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            ${formatJobType(job.job_type)}
+                        </span>
+                        ${job.salary_range_start ? `
+                            <span class="flex items-center">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                $${job.salary_range_start.toLocaleString()} - $${job.salary_range_end.toLocaleString()}
+                            </span>
+                        ` : ''}
+                    </div>
+                    
+                    <p class="text-white/80 line-clamp-2">${job.description}</p>
+                    
+                    <div class="mt-4 flex justify-between items-center">
+                        <span class="text-xs text-white/50">Posted ${formatDate(job.created_at)}</span>
+                        <button class="text-white hover:text-white/80 text-sm font-medium inline-flex items-center gap-1">
+                            View Details 
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateResultsCount(count) {
+            totalJobs = count;
+            document.getElementById('results-count').textContent = `${count} jobs found`;
+        }
+
+        function updatePagination(totalCount) {
+            const totalPages = Math.ceil(totalCount / jobsPerPage);
+            const pagination = document.getElementById('pagination');
+            
+            if (totalPages <= 1) {
+                pagination.innerHTML = '';
+                return;
+            }
+
+            let buttons = '';
+            
+            // Previous button
+            if (currentPage > 1) {
+                buttons += `<button onclick="loadJobs(${currentPage - 1})" class="glass-button-secondary px-3 py-1">Previous</button>`;
+            }
+            
+            // Page numbers
+            for (let i = 1; i <= Math.min(totalPages, 5); i++) {
+                const isActive = i === currentPage;
+                buttons += `<button onclick="loadJobs(${i})" class="${
+                    isActive ? 'glass-button' : 'glass-button-secondary'
+                } px-3 py-1">${i}</button>`;
+            }
+            
+            // Next button
+            if (currentPage < totalPages) {
+                buttons += `<button onclick="loadJobs(${currentPage + 1})" class="glass-button-secondary px-3 py-1">Next</button>`;
+            }
+            
+            pagination.innerHTML = buttons;
+        }
+
+        function formatJobType(type) {
+            const types = {
+                'FullTime': 'Full-time',
+                'PartTime': 'Part-time',
+                'Contract': 'Contract',
+                'Casual': 'Casual',
+                'Internship': 'Internship'
+            };
+            return types[type] || type;
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diff = now - date;
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            
+            if (days === 0) return 'Today';
+            if (days === 1) return 'Yesterday';
+            if (days < 7) return `${days} days ago`;
+            if (days < 30) return `${Math.floor(days / 7)} weeks ago`;
+            return `${Math.floor(days / 30)} months ago`;
+        }
+
+        function viewJob(jobId) {
+            window.location.href = `job-detail.html?id=${jobId}`;
+        }
+
+        function searchJobs() {
+            const searchTerm = document.getElementById('search-input').value;
+            const filters = getActiveFilters();
+            if (searchTerm) filters.search = searchTerm;
+            loadJobs(1, filters);
+        }
+
+        function applyFilters() {
+            const filters = getActiveFilters();
+            loadJobs(1, filters);
+        }
+
+        function getActiveFilters() {
+            const filters = {};
+            
+            // Location filter
+            const location = document.getElementById('location-filter').value;
+            if (location) filters.location = location;
+            
+            // Job type filters
+            const jobTypes = Array.from(document.querySelectorAll('.job-type-filter:checked')).map(cb => cb.value);
+            if (jobTypes.length > 0) filters.job_types = jobTypes.join(',');
+            
+            // Salary filters
+            const minSalary = document.getElementById('min-salary').value;
+            const maxSalary = document.getElementById('max-salary').value;
+            if (minSalary) filters.min_salary = minSalary;
+            if (maxSalary) filters.max_salary = maxSalary;
+            
+            // Search term
+            const searchTerm = document.getElementById('search-input').value;
+            if (searchTerm) filters.search = searchTerm;
+            
+            return filters;
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('active');
+            menu.classList.toggle('hidden');
+        }
+
+        function clearFilters() {
+            document.getElementById('location-filter').value = '';
+            document.getElementById('search-input').value = '';
+            document.getElementById('min-salary').value = '';
+            document.getElementById('max-salary').value = '';
+            document.querySelectorAll('.job-type-filter').forEach(cb => cb.checked = false);
+            loadJobs(1, {});
+        }
+
+        // WebSocket Functions
+        function initializeWebSocket() {
+            const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsUrl = `${wsProtocol}//localhost:3070/ws`;
+            
+            try {
+                websocket = new WebSocket(wsUrl);
+                
+                websocket.onopen = function(event) {
+                    console.log('WebSocket connected to real-time job feed');
+                    updateWebSocketStatus('connected');
+                    
+                    // Subscribe to job-related topics
+                    const subscribeMessage = {
+                        type: 'Subscribe',
+                        payload: ['jobs', 'applications', 'system']
+                    };
+                    websocket.send(JSON.stringify(subscribeMessage));
+                };
+                
+                websocket.onmessage = function(event) {
+                    try {
+                        const message = JSON.parse(event.data);
+                        handleWebSocketMessage(message);
+                    } catch (error) {
+                        console.error('Error parsing WebSocket message:', error);
+                    }
+                };
+                
+                websocket.onclose = function(event) {
+                    console.log('WebSocket connection closed');
+                    updateWebSocketStatus('disconnected');
+                    
+                    // Attempt to reconnect after 5 seconds
+                    setTimeout(() => {
+                        initializeWebSocket();
+                    }, 5000);
+                };
+                
+                websocket.onerror = function(error) {
+                    console.error('WebSocket error:', error);
+                    updateWebSocketStatus('error');
+                };
+                
+            } catch (error) {
+                console.error('Failed to initialize WebSocket:', error);
+                updateWebSocketStatus('error');
+            }
+        }
+
+        function updateWebSocketStatus(status) {
+            const indicator = document.getElementById('ws-indicator');
+            const statusText = document.getElementById('ws-status-text');
+            
+            switch (status) {
+                case 'connected':
+                    indicator.className = 'w-2 h-2 rounded-full bg-green-500 mr-2';
+                    statusText.textContent = 'Live Updates';
+                    statusText.className = 'text-green-400';
+                    break;
+                case 'disconnected':
+                    indicator.className = 'w-2 h-2 rounded-full bg-yellow-500 mr-2';
+                    statusText.textContent = 'Reconnecting...';
+                    statusText.className = 'text-yellow-400';
+                    break;
+                case 'error':
+                    indicator.className = 'w-2 h-2 rounded-full bg-red-500 mr-2';
+                    statusText.textContent = 'Connection Error';
+                    statusText.className = 'text-red-400';
+                    break;
+                default:
+                    indicator.className = 'w-2 h-2 rounded-full bg-gray-400 mr-2';
+                    statusText.textContent = 'Connecting...';
+                    statusText.className = 'text-white/70';
+            }
+        }
+
+        function handleWebSocketMessage(message) {
+            console.log('Received WebSocket message:', message);
+            
+            switch (message.type) {
+                case 'JobPosted':
+                    handleNewJob(message.payload);
+                    break;
+                case 'JobUpdated':
+                    handleJobUpdate(message.payload);
+                    break;
+                case 'JobDeleted':
+                    handleJobDeletion(message.payload);
+                    break;
+                case 'JobApplicationReceived':
+                    handleApplicationUpdate(message.payload);
+                    break;
+                case 'SystemNotification':
+                    showRealtimeNotification(message.payload.message, message.payload.level);
+                    break;
+                default:
+                    console.log('Unknown message type:', message.type);
+            }
+        }
+
+        function handleNewJob(job) {
+            // Add animation class for new jobs
+            const newJobElement = createJobElement(job, true);
+            const container = document.getElementById('jobs-container');
+            
+            // Insert at the beginning with animation
+            container.insertAdjacentHTML('afterbegin', newJobElement);
+            
+            // Update results count
+            totalJobs++;
+            updateResultsCount(totalJobs);
+            
+            // Show notification
+            showRealtimeNotification(`New job posted: ${job.title}`, 'success');
+        }
+
+        function handleJobUpdate(job) {
+            // Find and update existing job
+            const jobElements = document.querySelectorAll('[data-job-id]');
+            for (let element of jobElements) {
+                if (element.dataset.jobId === job.id) {
+                    element.outerHTML = createJobElement(job);
+                    break;
+                }
+            }
+            
+            showRealtimeNotification(`Job updated: ${job.title}`, 'info');
+        }
+
+        function handleJobDeletion(payload) {
+            const jobElement = document.querySelector(`[data-job-id="${payload.job_id}"]`);
+            if (jobElement) {
+                jobElement.style.transition = 'opacity 0.5s ease-out';
+                jobElement.style.opacity = '0';
+                setTimeout(() => {
+                    jobElement.remove();
+                    totalJobs--;
+                    updateResultsCount(totalJobs);
+                }, 500);
+            }
+            
+            showRealtimeNotification('A job posting has been removed', 'warning');
+        }
+
+        function handleApplicationUpdate(payload) {
+            // Update application count display if visible
+            const jobElement = document.querySelector(`[data-job-id="${payload.job_id}"]`);
+            if (jobElement) {
+                // Add visual indicator for active job applications
+                jobElement.classList.add('ring-2', 'ring-blue-200');
+                setTimeout(() => {
+                    jobElement.classList.remove('ring-2', 'ring-blue-200');
+                }, 3000);
+            }
+        }
+
+        function createJobElement(job, isNew = false) {
+            const newClass = isNew ? 'animate-pulse border-green-300' : '';
+            return `
+                <div class="modern-card ${newClass}" data-job-id="${job.id}" onclick="viewJob('${job.id}')">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h3 class="text-xl font-semibold text-white">${job.title}</h3>
+                            <p class="text-white/70">${job.company || 'Company Name'}</p>
+                        </div>
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+                            job.is_urgent ? 'bg-red-500/20 text-red-300' : 'bg-green-500/20 text-green-300'
+                        }">
+                            ${job.is_urgent ? 'Urgent' : 'Active'}
+                        </span>
+                    </div>
+                    
+                    <div class="flex flex-wrap gap-4 text-sm text-white/60 mb-4">
+                        <span class="flex items-center">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            </svg>
+                            ${job.location || 'Location not specified'}
+                        </span>
+                        <span class="flex items-center">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            ${formatJobType(job.job_type)}
+                        </span>
+                        ${job.salary_range_start ? `
+                            <span class="flex items-center">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                $${job.salary_range_start.toLocaleString()} - $${job.salary_range_end.toLocaleString()}
+                            </span>
+                        ` : ''}
+                    </div>
+                    
+                    <p class="text-white/80 line-clamp-2">${job.description}</p>
+                    
+                    <div class="mt-4 flex justify-between items-center">
+                        <span class="text-xs text-white/50">Posted ${formatDate(job.created_at)}</span>
+                        <button class="text-white hover:text-white/80 text-sm font-medium inline-flex items-center gap-1">
+                            View Details 
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function showRealtimeNotification(message, level = 'info') {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 max-w-sm transition-all duration-300 transform translate-x-full`;
+            
+            let bgColor = 'bg-blue-100 border-blue-500 text-blue-800';
+            let icon = '💡';
+            
+            switch (level) {
+                case 'success':
+                    bgColor = 'bg-green-100 border-green-500 text-green-800';
+                    icon = '✅';
+                    break;
+                case 'warning':
+                    bgColor = 'bg-yellow-100 border-yellow-500 text-yellow-800';
+                    icon = '⚠️';
+                    break;
+                case 'error':
+                    bgColor = 'bg-red-100 border-red-500 text-red-800';
+                    icon = '❌';
+                    break;
+            }
+            
+            notification.className += ` ${bgColor} border-l-4`;
+            notification.innerHTML = `
+                <div class="flex items-center">
+                    <span class="mr-2">${icon}</span>
+                    <p class="text-sm font-medium">${message}</p>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Animate in
+            setTimeout(() => {
+                notification.classList.remove('translate-x-full');
+            }, 100);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                notification.classList.add('translate-x-full');
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

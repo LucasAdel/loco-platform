@@ -1,5 +1,5 @@
 use leptos::*;
-use std::error::Error;
+use std::rc::Rc;
 
 /// Error boundary component that catches and displays errors gracefully
 #[component]
@@ -7,19 +7,18 @@ pub fn ErrorBoundary(
     children: Children,
     /// Optional fallback component to show when an error occurs
     #[prop(optional)]
-    fallback: Option<Box<dyn Fn(String) -> View>>,
+    fallback: Option<Rc<dyn Fn(String) -> View>>,
 ) -> impl IntoView {
     let (error_msg, set_error_msg) = create_signal(None::<String>);
     
     // Create error handler
-    let handle_error = move |err: Box<dyn Error>| {
-        let error_string = err.to_string();
-        leptos::logging::error!("Error boundary caught: {}", error_string);
-        set_error_msg.set(Some(error_string));
-    };
+    let error_handler = Rc::new(move |err_msg: String| {
+        leptos::logging::error!("Error boundary caught: {}", err_msg);
+        set_error_msg.set(Some(err_msg));
+    });
     
     // Provide error handler context
-    provide_context(Box::new(handle_error) as Box<dyn Fn(Box<dyn Error>)>);
+    provide_context(error_handler.clone());
     
     view! {
         <Show
@@ -33,7 +32,7 @@ pub fn ErrorBoundary(
                 } else {
                     // Default error display
                     view! {
-                        <DefaultErrorDisplay message=msg.clone() on_retry=move |_| set_error_msg.set(None) />
+                        <DefaultErrorDisplay message=msg.clone() on_retry=Box::new(move || set_error_msg.set(None)) />
                     }.into_view()
                 }
             }}
@@ -45,7 +44,7 @@ pub fn ErrorBoundary(
 #[component]
 fn DefaultErrorDisplay(
     message: String,
-    on_retry: impl Fn() + 'static,
+    on_retry: Box<dyn Fn()>,
 ) -> impl IntoView {
     view! {
         <div class="min-h-[400px] flex items-center justify-center p-4">
@@ -80,12 +79,12 @@ fn DefaultErrorDisplay(
 }
 
 /// Hook to use the error handler from ErrorBoundary context
-pub fn use_error_handler() -> Box<dyn Fn(Box<dyn Error>)> {
-    use_context::<Box<dyn Fn(Box<dyn Error>)>>()
+pub fn use_error_handler() -> Rc<dyn Fn(String)> {
+    use_context::<Rc<dyn Fn(String)>>()
         .unwrap_or_else(|| {
             // Fallback error handler if no ErrorBoundary is present
-            Box::new(move |err: Box<dyn Error>| {
-                leptos::logging::error!("Unhandled error: {}", err);
+            Rc::new(move |err_msg: String| {
+                leptos::logging::error!("Unhandled error: {}", err_msg);
             })
         })
 }

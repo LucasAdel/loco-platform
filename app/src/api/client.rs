@@ -10,7 +10,7 @@ impl ApiClient {
     pub fn new() -> Self {
         // In production, this would come from environment config
         let base_url = if cfg!(debug_assertions) {
-            "http://localhost:3000".to_string()
+            "http://localhost:3070".to_string()
         } else {
             window().location().origin().unwrap_or_default()
         };

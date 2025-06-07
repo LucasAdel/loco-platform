@@ -7,7 +7,7 @@ use chrono::{Duration, Utc};
 
 use crate::AppError;
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Claims {
     pub sub: Uuid,    // Subject (user ID)
     pub email: String,

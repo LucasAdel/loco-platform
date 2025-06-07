@@ -22,8 +22,8 @@ pub fn Jobs() -> impl IntoView {
     // Filter jobs based on search criteria
     let filtered_jobs = move || {
         jobs_resource.get()
-            .flatten()
-            .unwrap_or_else(Vec::new)
+            .unwrap_or_else(|| Ok(Vec::new()))
+            .unwrap_or_else(|_| Vec::new())
             .into_iter()
             .filter(|job| {
                 let matches_search = search_query.get().is_empty() || 
@@ -113,7 +113,7 @@ pub fn Jobs() -> impl IntoView {
                             <Alert variant=AlertVariant::Info>
                                 "No jobs found matching your criteria. Try adjusting your filters."
                             </Alert>
-                        }
+                        }.into_view()
                     } else {
                         view! {
                             <div>
@@ -128,7 +128,7 @@ pub fn Jobs() -> impl IntoView {
                                     }
                                 </div>
                             </div>
-                        }
+                        }.into_view()
                     }
                 }}
             </Suspense>

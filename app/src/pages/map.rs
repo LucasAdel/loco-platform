@@ -22,7 +22,7 @@ pub fn Map() -> impl IntoView {
             js_sys::Reflect::set(
                 &options,
                 &"container".into(),
-                &container.into(),
+                &container.clone().unchecked_into::<wasm_bindgen::JsValue>(),
             ).unwrap();
             js_sys::Reflect::set(
                 &options,

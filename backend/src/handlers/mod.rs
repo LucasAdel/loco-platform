@@ -2,6 +2,9 @@ pub mod jobs;
 pub mod users;
 pub mod health;
 pub mod auth;
+pub mod local_auth;
+pub mod websocket;
+pub mod search;
 
 use axum::{
     response::{IntoResponse, Json},

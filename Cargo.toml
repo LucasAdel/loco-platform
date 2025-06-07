@@ -3,16 +3,17 @@ members = [
     "app",        # Leptos SSR app (replaces frontend)
     "backend",    # API backend with multi-tenancy
     "shared",     # Shared types and utilities
-    "migrations"  # Database migrations
+    "migrations", # Database migrations
+    "tests"       # Rust-native testing suite
 ]
 resolver = "2"
 
 [workspace.dependencies]
-# Leptos framework
-leptos = { version = "0.6" }
-leptos_axum = { version = "0.6" }
-leptos_meta = { version = "0.6" }
-leptos_router = { version = "0.6" }
+# Leptos framework - using 0.5 for stability
+leptos = { version = "0.5.7", features = ["serde"] }
+leptos_axum = { version = "0.5" }
+leptos_meta = { version = "0.5" }
+leptos_router = { version = "0.5" }
 
 # Shared dependencies
 serde = { version = "1.0", features = ["derive"] }
@@ -55,6 +56,12 @@ async-trait = "0.1"
 url = "2.5"
 rand = "0.8"
 rust_decimal = "1.37"
+
+# Testing dependencies
+fantoccini = "0.19"
+wasm-bindgen-test = "0.3"
+tokio-test = "0.4"
+futures = "0.3"
 
 [profile.release]
 opt-level = 3

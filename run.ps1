@@ -70,7 +70,7 @@ function Start-Backend {
     Start-Process -FilePath "cargo" -ArgumentList "run", "--bin", "backend" -WindowStyle Hidden
     Set-Location ..
     
-    Write-Success "Backend server starting on http://localhost:3000"
+    Write-Success "Backend server starting on http://localhost:3070"
 }
 
 function Start-Frontend {
@@ -81,9 +81,9 @@ function Start-Frontend {
         cargo install dioxus-cli
     }
     
-    Start-Process -FilePath "dx" -ArgumentList "serve", "--package", "frontend", "--platform", "web", "--hot-reload", "true", "--port", "8080" -WindowStyle Hidden
+    Start-Process -FilePath "dx" -ArgumentList "serve", "--package", "frontend", "--platform", "web", "--hot-reload", "true", "--port", "3080" -WindowStyle Hidden
     
-    Write-Success "Frontend server starting on http://localhost:8080"
+    Write-Success "Frontend server starting on http://localhost:3080"
 }
 
 function Wait-ForServers {
@@ -92,7 +92,7 @@ function Wait-ForServers {
     # Wait for backend
     $backendReady = $false
     for ($i = 1; $i -le 30; $i++) {
-        if (Test-Port -Port 3000) {
+        if (Test-Port -Port 3070) {
             $backendReady = $true
             break
         }
@@ -102,7 +102,7 @@ function Wait-ForServers {
     # Wait for frontend
     $frontendReady = $false
     for ($i = 1; $i -le 60; $i++) {
-        if (Test-Port -Port 8080) {
+        if (Test-Port -Port 3080) {
             $frontendReady = $true
             break
         }
@@ -110,15 +110,15 @@ function Wait-ForServers {
     }
     
     if ($backendReady) {
-        Write-Success "Backend server is ready on http://localhost:3000"
+        Write-Success "Backend server is ready on http://localhost:3070"
     } else {
         Write-Warning "Backend server may still be starting."
     }
     
     if ($frontendReady) {
-        Write-Success "Frontend server is ready on http://localhost:8080"
+        Write-Success "Frontend server is ready on http://localhost:3080"
         Write-Status "Opening browser..."
-        Start-Process "http://localhost:8080"
+        Start-Process "http://localhost:3080"
     } else {
         Write-Warning "Frontend server may still be compiling."
     }
@@ -128,10 +128,10 @@ function Show-Status {
     Write-Host ""
     Write-Status "Server Status:"
     
-    if (Test-Port -Port 3000) {
+    if (Test-Port -Port 3070) {
         Write-Host "  Backend:  " -NoNewline
         Write-Host "✓ Running" -ForegroundColor Green -NoNewline
-        Write-Host " on http://localhost:3000"
+        Write-Host " on http://localhost:3070"
     } else {
         Write-Host "  Backend:  " -NoNewline
         Write-Host "✗ Not running" -ForegroundColor Red
@@ -140,7 +140,7 @@ function Show-Status {
     if (Test-Port -Port 8080) {
         Write-Host "  Frontend: " -NoNewline
         Write-Host "✓ Running" -ForegroundColor Green -NoNewline
-        Write-Host " on http://localhost:8080"
+        Write-Host " on http://localhost:3080"
     } else {
         Write-Host "  Frontend: " -NoNewline
         Write-Host "✗ Not running" -ForegroundColor Red
@@ -181,8 +181,8 @@ function Show-Help {
     Write-Host "  help      Show this help message"
     Write-Host ""
     Write-Host "Servers:"
-    Write-Host "  Backend:  http://localhost:3000 (Axum/Rust)"
-    Write-Host "  Frontend: http://localhost:8080 (Dioxus/WASM)"
+    Write-Host "  Backend:  http://localhost:3070 (Axum/Rust)"
+    Write-Host "  Frontend: http://localhost:3080 (Dioxus/WASM)"
 }
 
 # Main script logic

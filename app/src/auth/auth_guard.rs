@@ -222,6 +222,8 @@ pub fn AuthLink(
         true
     };
     
+    let children_view = children();
+    
     view! {
         <Show when=should_show>
             <A 
@@ -229,7 +231,7 @@ pub fn AuthLink(
                 class=class.unwrap_or("")
                 active_class=active_class.unwrap_or("")
             >
-                {children()}
+                {children_view}
             </A>
         </Show>
     }
@@ -239,7 +241,7 @@ pub fn AuthLink(
 #[component]
 pub fn ConditionalRedirect(
     /// Condition to check
-    when: impl Fn() -> bool + 'static,
+    when: Box<dyn Fn() -> bool>,
     
     /// Path to redirect to
     to: &'static str,
