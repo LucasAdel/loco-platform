@@ -1,4 +1,4 @@
-use shared::types::{SimpleJob, SimpleJobType};
+use shared::types::{SimpleJob, SimpleJobType, CreateJobRequest, Job};
 use super::client::use_api_client;
 
 pub async fn fetch_jobs() -> Result<Vec<SimpleJob>, String> {
@@ -70,4 +70,13 @@ fn get_mock_jobs() -> Vec<SimpleJob> {
             longitude: Some(153.0251),
         },
     ]
+}
+
+pub async fn create_job(request: CreateJobRequest) -> Result<Job, String> {
+    let client = use_api_client();
+    
+    match client.post::<Job, CreateJobRequest>("/api/jobs", &request).await {
+        Ok(job) => Ok(job),
+        Err(e) => Err(format!("Failed to create job: {:?}", e))
+    }
 }

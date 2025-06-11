@@ -63,9 +63,9 @@ impl JobRepository {
             .filter(job::Column::DeletedAt.is_null())
             .order_by_desc(job::Column::CreatedAt);
 
-        let paginator = select.paginate(db, pagination.page_size);
+        let paginator = select.paginate(db, pagination.page_size());
         let total_count = paginator.num_items().await?;
-        let items = paginator.fetch_page(pagination.page - 1).await?;
+        let items = paginator.fetch_page(pagination.page().saturating_sub(1)).await?;
 
         Ok(PaginatedResult::new(items, total_count, pagination))
     }
@@ -119,9 +119,9 @@ impl JobRepository {
             .order_by_desc(job::Column::IsUrgent)
             .order_by_desc(job::Column::CreatedAt);
 
-        let paginator = select.paginate(db, pagination.page_size);
+        let paginator = select.paginate(db, pagination.page_size());
         let total_count = paginator.num_items().await?;
-        let items = paginator.fetch_page(pagination.page - 1).await?;
+        let items = paginator.fetch_page(pagination.page().saturating_sub(1)).await?;
 
         Ok(PaginatedResult::new(items, total_count, pagination))
     }
@@ -170,7 +170,7 @@ impl JobRepository {
 
         let total_count = nearby_jobs.len() as u64;
         let start_idx = pagination.offset() as usize;
-        let end_idx = (start_idx + pagination.page_size as usize).min(nearby_jobs.len());
+        let end_idx = (start_idx + pagination.page_size() as usize).min(nearby_jobs.len());
         
         let page_items = if start_idx < nearby_jobs.len() {
             nearby_jobs[start_idx..end_idx].to_vec()
@@ -193,9 +193,9 @@ impl JobRepository {
             .filter(job::Column::DeletedAt.is_null())
             .order_by_desc(job::Column::CreatedAt);
 
-        let paginator = select.paginate(db, pagination.page_size);
+        let paginator = select.paginate(db, pagination.page_size());
         let total_count = paginator.num_items().await?;
-        let items = paginator.fetch_page(pagination.page - 1).await?;
+        let items = paginator.fetch_page(pagination.page().saturating_sub(1)).await?;
 
         Ok(PaginatedResult::new(items, total_count, pagination))
     }

@@ -16,10 +16,9 @@ use crate::{
 
 /// Get all jobs with optional filtering
 pub async fn list_jobs(
-    State(_state): State<AppState>,
+    State(state): State<AppState>,
     Query(filters): Query<JobFilters>,
 ) -> Result<impl IntoResponse, AppError> {
-    // Demo mode: Use service with sample data
     let (jobs, total) = crate::services::JobService::list_jobs(filters, Some(1), Some(20)).await?;
     
     Ok(Json(SearchResponse {
@@ -27,16 +26,15 @@ pub async fn list_jobs(
         total_count: total,
         page: 1,
         limit: 20,
-        has_more: false,
+        has_more: total > 20,
     }))
 }
 
 /// Get a specific job by ID
 pub async fn get_job(
-    State(_state): State<AppState>,
+    State(state): State<AppState>,
     Path(job_id): Path<Uuid>,
 ) -> Result<impl IntoResponse, AppError> {
-    // Demo mode: Use service
     match crate::services::JobService::get_job(job_id).await? {
         Some(job) => Ok(Json(job)),
         None => Err(AppError::NotFound),

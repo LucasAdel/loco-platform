@@ -1,8 +1,26 @@
 use leptos::*;
+use leptos::prelude::*;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use gloo_net::http::Request;
 use uuid::Uuid;
+use wasm_bindgen_futures::spawn_local;
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Job {
+    pub id: String,
+    pub title: String,
+    pub description: String,
+    pub company: String,
+    pub location: String,
+    pub salary_range: Option<String>,
+    pub job_type: String,
+    pub is_urgent: bool,
+    pub created_at: String,
+    pub latitude: Option<f64>,
+    pub longitude: Option<f64>,
+    pub status: String,
+}
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AuthResponse {
@@ -39,13 +57,23 @@ pub struct RegisterRequest {
     pub tenant_slug: Option<String>,
 }
 
+// Supabase configuration from environment
+const SUPABASE_URL: &str = "https://kpmmsogskffsiubbegvc.supabase.co";
+const SUPABASE_ANON_KEY: &str = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtwbW1zb2dza2Zmc2l1YmJlZ3ZjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkxMDQ5NDcsImV4cCI6MjA2NDY4MDk0N30.SqVBXS-r8eG0jxo2lCdHiCKEiAHDpTJbKqfr0NGeSqM";
+
 /// Supabase authentication client for Leptos
 pub struct SupabaseAuth;
 
 impl SupabaseAuth {
     /// Get the API base URL
     fn api_url() -> String {
+        // Use backend API for now, will switch to Supabase direct later
         "http://localhost:3070/api/v1".to_string()
+    }
+    
+    /// Get Supabase URL
+    fn supabase_url() -> String {
+        SUPABASE_URL.to_string()
     }
 
     /// Sign in with email and password
@@ -208,9 +236,9 @@ pub struct AuthContext {
 impl AuthContext {
     pub fn new() -> Self {
         Self {
-            user: create_rw_signal(None),
-            token: create_rw_signal(None),
-            loading: create_rw_signal(false),
+            user: RwSignal::new(None),
+            token: RwSignal::new(None),
+            loading: RwSignal::new(false),
         }
     }
 
@@ -301,10 +329,11 @@ impl AuthContext {
 #[component]
 pub fn AuthProvider(children: Children) -> impl IntoView {
     let auth_context = AuthContext::new();
+    let auth_clone = auth_context.clone();
     
     // Initialize auth on mount
-    create_effect(move |_| {
-        let auth = auth_context.clone();
+    Effect::new(move |_| {
+        let auth = auth_clone.clone();
         spawn_local(async move {
             let _ = auth.init_auth().await;
         });
@@ -319,4 +348,66 @@ pub fn AuthProvider(children: Children) -> impl IntoView {
 pub fn use_auth() -> AuthContext {
     use_context::<AuthContext>()
         .expect("AuthContext not found. Make sure to wrap your app with AuthProvider")
+}
+
+/// Provide auth context
+pub fn provide_auth_context() {
+    let auth_context = AuthContext::new();
+    provide_context(auth_context);
+}
+
+/// Get Supabase client instance
+pub fn use_supabase() -> SupabaseAuth {
+    SupabaseAuth
+}
+
+impl SupabaseAuth {
+    /// Get all active jobs
+    pub async fn get_jobs(&self) -> Result<Vec<Job>, String> {
+        // For now, return mock data
+        Ok(vec![
+            Job {
+                id: "1".to_string(),
+                title: "Senior Pharmacist".to_string(),
+                description: "Leading pharmacy role in Sydney CBD".to_string(),
+                company: "HealthPlus Pharmacy".to_string(),
+                location: "Sydney, NSW".to_string(),
+                salary_range: Some("$90k - $110k".to_string()),
+                job_type: "Full-time".to_string(),
+                is_urgent: true,
+                created_at: "2025-01-06".to_string(),
+                latitude: Some(-33.8688),
+                longitude: Some(151.2093),
+                status: "active".to_string(),
+            },
+            Job {
+                id: "2".to_string(),
+                title: "Locum Pharmacist".to_string(),
+                description: "Flexible locum position across Melbourne".to_string(),
+                company: "MediStaff Solutions".to_string(),
+                location: "Melbourne, VIC".to_string(),
+                salary_range: Some("$50/hr - $65/hr".to_string()),
+                job_type: "Contract".to_string(),
+                is_urgent: false,
+                created_at: "2025-01-05".to_string(),
+                latitude: Some(-37.8136),
+                longitude: Some(144.9631),
+                status: "active".to_string(),
+            },
+            Job {
+                id: "3".to_string(),
+                title: "Hospital Pharmacist".to_string(),
+                description: "Join our hospital pharmacy team in Brisbane".to_string(),
+                company: "Brisbane General Hospital".to_string(),
+                location: "Brisbane, QLD".to_string(),
+                salary_range: Some("$85k - $95k".to_string()),
+                job_type: "Full-time".to_string(),
+                is_urgent: true,
+                created_at: "2025-01-04".to_string(),
+                latitude: Some(-27.4698),
+                longitude: Some(153.0251),
+                status: "active".to_string(),
+            },
+        ])
+    }
 }

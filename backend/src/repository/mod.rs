@@ -22,22 +22,30 @@ pub trait BaseRepository<Entity, Model> {
 }
 
 /// Pagination helpers
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Deserialize)]
 pub struct PaginationParams {
-    pub page: u64,
-    pub page_size: u64,
+    pub page: Option<u64>,
+    pub page_size: Option<u64>,
 }
 
 impl PaginationParams {
     pub fn new(page: Option<u64>, page_size: Option<u64>) -> Self {
         Self {
-            page: page.unwrap_or(1).max(1),
-            page_size: page_size.unwrap_or(20).min(100).max(1),
+            page,
+            page_size,
         }
     }
     
+    pub fn page(&self) -> u64 {
+        self.page.unwrap_or(1).max(1)
+    }
+    
+    pub fn page_size(&self) -> u64 {
+        self.page_size.unwrap_or(20).min(100).max(1)
+    }
+    
     pub fn offset(&self) -> u64 {
-        (self.page - 1) * self.page_size
+        (self.page() - 1) * self.page_size()
     }
 }
 
@@ -54,15 +62,17 @@ pub struct PaginatedResult<T> {
 
 impl<T> PaginatedResult<T> {
     pub fn new(items: Vec<T>, total_count: u64, pagination: PaginationParams) -> Self {
-        let total_pages = (total_count + pagination.page_size - 1) / pagination.page_size;
-        let has_next = pagination.page < total_pages;
-        let has_prev = pagination.page > 1;
+        let page = pagination.page();
+        let page_size = pagination.page_size();
+        let total_pages = (total_count + page_size - 1) / page_size;
+        let has_next = page < total_pages;
+        let has_prev = page > 1;
         
         Self {
             items,
             total_count,
-            page: pagination.page,
-            page_size: pagination.page_size,
+            page,
+            page_size,
             total_pages,
             has_next,
             has_prev,

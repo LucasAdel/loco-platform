@@ -5,6 +5,7 @@ use uuid::Uuid;
 use crate::entities::application;
 use super::{BaseRepository, PaginationParams, PaginatedResult};
 
+#[derive(Clone)]
 pub struct ApplicationRepository;
 
 impl ApplicationRepository {

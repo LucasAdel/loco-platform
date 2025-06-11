@@ -1,5 +1,7 @@
 use leptos::*;
+use leptos::prelude::*;
 use shared::types::ApiError;
+use web_sys::window;
 
 #[derive(Clone)]
 pub struct ApiClient {
@@ -12,7 +14,11 @@ impl ApiClient {
         let base_url = if cfg!(debug_assertions) {
             "http://localhost:3070".to_string()
         } else {
-            window().location().origin().unwrap_or_default()
+            window()
+                .expect("window should exist")
+                .location()
+                .origin()
+                .unwrap_or_default()
         };
         
         Self { base_url }

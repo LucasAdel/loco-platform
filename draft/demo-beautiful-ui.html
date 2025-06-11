@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loco Platform - Beautiful React-Influenced UI Demo</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        /* CSS Variables - Tiffany Blue & Lavender Theme */
+        :root {
+            --tiffany-blue: #17DDB8;
+            --tiffany-dark: #0FA897;
+            --lavender: #E6E6FA;
+            --lavender-dark: #D4D4F0;
+            --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Icons", 
+                         "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            font-family: var(--font-sans);
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Glass Morphism Effects */
+        .glass {
+            background: rgba(255, 255, 255, 0.72);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+        }
+
+        .glass-tiffany {
+            background: rgba(23, 221, 184, 0.08);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(23, 221, 184, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(23, 221, 184, 0.15);
+        }
+
+        /* Apple-style Buttons */
+        .btn-primary {
+            background: var(--tiffany-blue);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: 500;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px rgba(23, 221, 184, 0.25);
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(23, 221, 184, 0.35);
+        }
+
+        /* Job Card */
+        .job-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid rgba(23, 221, 184, 0.15);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .job-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--tiffany-blue), var(--lavender));
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .job-card:hover::before {
+            opacity: 1;
+        }
+
+        .job-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(23, 221, 184, 0.2);
+            border-color: rgba(23, 221, 184, 0.3);
+        }
+
+        /* Stats Widget */
+        .stats-widget {
+            background: rgba(255, 255, 255, 0.72);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s;
+        }
+
+        .stats-widget:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Badge */
+        .badge-tiffany {
+            background: rgba(23, 221, 184, 0.1);
+            color: var(--tiffany-dark);
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border: 1px solid rgba(23, 221, 184, 0.2);
+        }
+
+        .badge-urgent {
+            background: rgba(255, 59, 48, 0.1);
+            color: rgb(255, 59, 48);
+            border-color: rgba(255, 59, 48, 0.2);
+        }
+
+        /* Text Gradient */
+        .text-gradient {
+            background: linear-gradient(135deg, var(--tiffany-blue), var(--lavender));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Animations */
+        @keyframes fade-in {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade-in {
+            animation: fade-in 0.6s ease-out;
+        }
+
+        /* Map Marker */
+        .map-marker {
+            width: 40px;
+            height: 40px;
+            background: var(--tiffany-blue);
+            border-radius: 50%;
+            box-shadow: 0 4px 12px rgba(23, 221, 184, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .map-marker:hover {
+            transform: scale(1.2);
+            box-shadow: 0 6px 20px rgba(23, 221, 184, 0.6);
+        }
+
+        .map-marker.urgent {
+            background: rgb(255, 59, 48);
+            animation: pulse-urgent 2s infinite;
+        }
+
+        @keyframes pulse-urgent {
+            0% {
+                box-shadow: 0 0 0 0 rgba(255, 59, 48, 0.4);
+            }
+            70% {
+                box-shadow: 0 0 0 20px rgba(255, 59, 48, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 59, 48, 0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="min-h-screen p-8">
+        <!-- Header -->
+        <div class="glass rounded-2xl p-6 mb-8 animate-fade-in">
+            <h1 class="text-4xl font-bold mb-2">
+                Welcome to <span class="text-gradient">Loco Platform</span>
+            </h1>
+            <p class="text-gray-600 text-lg">Beautiful React-Influenced UI with Tiffany Blue & Lavender Theme</p>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="grid md:grid-cols-4 gap-6 mb-8">
+            <div class="stats-widget animate-fade-in" style="animation-delay: 0.1s">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-14 h-14 glass-tiffany rounded-2xl flex items-center justify-center text-2xl">
+                        🔍
+                    </div>
+                    <span class="badge-tiffany">12 new</span>
+                </div>
+                <h3 class="font-semibold text-lg">Search Jobs</h3>
+            </div>
+
+            <div class="stats-widget animate-fade-in" style="animation-delay: 0.2s">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-14 h-14 glass-tiffany rounded-2xl flex items-center justify-center text-2xl">
+                        📄
+                    </div>
+                    <span class="badge-tiffany">3 pending</span>
+                </div>
+                <h3 class="font-semibold text-lg">Applications</h3>
+            </div>
+
+            <div class="stats-widget animate-fade-in" style="animation-delay: 0.3s">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-14 h-14 glass-tiffany rounded-2xl flex items-center justify-center text-2xl">
+                        💬
+                    </div>
+                    <span class="badge-tiffany">2 unread</span>
+                </div>
+                <h3 class="font-semibold text-lg">Messages</h3>
+            </div>
+
+            <div class="stats-widget animate-fade-in" style="animation-delay: 0.4s">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-14 h-14 glass-tiffany rounded-2xl flex items-center justify-center text-2xl">
+                        🔔
+                    </div>
+                    <span class="badge-tiffany">5 new</span>
+                </div>
+                <h3 class="font-semibold text-lg">Alerts</h3>
+            </div>
+        </div>
+
+        <!-- Job Cards -->
+        <div class="grid md:grid-cols-2 gap-8">
+            <div class="glass backdrop-blur-xl rounded-2xl p-8 animate-fade-in" style="animation-delay: 0.5s">
+                <h2 class="text-2xl font-semibold mb-6">Featured Jobs</h2>
+                
+                <div class="space-y-4">
+                    <div class="job-card">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="font-semibold text-lg">Senior Pharmacist</h3>
+                            <span class="badge-urgent">Urgent</span>
+                        </div>
+                        <p class="text-gray-600 mb-1">HealthPlus Pharmacy</p>
+                        <p class="text-gray-500 text-sm flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                            </svg>
+                            Sydney, NSW
+                        </p>
+                        <div class="flex justify-between items-center mt-3">
+                            <span class="badge-tiffany">Full-time</span>
+                            <span class="text-sm font-medium text-gray-700">$90k - $110k</span>
+                        </div>
+                    </div>
+
+                    <div class="job-card">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="font-semibold text-lg">Locum Pharmacist</h3>
+                        </div>
+                        <p class="text-gray-600 mb-1">MediStaff Solutions</p>
+                        <p class="text-gray-500 text-sm flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                            </svg>
+                            Melbourne, VIC
+                        </p>
+                        <div class="flex justify-between items-center mt-3">
+                            <span class="badge-tiffany">Contract</span>
+                            <span class="text-sm font-medium text-gray-700">$50/hr - $65/hr</span>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn-primary w-full mt-6">
+                    View All Jobs
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="glass backdrop-blur-xl rounded-2xl p-8 animate-fade-in" style="animation-delay: 0.6s">
+                <h2 class="text-2xl font-semibold mb-6">Map Preview</h2>
+                
+                <div class="bg-gray-100 rounded-xl h-64 flex items-center justify-center relative overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-br from-blue-50 to-teal-50"></div>
+                    
+                    <!-- Mock map markers -->
+                    <div class="map-marker urgent" style="position: absolute; top: 30%; left: 40%;">!</div>
+                    <div class="map-marker" style="position: absolute; top: 50%; left: 60%;">📍</div>
+                    <div class="map-marker" style="position: absolute; top: 70%; left: 30%;">📍</div>
+                    
+                    <p class="text-gray-500 z-10">Interactive Mapbox Integration</p>
+                </div>
+
+                <div class="mt-6 space-y-3">
+                    <div class="flex items-center gap-3">
+                        <div class="map-marker w-8 h-8 text-sm">📍</div>
+                        <span class="text-sm">Regular Position</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="map-marker urgent w-8 h-8 text-sm">!</div>
+                        <span class="text-sm">Urgent Position</span>
+                    </div>
+                </div>
+
+                <button class="btn-primary w-full mt-6">
+                    Open Full Map
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Profile Completion -->
+        <div class="glass-tiffany rounded-2xl p-8 mt-8 animate-fade-in" style="animation-delay: 0.7s">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-xl font-semibold mb-2">Complete Your Profile</h3>
+                    <p class="text-gray-600">Your profile is 75% complete. Add more details to get better job matches.</p>
+                </div>
+                <button class="btn-primary">Complete Profile</button>
+            </div>
+            <div class="mt-6 bg-gray-200 rounded-full h-3 overflow-hidden">
+                <div class="h-full rounded-full bg-gradient-to-r from-tiffany-blue to-lavender transition-all duration-1000" style="width: 75%; background: linear-gradient(90deg, #17DDB8, #E6E6FA);"></div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

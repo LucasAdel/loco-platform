@@ -1,4 +1,4 @@
-use crate::providers::auth_provider::{LoginRequest, RegisterRequest, AuthResponse};
+use crate::api::supabase::{LoginRequest, RegisterRequest, AuthResponse};
 use super::client::use_api_client;
 
 pub async fn login(credentials: LoginRequest) -> Result<AuthResponse, String> {

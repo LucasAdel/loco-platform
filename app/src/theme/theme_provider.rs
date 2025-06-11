@@ -1,4 +1,5 @@
 use leptos::*;
+use leptos::prelude::*;
 use leptos_meta::*;
 use web_sys::window;
 use super::{Theme, ThemeContext, THEME_CSS};

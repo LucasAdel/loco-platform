@@ -1,262 +1,233 @@
 use leptos::*;
-use leptos_router::use_navigate;
+use leptos::prelude::*;
+use leptos_router::hooks::use_navigate;
 use serde::{Deserialize, Serialize};
-use shared::types::UserRole;
-use uuid::Uuid;
-use gloo_net::http::Request;
+use std::rc::Rc;
 
-#[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
-pub struct AuthUser {
-    pub id: Uuid,
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct User {
+    pub id: String,
     pub email: String,
-    pub role: UserRole,
-    pub tenant_id: Uuid,
-    pub tenant_name: String,
-    pub permissions: Vec<String>,
+    pub name: Option<String>,
+    pub role: String,
+    pub avatar: Option<String>,
 }
 
-#[derive(Clone, Debug, PartialEq)]
-pub enum AuthState {
-    Loading,
-    Authenticated(AuthUser),
-    Unauthenticated,
+#[derive(Debug, Clone)]
+pub struct AuthProvider {
+    pub user: RwSignal<Option<User>>,
+    pub is_authenticated: RwSignal<bool>,
+    pub loading: RwSignal<bool>,
+    pub error: RwSignal<Option<String>>,
 }
 
-impl AuthState {
-    pub fn is_authenticated(&self) -> bool {
-        matches!(self, AuthState::Authenticated(_))
-    }
-    
-    pub fn user(&self) -> Option<&AuthUser> {
-        match self {
-            AuthState::Authenticated(user) => Some(user),
-            _ => None,
-        }
-    }
-}
-
-#[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct LoginRequest {
-    pub email: String,
-    pub password: String,
-}
-
-#[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct RegisterRequest {
-    pub email: String,
-    pub password: String,
-    pub company_name: String,
-    pub first_name: String,
-    pub last_name: String,
-    pub role: UserRole,
-}
-
-#[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct AuthResponse {
-    pub access_token: String,
-    pub refresh_token: String,
-    pub user: AuthUser,
-}
-
-// Supabase configuration from environment
-pub fn get_supabase_config() -> (String, String) {
-    #[cfg(target_arch = "wasm32")]
-    {
-        // In WASM, we can't access env vars directly, use hardcoded values or pass from build
-        (
-            "https://piziiyfwbljvwwqicvlc.supabase.co".to_string(),
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBpemlpeWZ3Ymxqdnd3cWljdmxjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDYxNzk3NzcsImV4cCI6MjA2MTc1NTc3N30.Akue6yeM-g4ugLxxKU6TcUSl4kxU06mUYNWUJ2IaTNc".to_string()
-        )
-    }
-    #[cfg(not(target_arch = "wasm32"))]
-    {
-        // On server, read from environment
-        (
-            std::env::var("VITE_SUPABASE_URL").unwrap_or_else(|_| "https://piziiyfwbljvwwqicvlc.supabase.co".to_string()),
-            std::env::var("VITE_SUPABASE_ANON_KEY").unwrap_or_else(|_| "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBpemlpeWZ3Ymxqdnd3cWljdmxjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDYxNzk3NzcsImV4cCI6MjA2MTc1NTc3N30.Akue6yeM-g4ugLxxKU6TcUSl4kxU06mUYNWUJ2IaTNc".to_string())
-        )
-    }
-}
-
-#[component]
-pub fn AuthProvider(children: Children) -> impl IntoView {
-    let (auth_state, set_auth_state) = create_signal(AuthState::Loading);
-    
-    // Check for existing session on mount
-    create_effect(move |_| {
-        spawn_local(async move {
-            if let Some(token) = get_stored_token() {
-                match validate_session(&token).await {
-                    Ok(user) => set_auth_state.set(AuthState::Authenticated(user)),
-                    Err(_) => {
-                        clear_stored_token();
-                        set_auth_state.set(AuthState::Unauthenticated);
-                    }
-                }
-            } else {
-                set_auth_state.set(AuthState::Unauthenticated);
-            }
-        });
-    });
-    
-    let login = create_action(move |input: &LoginRequest| {
-        let input = input.clone();
-        async move {
-            let (supabase_url, supabase_anon_key) = get_supabase_config();
-            let response = Request::post(&format!("{}/auth/v1/token?grant_type=password", supabase_url))
-                .header("apikey", &supabase_anon_key)
-                .header("Content-Type", "application/json")
-                .json(&input)
-                .unwrap()
-                .send()
-                .await
-                .map_err(|e| format!("Login failed: {}", e))?;
-                
-            if response.ok() {
-                let auth_response: AuthResponse = response.json().await
-                    .map_err(|e| format!("Failed to parse response: {}", e))?;
-                    
-                store_token(&auth_response.access_token);
-                set_auth_state.set(AuthState::Authenticated(auth_response.user));
-                Ok(())
-            } else {
-                Err("Invalid credentials".to_string())
-            }
-        }
-    });
-    
-    let logout = create_action(move |_: &()| async move {
-        // Call Supabase logout endpoint
-        let (supabase_url, supabase_anon_key) = get_supabase_config();
-        let _ = Request::post(&format!("{}/auth/v1/logout", supabase_url))
-            .header("apikey", &supabase_anon_key)
-            .header("Authorization", &format!("Bearer {}", get_stored_token().unwrap_or_default()))
-            .send()
-            .await;
-            
-        clear_stored_token();
-        set_auth_state.set(AuthState::Unauthenticated);
+impl AuthProvider {
+    pub fn new() -> Self {
+        // Check for existing session
+        let stored_user = load_user_from_storage();
+        let is_authenticated = stored_user.is_some();
         
-        // Redirect to login
-        let navigate = use_navigate();
-        navigate("/login", Default::default());
-    });
-    
-    let register = create_action(move |input: &RegisterRequest| {
-        let input = input.clone();
-        async move {
-            // First, create the user in Supabase Auth
-            let (supabase_url, supabase_anon_key) = get_supabase_config();
-            let auth_response = Request::post(&format!("{}/auth/v1/signup", supabase_url))
-                .header("apikey", &supabase_anon_key)
-                .header("Content-Type", "application/json")
-                .json(&serde_json::json!({
-                    "email": input.email,
-                    "password": input.password,
-                }))
-                .unwrap()
-                .send()
-                .await
-                .map_err(|e| format!("Registration failed: {}", e))?;
-                
-            if auth_response.ok() {
-                // Create tenant and user profile
-                let tenant_response = Request::post(&format!("{}/rest/v1/tenants", supabase_url))
-                    .header("apikey", &supabase_anon_key)
-                    .header("Content-Type", "application/json")
-                    .json(&serde_json::json!({
-                        "name": input.company_name,
-                        "owner_email": input.email,
-                    }))
-                    .unwrap()
-                    .send()
-                    .await
-                    .map_err(|e| format!("Failed to create tenant: {}", e))?;
-                    
-                Ok(())
-            } else {
-                Err("Registration failed".to_string())
-            }
+        Self {
+            user: create_rw_signal(stored_user),
+            is_authenticated: create_rw_signal(is_authenticated),
+            loading: create_rw_signal(false),
+            error: create_rw_signal(None),
         }
-    });
-    
-    provide_context(AuthContext {
-        auth_state: auth_state.into(),
-        login,
-        logout,
-        register,
-    });
-    
-    children()
-}
-
-#[derive(Clone)]
-pub struct AuthContext {
-    pub auth_state: Signal<AuthState>,
-    pub login: Action<LoginRequest, Result<(), String>>,
-    pub logout: Action<(), ()>,
-    pub register: Action<RegisterRequest, Result<(), String>>,
-}
-
-pub fn use_auth() -> AuthContext {
-    use_context::<AuthContext>()
-        .expect("AuthContext not found. Make sure to wrap your app with AuthProvider")
-}
-
-// Helper functions
-pub fn get_stored_token() -> Option<String> {
-    #[cfg(feature = "hydrate")]
-    {
-        use web_sys::window;
-        window()
-            .and_then(|w| w.local_storage().ok().flatten())
-            .and_then(|storage| storage.get_item("auth_token").ok().flatten())
     }
     
-    #[cfg(not(feature = "hydrate"))]
+    pub fn login(&self, email: String, password: String) -> impl Future<Output = Result<(), String>> {
+        let user_signal = self.user;
+        let is_authenticated_signal = self.is_authenticated;
+        let loading_signal = self.loading;
+        let error_signal = self.error;
+        
+        async move {
+            loading_signal.set(true);
+            error_signal.set(None);
+            
+            // Simulate API call
+            gloo_timers::future::TimeoutFuture::new(1000).await;
+            
+            // For demo, accept any login
+            if email.is_empty() || password.is_empty() {
+                loading_signal.set(false);
+                error_signal.set(Some("Email and password are required".to_string()));
+                return Err("Invalid credentials".to_string());
+            }
+            
+            let user = User {
+                id: "1".to_string(),
+                email: email.clone(),
+                name: Some("Demo User".to_string()),
+                role: if email.contains("admin") { "admin".to_string() } else { "user".to_string() },
+                avatar: None,
+            };
+            
+            user_signal.set(Some(user.clone()));
+            is_authenticated_signal.set(true);
+            save_user_to_storage(&user);
+            
+            loading_signal.set(false);
+            Ok(())
+        }
+    }
+    
+    pub fn register(&self, email: String, password: String, name: String) -> impl Future<Output = Result<(), String>> {
+        let user_signal = self.user;
+        let is_authenticated_signal = self.is_authenticated;
+        let loading_signal = self.loading;
+        let error_signal = self.error;
+        
+        async move {
+            loading_signal.set(true);
+            error_signal.set(None);
+            
+            // Simulate API call
+            gloo_timers::future::TimeoutFuture::new(1000).await;
+            
+            // Validation
+            if email.is_empty() || password.is_empty() || name.is_empty() {
+                loading_signal.set(false);
+                error_signal.set(Some("All fields are required".to_string()));
+                return Err("All fields are required".to_string());
+            }
+            
+            if password.len() < 6 {
+                loading_signal.set(false);
+                error_signal.set(Some("Password must be at least 6 characters".to_string()));
+                return Err("Password too short".to_string());
+            }
+            
+            let user = User {
+                id: "1".to_string(),
+                email: email.clone(),
+                name: Some(name),
+                role: "user".to_string(),
+                avatar: None,
+            };
+            
+            user_signal.set(Some(user.clone()));
+            is_authenticated_signal.set(true);
+            save_user_to_storage(&user);
+            
+            loading_signal.set(false);
+            Ok(())
+        }
+    }
+    
+    pub fn logout(&self) {
+        self.user.set(None);
+        self.is_authenticated.set(false);
+        self.error.set(None);
+        clear_user_from_storage();
+    }
+    
+    pub fn forgot_password(&self, email: String) -> impl Future<Output = Result<(), String>> {
+        let loading_signal = self.loading;
+        let error_signal = self.error;
+        
+        async move {
+            loading_signal.set(true);
+            error_signal.set(None);
+            
+            // Simulate API call
+            gloo_timers::future::TimeoutFuture::new(1000).await;
+            
+            if email.is_empty() {
+                loading_signal.set(false);
+                error_signal.set(Some("Email is required".to_string()));
+                return Err("Email is required".to_string());
+            }
+            
+            loading_signal.set(false);
+            Ok(())
+        }
+    }
+    
+    pub fn update_profile(&self, name: String) -> impl Future<Output = Result<(), String>> {
+        let user_signal = self.user;
+        let loading_signal = self.loading;
+        let error_signal = self.error;
+        
+        async move {
+            loading_signal.set(true);
+            error_signal.set(None);
+            
+            // Simulate API call
+            gloo_timers::future::TimeoutFuture::new(500).await;
+            
+            if let Some(mut user) = user_signal.get_untracked() {
+                user.name = Some(name);
+                user_signal.set(Some(user.clone()));
+                save_user_to_storage(&user);
+            }
+            
+            loading_signal.set(false);
+            Ok(())
+        }
+    }
+}
+
+// Local storage helpers
+fn load_user_from_storage() -> Option<User> {
+    if let Ok(Some(storage)) = web_sys::window()
+        .unwrap()
+        .local_storage()
     {
+        if let Ok(Some(user_str)) = storage.get_item("loco_user") {
+            serde_json::from_str(&user_str).ok()
+        } else {
+            None
+        }
+    } else {
         None
     }
 }
 
-fn store_token(token: &str) {
-    #[cfg(feature = "hydrate")]
+fn save_user_to_storage(user: &User) {
+    if let Ok(Some(storage)) = web_sys::window()
+        .unwrap()
+        .local_storage()
     {
-        use web_sys::window;
-        if let Some(storage) = window().and_then(|w| w.local_storage().ok().flatten()) {
-            let _ = storage.set_item("auth_token", token);
+        if let Ok(user_str) = serde_json::to_string(user) {
+            let _ = storage.set_item("loco_user", &user_str);
         }
     }
 }
 
-fn clear_stored_token() {
-    #[cfg(feature = "hydrate")]
+fn clear_user_from_storage() {
+    if let Ok(Some(storage)) = web_sys::window()
+        .unwrap()
+        .local_storage()
     {
-        use web_sys::window;
-        if let Some(storage) = window().and_then(|w| w.local_storage().ok().flatten()) {
-            let _ = storage.remove_item("auth_token");
-        }
+        let _ = storage.remove_item("loco_user");
     }
 }
 
-async fn validate_session(token: &str) -> Result<AuthUser, String> {
-    let (supabase_url, supabase_anon_key) = get_supabase_config();
-    let response = Request::get(&format!("{}/auth/v1/user", supabase_url))
-        .header("apikey", &supabase_anon_key)
-        .header("Authorization", &format!("Bearer {}", token))
-        .send()
-        .await
-        .map_err(|e| format!("Failed to validate session: {}", e))?;
-        
-    if response.ok() {
-        response.json::<AuthUser>().await
-            .map_err(|e| format!("Failed to parse user: {}", e))
+// Helper to use auth context
+pub fn use_auth() -> AuthProvider {
+    use_context::<AuthProvider>().expect("AuthProvider not found in context")
+}
+
+// Supabase configuration helpers
+pub fn get_supabase_config() -> (String, String) {
+    // These would normally come from environment variables
+    let supabase_url = "https://your-project.supabase.co".to_string();
+    let supabase_anon_key = "your-anon-key".to_string();
+    (supabase_url, supabase_anon_key)
+}
+
+pub fn get_stored_token() -> Result<String, &'static str> {
+    if let Ok(Some(storage)) = web_sys::window()
+        .unwrap()
+        .local_storage()
+    {
+        if let Ok(Some(token)) = storage.get_item("loco_auth_token") {
+            Ok(token)
+        } else {
+            Err("No token in storage")
+        }
     } else {
-        Err("Invalid session".to_string())
+        Err("Storage not available")
     }
-}
-
-pub fn provide_auth_context() {
-    // This is already handled in the AuthProvider component
-    // This function exists for compatibility with the AppProviders component
 }

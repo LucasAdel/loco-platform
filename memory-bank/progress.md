@@ -280,15 +280,20 @@
 
 ## 🚨 Blockers & Issues
 
+### **Current Issues (2025-06-07)**
+1. **ApplicationService Missing**: File corrupted during test implementation - needs recreation
+2. **Frontend Compilation**: Leptos components have syntax errors
+3. **Backend Won't Start**: Missing ApplicationService prevents compilation
+
 ### **Resolved Issues** ✅
-1. ~~**Build Failure**: All compilation issues resolved~~
+1. ~~**Build Failure**: All compilation issues resolved~~ (New issues introduced)
 2. ~~**Missing Backend**: Complete Axum backend implemented~~
 3. ~~**Framework Migration**: Successfully migrated to Leptos~~
 
-### **Remaining Technical Debt**
-1. **Database Integration**: SeaORM models ready, need connection setup
-2. **Authentication Activation**: JWT middleware ready, needs database integration
-3. **Testing Infrastructure**: Unit and integration tests needed
+### **Technical Debt**
+1. **Restore ApplicationService**: Recreate the missing application service
+2. **Fix Frontend Syntax**: Resolve Leptos component compilation errors
+3. **Testing Infrastructure**: Unit tests partially implemented but need completion
 4. **Production Deployment**: CI/CD pipeline configuration needed
 
 ## 📅 Timeline Adjustments

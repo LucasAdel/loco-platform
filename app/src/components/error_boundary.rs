@@ -1,4 +1,5 @@
 use leptos::*;
+use leptos::prelude::*;
 use std::rc::Rc;
 
 /// Error boundary component that catches and displays errors gracefully

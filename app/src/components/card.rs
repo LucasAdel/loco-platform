@@ -1,4 +1,5 @@
 use leptos::*;
+use leptos::prelude::*;
 
 /// Card elevation levels
 #[derive(Debug, Clone, Copy, PartialEq)]

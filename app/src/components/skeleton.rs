@@ -1,4 +1,5 @@
 use leptos::*;
+use leptos::prelude::*;
 
 /// Skeleton loading component for placeholder content
 #[component]

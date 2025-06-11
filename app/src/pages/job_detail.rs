@@ -1,4 +1,5 @@
 use leptos::*;
+use leptos::prelude::*;
 use leptos_router::*;
 use crate::api::jobs::fetch_job_by_id;
 use crate::components::ui::{Button, ButtonVariant, ButtonSize, LoadingSpinner, SpinnerSize, Alert, AlertVariant};

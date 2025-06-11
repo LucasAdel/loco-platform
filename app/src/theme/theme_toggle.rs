@@ -1,4 +1,5 @@
 use leptos::*;
+use leptos::prelude::*;
 use super::{Theme, use_theme_state};
 
 /// Theme toggle component that allows users to switch between themes

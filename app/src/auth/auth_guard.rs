@@ -1,4 +1,5 @@
 use leptos::*;
+use leptos::prelude::*;
 use leptos_router::*;
 use crate::providers::auth_provider::use_auth;
 
@@ -222,8 +223,6 @@ pub fn AuthLink(
         true
     };
     
-    let children_view = children();
-    
     view! {
         <Show when=should_show>
             <A 
@@ -231,7 +230,7 @@ pub fn AuthLink(
                 class=class.unwrap_or("")
                 active_class=active_class.unwrap_or("")
             >
-                {children_view}
+                {children()}
             </A>
         </Show>
     }
@@ -258,6 +257,12 @@ pub fn ConditionalRedirect(
         }
     });
     
+    let fallback_content = fallback.map(|fb| fb()).unwrap_or_else(|| view! {
+        <div class="flex items-center justify-center p-4">
+            <p class="text-gray-600">No content available</p>
+        </div>
+    }.into_view());
+    
     view! {
         <Show
             when=move || !when()
@@ -267,7 +272,7 @@ pub fn ConditionalRedirect(
                 </div>
             }
         >
-            {fallback.map(|fb| fb())}
+            {fallback_content}
         </Show>
     }
 }

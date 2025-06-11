@@ -7,6 +7,58 @@
 /* Import base modern design system */
 @import url('modern-design-system.css');
 
+/* Enhanced Map Features Styles */
+.feature-card {
+  padding: 24px;
+  text-align: center;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.feature-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
+}
+
+.feature-icon {
+  margin-bottom: 16px;
+}
+
+.feature-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: var(--color-gray-900);
+}
+
+.feature-description {
+  color: var(--color-gray-600);
+  line-height: 1.6;
+}
+
+/* Map-specific enhancements */
+.mapboxgl-popup-content {
+  border-radius: var(--radius-lg) !important;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15) !important;
+}
+
+.mapboxgl-popup-tip {
+  border-top-color: white !important;
+}
+
+/* Pulse animation for urgent markers */
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(231, 76, 60, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(231, 76, 60, 0);
+  }
+}
+
 /* Enhanced Form Input Styles with Soft Corners */
 .form-input,
 .glass-input,

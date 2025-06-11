@@ -1,4 +1,7 @@
 use leptos::*;
+use wasm_bindgen_futures::spawn_local;
+use leptos::prelude::*;
+use leptos::html::Div;
 use leptos_router::*;
 use wasm_bindgen::prelude::*;
 use web_sys::HtmlElement;
@@ -42,13 +45,13 @@ extern "C" {
     fn new_marker(options: &JsValue) -> Marker;
     
     #[wasm_bindgen(method)]
-    fn setLngLat(this: &Marker, coords: &Array) -> &Marker;
+    fn setLngLat(this: &Marker, coords: &Array);
     
     #[wasm_bindgen(method)]
-    fn setPopup(this: &Marker, popup: &Popup) -> &Marker;
+    fn setPopup(this: &Marker, popup: &Popup);
     
     #[wasm_bindgen(method)]
-    fn addTo(this: &Marker, map: &Map) -> &Marker;
+    fn addTo(this: &Marker, map: &Map);
 
     #[wasm_bindgen(js_namespace = mapboxgl)]
     type Popup;
@@ -57,12 +60,12 @@ extern "C" {
     fn new_popup(options: &JsValue) -> Popup;
     
     #[wasm_bindgen(method)]
-    fn setHTML(this: &Popup, html: &str) -> &Popup;
+    fn setHTML(this: &Popup, html: &str);
 }
 
 #[component]
 pub fn MapEnhanced() -> impl IntoView {
-    let map_container = create_node_ref::<HtmlElement>();
+    let map_container = create_node_ref::<Div>();
     let (selected_suburb, set_selected_suburb) = create_signal(String::from("All"));
     let (job_type_filter, set_job_type_filter) = create_signal(String::from("All"));
     let (jobs_data, set_jobs_data) = create_signal(Vec::<JobMarker>::new());

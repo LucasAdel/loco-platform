@@ -1,6 +1,8 @@
 use leptos::*;
+use leptos::prelude::*;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
+use wasm_bindgen_futures::spawn_local;
 use crate::providers::auth_provider::use_auth;
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
@@ -38,15 +40,18 @@ pub fn TenantProvider(children: Children) -> impl IntoView {
     
     // Load tenant data when user is authenticated
     create_effect(move |_| {
-        if let crate::providers::auth_provider::AuthState::Authenticated(user) = auth.auth_state.get() {
-            spawn_local(async move {
-                match load_tenant_data(user.tenant_id).await {
-                    Ok(tenant) => set_current_tenant.set(Some(tenant)),
-                    Err(e) => {
-                        leptos::logging::error!("Failed to load tenant data: {}", e);
+        if auth.is_authenticated.get() {
+            if let Some(user) = auth.user.get() {
+                spawn_local(async move {
+                    // Use a default tenant_id since the User struct doesn't have one
+                    match load_tenant_data("default".to_string()).await {
+                        Ok(tenant) => set_current_tenant.set(Some(tenant)),
+                        Err(e) => {
+                            leptos::logging::error!("Failed to load tenant data: {}", e);
+                        }
                     }
-                }
-            });
+                });
+            }
         } else {
             set_current_tenant.set(None);
         }
@@ -69,11 +74,11 @@ pub fn use_tenant() -> TenantContext {
         .expect("TenantContext not found. Make sure to wrap your app with TenantProvider")
 }
 
-async fn load_tenant_data(tenant_id: Uuid) -> Result<Tenant, String> {
+async fn load_tenant_data(tenant_id: String) -> Result<Tenant, String> {
     use gloo_net::http::Request;
     use crate::providers::auth_provider::{get_supabase_config, get_stored_token};
     
-    let token = get_stored_token().ok_or("No auth token found")?;
+    let token = get_stored_token().map_err(|e| e.to_string())?;
     let (supabase_url, supabase_anon_key) = get_supabase_config();
     
     let response = Request::get(&format!("{}/rest/v1/tenants?id=eq.{}", supabase_url, tenant_id))

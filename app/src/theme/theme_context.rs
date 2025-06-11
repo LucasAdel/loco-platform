@@ -1,4 +1,5 @@
 use leptos::*;
+use leptos::prelude::*;
 use super::Theme;
 
 /// Context key for the theme

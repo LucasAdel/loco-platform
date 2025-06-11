@@ -1,4 +1,5 @@
 use leptos::*;
+use leptos::prelude::*;
 
 /// Validation result type
 pub type ValidationResult = Result<(), String>;
@@ -51,8 +52,9 @@ pub fn Input(
     let (error, set_error) = create_signal(None::<String>);
     let (touched, set_touched) = create_signal(false);
     
-    // Validate input
-    let validate = move |value: &str| {
+    // Create a shared validation function using Rc
+    use std::rc::Rc;
+    let validate_fn = Rc::new(move |value: &str| -> bool {
         if required && value.trim().is_empty() {
             set_error.set(Some("This field is required".to_string()));
             return false;
@@ -67,22 +69,24 @@ pub fn Input(
         
         set_error.set(None);
         true
-    };
+    });
     
     // Handle input change
+    let validate_fn_1 = validate_fn.clone();
     let on_input = move |ev| {
         let new_value = event_target_value(&ev);
         value.set(new_value.clone());
         
         if touched.get() {
-            validate(&new_value);
+            validate_fn_1(&new_value);
         }
     };
     
     // Handle blur
+    let validate_fn_2 = validate_fn.clone();
     let on_blur = move |_| {
         set_touched.set(true);
-        validate(&value.get());
+        validate_fn_2(&value.get());
     };
     
     let input_classes = move || {
@@ -195,8 +199,9 @@ pub fn TextArea(
     let (error, set_error) = create_signal(None::<String>);
     let (touched, set_touched) = create_signal(false);
     
-    // Validate input
-    let validate = move |value: &str| {
+    // Create a shared validation function using Rc
+    use std::rc::Rc;
+    let validate_fn = Rc::new(move |value: &str| -> bool {
         if required && value.trim().is_empty() {
             set_error.set(Some("This field is required".to_string()));
             return false;
@@ -218,9 +223,10 @@ pub fn TextArea(
         
         set_error.set(None);
         true
-    };
+    });
     
     // Handle input change
+    let validate_fn_1 = validate_fn.clone();
     let on_input = move |ev| {
         let new_value = event_target_value(&ev);
         
@@ -234,14 +240,15 @@ pub fn TextArea(
         value.set(final_value.clone());
         
         if touched.get() {
-            validate(&final_value);
+            validate_fn_1(&final_value);
         }
     };
     
     // Handle blur
+    let validate_fn_2 = validate_fn.clone();
     let on_blur = move |_| {
         set_touched.set(true);
-        validate(&value.get());
+        validate_fn_2(&value.get());
     };
     
     let textarea_classes = move || {

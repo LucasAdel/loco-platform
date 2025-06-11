@@ -32,7 +32,7 @@ pub struct Model {
     pub updated_at: DateTimeWithTimeZone,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, EnumIter, DeriveActiveEnum, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, EnumIter, DeriveActiveEnum, Serialize, Deserialize)]
 #[sea_orm(rs_type = "String", db_type = "String(Some(20))")]
 pub enum ApplicationStatus {
     #[sea_orm(string_value = "Pending")]

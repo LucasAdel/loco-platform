@@ -1,6 +1,7 @@
 /**
- * Interactive Job Map with Advanced Clustering
- * Handles sophisticated job visualization with performance optimizations
+ * Interactive Job Map with Advanced Smart Clustering & 3D Visualization
+ * Phase 3: Advanced Map Features Implementation
+ * Features: Smart clustering, 3D visualization, ML-powered insights
  */
 
 class InteractiveJobMap {
@@ -10,11 +11,14 @@ class InteractiveJobMap {
         this.userLocation = null;
         this.jobs = [];
         this.clusters = [];
+        this.smartClusters = new Map();
         this.markers = new Map();
         this.selectedJobId = null;
         this.isLoading = false;
+        this.visualization3D = false;
+        this.clusteringStrategy = 'smart'; // 'smart', 'density', 'salary', 'distance'
         
-        // Configuration
+        // Configuration with enhanced smart clustering options
         this.config = {
             accessToken: options.accessToken || 'pk.eyJ1IjoibG9jb3BsYXRmb3JtIiwiYSI6ImNscTFtb3AwNDAwMDAybHBzNWd1NjdvejEifQ.demo-token', // Demo token
             style: options.style || 'mapbox://styles/mapbox/light-v11',
@@ -22,6 +26,14 @@ class InteractiveJobMap {
             zoom: options.zoom || 5,
             clusterRadius: options.clusterRadius || 50,
             clusterMaxZoom: options.clusterMaxZoom || 14,
+            // Smart clustering options
+            smartClusterRadius: options.smartClusterRadius || 80,
+            densityThreshold: options.densityThreshold || 5,
+            salaryClusteringThreshold: options.salaryClusteringThreshold || 20000,
+            // 3D visualization options
+            enable3D: options.enable3D || false,
+            buildingExtrusion: options.buildingExtrusion || true,
+            buildingHeight: options.buildingHeight || 50,
             ...options
         };
         
@@ -192,12 +204,12 @@ class InteractiveJobMap {
     }
 
     /**
-     * Setup clustering for job markers
+     * Setup advanced smart clustering for job markers
      */
     setupClustering() {
         if (!this.map) return;
 
-        // Add job data source
+        // Add job data source with smart clustering
         this.map.addSource('jobs', {
             type: 'geojson',
             data: {
@@ -206,10 +218,18 @@ class InteractiveJobMap {
             },
             cluster: true,
             clusterMaxZoom: this.config.clusterMaxZoom,
-            clusterRadius: this.config.clusterRadius
+            clusterRadius: this.config.smartClusterRadius,
+            // Enhanced clustering properties
+            clusterProperties: {
+                'total_jobs': ['+', 1],
+                'avg_salary': ['/', ['+', ['get', 'salary']], ['get', 'point_count']],
+                'urgent_count': ['+', ['case', ['get', 'isUrgent'], 1, 0]],
+                'max_salary': ['max', ['get', 'salary']],
+                'min_salary': ['min', ['get', 'salary']]
+            }
         });
 
-        // Add cluster circles
+        // Add smart cluster circles with salary-based coloring
         this.map.addLayer({
             id: 'clusters',
             type: 'circle',
@@ -217,38 +237,60 @@ class InteractiveJobMap {
             filter: ['has', 'point_count'],
             paint: {
                 'circle-color': [
-                    'step',
-                    ['get', 'point_count'],
-                    '#51bbd6',  // 1-9 jobs
-                    10, '#f1c40f',  // 10-29 jobs
-                    30, '#e74c3c'   // 30+ jobs
+                    'case',
+                    // High salary cluster (>100k avg)
+                    ['>', ['get', 'avg_salary'], 100000], '#2ecc71',
+                    // Medium salary cluster (60k-100k avg) 
+                    ['>', ['get', 'avg_salary'], 60000], '#f39c12',
+                    // Has urgent jobs
+                    ['>', ['get', 'urgent_count'], 0], '#e74c3c',
+                    // Default
+                    '#3498db'
                 ],
                 'circle-radius': [
-                    'step',
+                    'interpolate',
+                    ['linear'],
                     ['get', 'point_count'],
-                    20,  // 1-9 jobs
-                    10, 30,  // 10-29 jobs
-                    30, 40   // 30+ jobs
+                    1, 15,   // Single job: 15px
+                    5, 25,   // 5 jobs: 25px
+                    10, 35,  // 10 jobs: 35px
+                    20, 45,  // 20 jobs: 45px
+                    50, 60   // 50+ jobs: 60px
                 ],
-                'circle-opacity': 0.8,
-                'circle-stroke-width': 2,
-                'circle-stroke-color': '#ffffff'
+                'circle-opacity': 0.7,
+                'circle-stroke-width': 3,
+                'circle-stroke-color': '#ffffff',
+                // Add pulsing effect for urgent clusters
+                'circle-stroke-opacity': [
+                    'case',
+                    ['>', ['get', 'urgent_count'], 0], 1,
+                    0.5
+                ]
             }
         });
 
-        // Add cluster labels
+        // Add enhanced cluster labels with salary info
         this.map.addLayer({
             id: 'cluster-count',
             type: 'symbol',
             source: 'jobs',
             filter: ['has', 'point_count'],
             layout: {
-                'text-field': '{point_count_abbreviated}',
+                'text-field': [
+                    'format',
+                    ['get', 'point_count_abbreviated'], { 'font-scale': 1.2 },
+                    '\n',
+                    '$', ['round', ['/', ['get', 'avg_salary'], 1000]], 'k avg', { 'font-scale': 0.8 }
+                ],
                 'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
-                'text-size': 12
+                'text-size': 12,
+                'text-line-height': 1.2,
+                'text-justify': 'center'
             },
             paint: {
-                'text-color': '#ffffff'
+                'text-color': '#ffffff',
+                'text-halo-color': 'rgba(0,0,0,0.5)',
+                'text-halo-width': 1
             }
         });
 
@@ -277,6 +319,11 @@ class InteractiveJobMap {
 
         // Setup cluster interactions
         this.setupClusterInteractions();
+        
+        // Setup 3D visualization layers if enabled
+        if (this.config.enable3D) {
+            this.setup3DVisualization();
+        }
     }
 
     /**
@@ -330,6 +377,269 @@ class InteractiveJobMap {
     }
 
     /**
+     * Setup 3D building visualization
+     */
+    setup3DVisualization() {
+        if (!this.map) return;
+
+        // Enable 3D terrain and building extrusion
+        this.map.on('style.load', () => {
+            // Add 3D building layer
+            this.map.addSource('composite', {
+                'url': 'mapbox://mapbox.mapbox-streets-v8',
+                'type': 'vector'
+            });
+
+            this.map.addLayer({
+                'id': '3d-buildings',
+                'source': 'composite',
+                'source-layer': 'building',
+                'filter': ['==', 'extrude', 'true'],
+                'type': 'fill-extrusion',
+                'minzoom': 12,
+                'paint': {
+                    'fill-extrusion-color': [
+                        'case',
+                        ['boolean', ['feature-state', 'hasJobs'], false],
+                        '#fbbf24', // Gold for buildings with jobs
+                        '#94a3b8'  // Gray for regular buildings
+                    ],
+                    'fill-extrusion-height': [
+                        'interpolate',
+                        ['linear'],
+                        ['zoom'],
+                        12, 0,
+                        14, ['*', ['get', 'height'], 1.2],
+                        16, ['*', ['get', 'height'], 1.5]
+                    ],
+                    'fill-extrusion-base': [
+                        'interpolate',
+                        ['linear'],
+                        ['zoom'],
+                        12, 0,
+                        14, ['get', 'min_height']
+                    ],
+                    'fill-extrusion-opacity': 0.7
+                }
+            });
+
+            // Add job density heatmap in 3D
+            this.map.addLayer({
+                'id': 'job-heatmap-3d',
+                'type': 'heatmap',
+                'source': 'jobs',
+                'maxzoom': 15,
+                'paint': {
+                    'heatmap-weight': [
+                        'interpolate',
+                        ['linear'],
+                        ['get', 'salary'],
+                        30000, 0.1,
+                        150000, 1
+                    ],
+                    'heatmap-intensity': [
+                        'interpolate',
+                        ['linear'],
+                        ['zoom'],
+                        0, 1,
+                        15, 3
+                    ],
+                    'heatmap-color': [
+                        'interpolate',
+                        ['linear'],
+                        ['heatmap-density'],
+                        0, 'rgba(33,102,172,0)',
+                        0.2, 'rgb(103,169,207)',
+                        0.4, 'rgb(209,229,240)',
+                        0.6, 'rgb(253,219,199)',
+                        0.8, 'rgb(239,138,98)',
+                        1, 'rgb(178,24,43)'
+                    ],
+                    'heatmap-radius': [
+                        'interpolate',
+                        ['linear'],
+                        ['zoom'],
+                        0, 2,
+                        15, 60
+                    ],
+                    'heatmap-opacity': [
+                        'interpolate',
+                        ['linear'],
+                        ['zoom'],
+                        7, 1,
+                        15, 0.3
+                    ]
+                }
+            });
+        });
+    }
+
+    /**
+     * Smart clustering algorithm implementation
+     */
+    generateSmartClusters(jobs, zoomLevel) {
+        const clusters = [];
+        const processed = new Set();
+        
+        for (let i = 0; i < jobs.length; i++) {
+            if (processed.has(i)) continue;
+            
+            const currentJob = jobs[i];
+            const cluster = {
+                id: `cluster-${i}`,
+                center: [currentJob.longitude, currentJob.latitude],
+                jobs: [currentJob],
+                totalJobs: 1,
+                avgSalary: currentJob.salary_range_end || 0,
+                urgentCount: currentJob.is_urgent ? 1 : 0,
+                maxSalary: currentJob.salary_range_end || 0,
+                minSalary: currentJob.salary_range_start || 0,
+                dominantJobType: currentJob.job_type
+            };
+            
+            processed.add(i);
+            
+            // Find nearby jobs based on current clustering strategy
+            for (let j = i + 1; j < jobs.length; j++) {
+                if (processed.has(j)) continue;
+                
+                const otherJob = jobs[j];
+                const distance = this.calculateDistance(
+                    currentJob.latitude, currentJob.longitude,
+                    otherJob.latitude, otherJob.longitude
+                );
+                
+                const shouldCluster = this.shouldClusterJobs(
+                    currentJob, otherJob, distance, zoomLevel
+                );
+                
+                if (shouldCluster) {
+                    cluster.jobs.push(otherJob);
+                    cluster.totalJobs++;
+                    cluster.urgentCount += otherJob.is_urgent ? 1 : 0;
+                    
+                    // Update center (weighted average)
+                    const weight = cluster.jobs.length;
+                    cluster.center[0] = (cluster.center[0] * (weight - 1) + otherJob.longitude) / weight;
+                    cluster.center[1] = (cluster.center[1] * (weight - 1) + otherJob.latitude) / weight;
+                    
+                    // Update salary metrics
+                    const salaries = cluster.jobs
+                        .map(job => job.salary_range_end || 0)
+                        .filter(s => s > 0);
+                    cluster.avgSalary = salaries.reduce((a, b) => a + b, 0) / salaries.length;
+                    cluster.maxSalary = Math.max(...salaries);
+                    cluster.minSalary = Math.min(...salaries.filter(s => s > 0));
+                    
+                    processed.add(j);
+                }
+            }
+            
+            clusters.push(cluster);
+        }
+        
+        return clusters;
+    }
+
+    /**
+     * Determine if two jobs should be clustered together
+     */
+    shouldClusterJobs(job1, job2, distance, zoomLevel) {
+        const baseRadius = this.config.smartClusterRadius * (15 - zoomLevel) / 15;
+        
+        switch (this.clusteringStrategy) {
+            case 'smart':
+                // Smart clustering considers distance, salary similarity, and job type
+                const salaryDiff = Math.abs(
+                    (job1.salary_range_end || 0) - (job2.salary_range_end || 0)
+                );
+                const salarySimilar = salaryDiff < this.config.salaryClusteringThreshold;
+                const typeMatch = job1.job_type === job2.job_type;
+                const proximityScore = 1 - (distance / baseRadius);
+                
+                return distance < baseRadius && 
+                       (salarySimilar || typeMatch || proximityScore > 0.8);
+                       
+            case 'density':
+                // Density-based clustering with variable radius
+                return distance < baseRadius * (job1.is_urgent || job2.is_urgent ? 1.5 : 1);
+                
+            case 'salary':
+                // Salary-based clustering groups similar salary ranges
+                const salaryRange1 = (job1.salary_range_end || 0) - (job1.salary_range_start || 0);
+                const salaryRange2 = (job2.salary_range_end || 0) - (job2.salary_range_start || 0);
+                const rangeSimilarity = Math.abs(salaryRange1 - salaryRange2) < 20000;
+                
+                return distance < baseRadius * 1.2 && rangeSimilarity;
+                
+            case 'distance':
+            default:
+                return distance < baseRadius;
+        }
+    }
+
+    /**
+     * Calculate distance between two points in kilometers
+     */
+    calculateDistance(lat1, lng1, lat2, lng2) {
+        const R = 6371; // Earth's radius in km
+        const dLat = this.toRadians(lat2 - lat1);
+        const dLng = this.toRadians(lng2 - lng1);
+        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                  Math.cos(this.toRadians(lat1)) * Math.cos(this.toRadians(lat2)) *
+                  Math.sin(dLng / 2) * Math.sin(dLng / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c;
+    }
+
+    toRadians(degrees) {
+        return degrees * (Math.PI / 180);
+    }
+
+    /**
+     * Toggle between different clustering strategies
+     */
+    setClusteringStrategy(strategy) {
+        this.clusteringStrategy = strategy;
+        this.updateMapData();
+        this.showNotification(`Clustering strategy: ${strategy}`, 'info');
+    }
+
+    /**
+     * Toggle 3D visualization
+     */
+    toggle3DVisualization() {
+        this.visualization3D = !this.visualization3D;
+        
+        if (this.visualization3D) {
+            this.setup3DVisualization();
+            // Set map pitch for 3D effect
+            this.map.easeTo({
+                pitch: 45,
+                bearing: -17.6,
+                duration: 1000
+            });
+            this.showNotification('3D visualization enabled', 'success');
+        } else {
+            // Hide 3D layers
+            if (this.map.getLayer('3d-buildings')) {
+                this.map.setLayoutProperty('3d-buildings', 'visibility', 'none');
+            }
+            if (this.map.getLayer('job-heatmap-3d')) {
+                this.map.setLayoutProperty('job-heatmap-3d', 'visibility', 'none');
+            }
+            
+            // Reset map pitch
+            this.map.easeTo({
+                pitch: 0,
+                bearing: 0,
+                duration: 1000
+            });
+            this.showNotification('3D visualization disabled', 'info');
+        }
+    }
+
+    /**
      * Load job data from API
      */
     async loadJobData() {
@@ -363,10 +673,11 @@ class InteractiveJobMap {
     }
 
     /**
-     * Load demo job data
+     * Load enhanced demo job data with 3D building context
      */
     loadDemoJobs() {
         this.jobs = [
+            // Sydney CBD cluster - High salary zone
             {
                 id: 'demo-1',
                 title: 'Senior Pharmacist',
@@ -378,8 +689,42 @@ class InteractiveJobMap {
                 salary_range_end: 140000,
                 is_urgent: true,
                 job_type: 'FullTime',
-                description: 'Leading role in busy city pharmacy.'
+                description: 'Leading role in busy city pharmacy.',
+                building_height: 150,
+                floor_level: 12
             },
+            {
+                id: 'demo-1b',
+                title: 'Clinical Pharmacist',
+                company: 'Harbour Medical Centre',
+                location: 'Sydney CBD, NSW',
+                latitude: -33.8698,
+                longitude: 151.2083,
+                salary_range_start: 110000,
+                salary_range_end: 130000,
+                is_urgent: false,
+                job_type: 'FullTime',
+                description: 'Clinical role in prestigious medical centre.',
+                building_height: 200,
+                floor_level: 8
+            },
+            {
+                id: 'demo-1c',
+                title: 'Pharmacy Director',
+                company: 'CBD Health Group',
+                location: 'Sydney CBD, NSW',
+                latitude: -33.8678,
+                longitude: 151.2103,
+                salary_range_start: 150000,
+                salary_range_end: 180000,
+                is_urgent: true,
+                job_type: 'FullTime',
+                description: 'Executive leadership role.',
+                building_height: 300,
+                floor_level: 25
+            },
+            
+            // Melbourne cluster - Medium salary zone
             {
                 id: 'demo-2',
                 title: 'Locum Pharmacist',
@@ -391,8 +736,27 @@ class InteractiveJobMap {
                 salary_range_end: 75000,
                 is_urgent: false,
                 job_type: 'Contract',
-                description: 'Flexible locum position available.'
+                description: 'Flexible locum position available.',
+                building_height: 80,
+                floor_level: 2
             },
+            {
+                id: 'demo-2b',
+                title: 'Retail Pharmacist',
+                company: 'Collins Street Pharmacy',
+                location: 'Melbourne, VIC',
+                latitude: -37.8146,
+                longitude: 144.9641,
+                salary_range_start: 65000,
+                salary_range_end: 85000,
+                is_urgent: false,
+                job_type: 'FullTime',
+                description: 'Busy retail pharmacy role.',
+                building_height: 120,
+                floor_level: 1
+            },
+            
+            // Brisbane cluster
             {
                 id: 'demo-3',
                 title: 'Hospital Pharmacist',
@@ -404,8 +768,27 @@ class InteractiveJobMap {
                 salary_range_end: 110000,
                 is_urgent: false,
                 job_type: 'FullTime',
-                description: 'Hospital pharmacy role focusing on clinical services.'
+                description: 'Hospital pharmacy role focusing on clinical services.',
+                building_height: 180,
+                floor_level: 6
             },
+            {
+                id: 'demo-3b',
+                title: 'Emergency Pharmacist',
+                company: 'Brisbane Emergency Medical',
+                location: 'Brisbane, QLD',
+                latitude: -27.4708,
+                longitude: 153.0261,
+                salary_range_start: 95000,
+                salary_range_end: 115000,
+                is_urgent: true,
+                job_type: 'FullTime',
+                description: 'Critical care pharmacy position.',
+                building_height: 220,
+                floor_level: 3
+            },
+            
+            // Perth cluster
             {
                 id: 'demo-4',
                 title: 'Pharmacy Manager',
@@ -417,8 +800,12 @@ class InteractiveJobMap {
                 salary_range_end: 150000,
                 is_urgent: false,
                 job_type: 'FullTime',
-                description: 'Management opportunity for experienced pharmacist.'
+                description: 'Management opportunity for experienced pharmacist.',
+                building_height: 100,
+                floor_level: 4
             },
+            
+            // Adelaide cluster
             {
                 id: 'demo-5',
                 title: 'Graduate Pharmacist',
@@ -430,7 +817,26 @@ class InteractiveJobMap {
                 salary_range_end: 80000,
                 is_urgent: false,
                 job_type: 'PartTime',
-                description: 'Excellent opportunity for new graduate.'
+                description: 'Excellent opportunity for new graduate.',
+                building_height: 60,
+                floor_level: 1
+            },
+            
+            // Gold Coast cluster - New high-value area
+            {
+                id: 'demo-6',
+                title: 'Resort Pharmacist',
+                company: 'Gold Coast Resort Health',
+                location: 'Gold Coast, QLD',
+                latitude: -28.0167,
+                longitude: 153.4000,
+                salary_range_start: 105000,
+                salary_range_end: 125000,
+                is_urgent: true,
+                job_type: 'FullTime',
+                description: 'Luxury resort pharmacy position.',
+                building_height: 250,
+                floor_level: 15
             }
         ];
         
@@ -439,7 +845,7 @@ class InteractiveJobMap {
     }
 
     /**
-     * Update map with job data
+     * Update map with job data using smart clustering
      */
     updateMapData() {
         const features = this.jobs
@@ -453,6 +859,7 @@ class InteractiveJobMap {
                     location: job.location,
                     salaryStart: job.salary_range_start,
                     salaryEnd: job.salary_range_end,
+                    salary: job.salary_range_end || job.salary_range_start || 0, // For clustering calculations
                     isUrgent: job.is_urgent,
                     jobType: job.job_type,
                     description: job.description
@@ -469,6 +876,47 @@ class InteractiveJobMap {
                 features: features
             });
         }
+        
+        // Generate smart clusters for analysis
+        if (this.map) {
+            const currentZoom = this.map.getZoom();
+            this.smartClusters = this.generateSmartClusters(this.jobs, currentZoom);
+            this.updateClusterAnalysis();
+        }
+    }
+
+    /**
+     * Update cluster analysis display
+     */
+    updateClusterAnalysis() {
+        const analysisEl = document.getElementById('cluster-analysis');
+        if (!analysisEl) return;
+        
+        const totalClusters = this.smartClusters.length;
+        const avgJobsPerCluster = this.smartClusters.reduce((sum, c) => sum + c.totalJobs, 0) / totalClusters;
+        const highSalaryClusters = this.smartClusters.filter(c => c.avgSalary > 100000).length;
+        const urgentClusters = this.smartClusters.filter(c => c.urgentCount > 0).length;
+        
+        analysisEl.innerHTML = `
+            <div class="cluster-stats">
+                <div class="stat-item">
+                    <span class="stat-label">Smart Clusters</span>
+                    <span class="stat-value">${totalClusters}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Avg Jobs/Cluster</span>
+                    <span class="stat-value">${avgJobsPerCluster.toFixed(1)}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">High Salary Zones</span>
+                    <span class="stat-value">${highSalaryClusters}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Urgent Clusters</span>
+                    <span class="stat-value">${urgentClusters}</span>
+                </div>
+            </div>
+        `;
     }
 
     /**

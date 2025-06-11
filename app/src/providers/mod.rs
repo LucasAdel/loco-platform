@@ -1,18 +1,7 @@
 pub mod auth_provider;
 pub mod tenant_provider;
+pub mod theme_provider;
 
-use leptos::*;
-
-use auth_provider::*;
-use tenant_provider::*;
-
-#[component]
-pub fn AppProviders(children: Children) -> impl IntoView {
-    view! {
-        <AuthProvider>
-            <TenantProvider>
-                {children()}
-            </TenantProvider>
-        </AuthProvider>
-    }
-}
+pub use auth_provider::{AuthProvider, User, use_auth};
+pub use tenant_provider::{TenantProvider, Tenant, use_tenant};
+pub use theme_provider::{ThemeProvider, Theme, use_theme};

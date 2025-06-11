@@ -3,36 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Loco Platform</title>
-    <link data-trunk rel="rust" data-wasm-opt="z" />
+    <title>Loco Platform - Professional Pharmacy Jobs</title>
+    
+    <!-- Preconnect to external domains -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Custom CSS -->
     <link data-trunk rel="css" href="style.css" />
-    <style>
-        /* Loading styles */
-        .loading-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background: linear-gradient(to br, #f3f4f6, #e5e7eb);
+    
+    <!-- Rust/WASM Application -->
+    <link data-trunk rel="rust" data-bin="loco-app" />
+    
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'sans': ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+                    },
+                    colors: {
+                        'tiffany': {
+                            'light': '#4FE3CE',
+                            'DEFAULT': '#17DDB8',
+                            'dark': '#0FA897',
+                        },
+                        'lavender': {
+                            'light': '#F0F0FA',
+                            'DEFAULT': '#E6E6FA',
+                            'dark': '#D4D4F0',
+                        }
+                    },
+                    animation: {
+                        'blob': 'blob 7s infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                        'gradient-x': 'gradient-x 15s ease infinite',
+                        'gradient-y': 'gradient-y 15s ease infinite',
+                        'gradient-xy': 'gradient-xy 15s ease infinite',
+                    },
+                    keyframes: {
+                        blob: {
+                            '0%': {
+                                transform: 'translate(0px, 0px) scale(1)',
+                            },
+                            '33%': {
+                                transform: 'translate(30px, -50px) scale(1.1)',
+                            },
+                            '66%': {
+                                transform: 'translate(-20px, 20px) scale(0.9)',
+                            },
+                            '100%': {
+                                transform: 'translate(0px, 0px) scale(1)',
+                            },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        },
+                        'gradient-x': {
+                            '0%, 100%': {
+                                'background-size': '200% 200%',
+                                'background-position': 'left center'
+                            },
+                            '50%': {
+                                'background-size': '200% 200%',
+                                'background-position': 'right center'
+                            }
+                        },
+                    }
+                }
+            }
         }
-        .spinner {
-            width: 50px;
-            height: 50px;
-            border: 5px solid #e5e7eb;
-            border-top-color: #3b82f6;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-    </style>
+    </script>
 </head>
 <body>
-    <div id="app">
-        <div class="loading-container">
-            <div class="spinner"></div>
-        </div>
-    </div>
+    <div id="app"></div>
 </body>
 </html>

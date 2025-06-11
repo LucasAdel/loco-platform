@@ -539,7 +539,7 @@ impl From<&str> for UserRole {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Application {
     pub id: Uuid,
     pub job_id: Uuid,
@@ -550,7 +550,7 @@ pub struct Application {
     pub updated_at: DateTime<Utc>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub enum ApplicationStatus {
     Pending,
     Reviewing,
@@ -560,6 +560,30 @@ pub enum ApplicationStatus {
     Accepted,
     Rejected,
     Withdrawn,
+}
+
+/// Request types for application management
+#[derive(Debug, Clone, Serialize, Deserialize, Validate)]
+pub struct CreateApplicationRequest {
+    pub job_id: Uuid,
+    #[validate(length(min = 10, max = 2000, message = "Cover letter must be between 10 and 2000 characters"))]
+    pub cover_letter: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct UpdateApplicationRequest {
+    pub status: Option<ApplicationStatus>,
+    pub cover_letter: Option<String>,
+}
+
+/// Filters for application queries
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct ApplicationFilters {
+    pub status: Option<ApplicationStatus>,
+    pub job_id: Option<Uuid>,
+    pub user_id: Option<Uuid>,
+    pub date_from: Option<DateTime<Utc>>,
+    pub date_to: Option<DateTime<Utc>>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
@@ -573,6 +597,10 @@ pub struct JobFilters {
     pub max_distance: Option<f64>,
     pub start_date: Option<DateTime<Utc>>,
     pub end_date: Option<DateTime<Utc>>,
+    // Additional fields used by frontend
+    pub salary_min: Option<f64>,
+    pub salary_max: Option<f64>,
+    pub urgent_only: Option<bool>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

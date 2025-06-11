@@ -75,7 +75,25 @@
       "Bash(log show:*)",
       "Bash(cat:*)",
       "Bash(trunk build:*)",
-      "Bash(bash run stop)"
+      "Bash(bash run stop)",
+      "Bash(git commit:*)",
+      "Bash(./run:*)",
+      "Bash(git checkout:*)",
+      "Bash(cargo test:*)",
+      "Bash(cargo doc:*)",
+      "Bash(touch:*)",
+      "Bash(trunk serve:*)",
+      "Bash(for:*)",
+      "Bash(do echo \"=== $file ===\")",
+      "Bash(head:*)",
+      "Bash(done)",
+      "Bash(do if grep -q \"use leptos::\\*;\" \"$file\")",
+      "Bash(! grep -q \"use leptos::prelude::\\*;\" \"$file\")",
+      "Bash(then echo \"STILL NEEDS UPDATE: $file\")",
+      "Bash(fi)",
+      "Bash(trunk:*)",
+      "Bash(awk:*)",
+      "Bash(rustc:*)"
     ],
     "deny": []
   }

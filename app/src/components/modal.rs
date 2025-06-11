@@ -1,4 +1,6 @@
 use leptos::*;
+use leptos::prelude::*;
+use leptos::html::Div;
 use wasm_bindgen::{JsCast, closure::Closure};
 use web_sys::HtmlElement;
 use std::rc::Rc;
@@ -59,7 +61,7 @@ pub fn Modal(
     /// Modal content
     children: Children,
 ) -> impl IntoView {
-    let modal_ref = create_node_ref::<HtmlElement>();
+    let modal_ref = create_node_ref::<Div>();
     
     // Handle escape key
     create_effect(move |_| {
@@ -82,9 +84,10 @@ pub fn Modal(
     // Handle backdrop click
     let handle_backdrop_click = move |ev: web_sys::MouseEvent| {
         if close_on_backdrop_click {
-            if let Some(modal) = modal_ref.get() {
+            if let Some(modal_element) = modal_ref.get() {
                 let target = ev.target().unwrap().dyn_into::<HtmlElement>().unwrap();
-                if !modal.contains(Some(&target)) {
+                let modal_html: &HtmlElement = modal_element.as_ref();
+                if !modal_html.contains(Some(&target)) {
                     on_close();
                 }
             }

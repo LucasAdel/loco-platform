@@ -37,6 +37,18 @@ pub enum AppError {
     
     #[error("Configuration error: {0}")]
     Configuration(String),
+    
+    #[error("Bad request: {0}")]
+    BadRequest(String),
+    
+    #[error("Forbidden")]
+    Forbidden,
+    
+    #[error("Unauthorized")]
+    Unauthorized,
+    
+    #[error("Feature not implemented: {0}")]
+    NotImplemented(String),
 }
 
 // Conversion from shared AppError to backend AppError
@@ -68,6 +80,13 @@ impl From<shared::errors::AppError> for AppError {
     }
 }
 
+// Conversion from sea_orm::DbErr to AppError
+impl From<sea_orm::DbErr> for AppError {
+    fn from(err: sea_orm::DbErr) -> Self {
+        AppError::Database(err.to_string())
+    }
+}
+
 impl IntoResponse for AppError {
     fn into_response(self) -> axum::response::Response {
         let (status, error_message) = match &self {
@@ -90,6 +109,10 @@ impl IntoResponse for AppError {
                 tracing::error!("Configuration error: {}", msg);
                 (StatusCode::INTERNAL_SERVER_ERROR, "Service configuration error".to_string())
             }
+            AppError::BadRequest(msg) => (StatusCode::BAD_REQUEST, msg.clone()),
+            AppError::Forbidden => (StatusCode::FORBIDDEN, "Access forbidden".to_string()),
+            AppError::Unauthorized => (StatusCode::UNAUTHORIZED, "Authentication required".to_string()),
+            AppError::NotImplemented(msg) => (StatusCode::NOT_IMPLEMENTED, msg.clone()),
         };
 
         let body = Json(json!({

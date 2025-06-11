@@ -10,6 +10,12 @@ pub mod card;
 pub mod skeleton;
 pub mod breadcrumb;
 pub mod modern_ui;
+pub mod job_creation_wizard;
+pub mod application_board;
+pub mod advanced_filters;
+pub mod calendar_system;
+pub mod analytics_dashboard;
+pub mod mapbox;
 
 pub use header::Header;
 pub use sidebar::Sidebar;
@@ -22,3 +28,9 @@ pub use card::{Card, FeatureCard, StatCard, ImageCard, ProfileCard, CardElevatio
 pub use skeleton::{Skeleton, SkeletonText, SkeletonCard, SkeletonList, SkeletonTable, LoadingSpinner, SpinnerSize, LoadingOverlay, ContentLoader};
 pub use breadcrumb::{Breadcrumb, BreadcrumbItem, AutoBreadcrumb, StructuredBreadcrumb};
 pub use modern_ui::{NeuralButton, QuantumCard, HolographicText, NeuralInput, FloatingElement, MetricCard, SkeletonLoader, Toast};
+pub use job_creation_wizard::JobCreationWizard;
+pub use application_board::ApplicationBoard;
+pub use advanced_filters::AdvancedFilters;
+pub use calendar_system::CalendarSystem;
+pub use analytics_dashboard::AnalyticsDashboard;
+pub use mapbox::{MapboxComponent, MapboxScripts, MapLocation, MapCenter};

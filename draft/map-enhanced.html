@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Job Map - Loco Platform</title>
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="modern-design-system-enhanced.css">
+    <link rel="stylesheet" href="soft-corners-fix.css">
+    <link rel="stylesheet" href="responsive-fix.css">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Mapbox GL JS -->
+    <script src='https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css' rel='stylesheet' />
+    
+    <style>
+        .map-container {
+            position: relative;
+            height: 80vh;
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            background: var(--color-primary-50);
+        }
+        
+        .map-controls {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .control-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: var(--radius-lg);
+            padding: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            min-width: 280px;
+        }
+        
+        .control-section {
+            margin-bottom: 16px;
+        }
+        
+        .control-section:last-child {
+            margin-bottom: 0;
+        }
+        
+        .control-title {
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: var(--color-gray-700);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .clustering-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        
+        .clustering-btn {
+            padding: 8px 12px;
+            background: var(--color-gray-100);
+            border: 1px solid var(--color-gray-200);
+            border-radius: var(--radius-md);
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+        
+        .clustering-btn.active {
+            background: var(--color-primary-500);
+            color: white;
+            border-color: var(--color-primary-500);
+        }
+        
+        .clustering-btn:hover:not(.active) {
+            background: var(--color-gray-200);
+        }
+        
+        .toggle-switch {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        
+        .switch {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            background: var(--color-gray-300);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        
+        .switch.active {
+            background: var(--color-primary-500);
+        }
+        
+        .switch-handle {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        .switch.active .switch-handle {
+            transform: translateX(20px);
+        }
+        
+        .map-stats {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: var(--radius-lg);
+            padding: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .cluster-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-label {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--color-gray-500);
+            margin-bottom: 4px;
+        }
+        
+        .stat-value {
+            display: block;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--color-gray-900);
+        }
+        
+        .map-legend {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: var(--radius-lg);
+            padding: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .legend-title {
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: var(--color-gray-700);
+            margin-bottom: 12px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            font-size: 0.75rem;
+        }
+        
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+        
+        .legend-color.high-salary { background: #2ecc71; }
+        .legend-color.medium-salary { background: #f39c12; }
+        .legend-color.urgent { background: #e74c3c; }
+        .legend-color.default { background: #3498db; }
+        
+        .search-integration {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--color-gray-200);
+        }
+        
+        .quick-filters {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .quick-filter {
+            padding: 4px 8px;
+            background: var(--color-gray-100);
+            border: 1px solid var(--color-gray-200);
+            border-radius: var(--radius-sm);
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .quick-filter.active {
+            background: var(--color-blue-100);
+            border-color: var(--color-blue-300);
+            color: var(--color-blue-700);
+        }
+        
+        .quick-filter:hover {
+            background: var(--color-gray-200);
+        }
+        
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+        
+        @media (max-width: 768px) {
+            .map-controls {
+                position: static;
+                margin-bottom: 20px;
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+            
+            .control-panel {
+                min-width: auto;
+                flex: 1;
+                min-width: 250px;
+            }
+            
+            .map-stats {
+                position: static;
+                margin-top: 20px;
+            }
+            
+            .cluster-stats {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            
+            .map-legend {
+                position: static;
+                margin-top: 20px;
+            }
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <!-- Header -->
+    <header class="site-header glass-card">
+        <div class="header-content">
+            <div class="header-brand">
+                <a href="/" class="brand-link">
+                    <div class="brand-icon">
+                        <i class="fas fa-capsules text-2xl"></i>
+                    </div>
+                    <div class="brand-text">
+                        <span class="brand-name">Loco Platform</span>
+                        <span class="brand-tagline">Enhanced Job Map</span>
+                    </div>
+                </a>
+            </div>
+            
+            <nav class="header-nav">
+                <a href="/jobs.html" class="nav-link">
+                    <i class="fas fa-briefcase"></i>
+                    <span>Jobs</span>
+                </a>
+                <a href="/map.html" class="nav-link">
+                    <i class="fas fa-map-marked-alt"></i>
+                    <span>Basic Map</span>
+                </a>
+                <a href="/map-enhanced.html" class="nav-link active">
+                    <i class="fas fa-cube"></i>
+                    <span>Enhanced Map</span>
+                </a>
+                <a href="/dashboard.html" class="nav-link">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Dashboard</span>
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container-wide">
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="page-header-content">
+                    <h1 class="page-title">
+                        <i class="fas fa-cube mr-3"></i>
+                        Enhanced Job Map
+                    </h1>
+                    <p class="page-description">
+                        Advanced visualization with smart clustering, 3D buildings, and AI-powered insights
+                    </p>
+                </div>
+                
+                <div class="page-actions">
+                    <button class="btn btn-outline" onclick="jobMap.toggle3DVisualization()">
+                        <i class="fas fa-cube"></i>
+                        Toggle 3D
+                    </button>
+                    <button class="btn btn-primary" onclick="jobMap.fitAllJobs()">
+                        <i class="fas fa-search-location"></i>
+                        View All Jobs
+                    </button>
+                </div>
+            </div>
+
+            <!-- Map Container -->
+            <div class="map-container">
+                <!-- Map Canvas -->
+                <div id="map"></div>
+                
+                <!-- Map Controls -->
+                <div class="map-controls">
+                    <div class="control-panel">
+                        <div class="control-section">
+                            <div class="control-title">Smart Clustering</div>
+                            <div class="clustering-options">
+                                <button class="clustering-btn active" onclick="setClusteringStrategy('smart')">
+                                    Smart
+                                </button>
+                                <button class="clustering-btn" onclick="setClusteringStrategy('density')">
+                                    Density
+                                </button>
+                                <button class="clustering-btn" onclick="setClusteringStrategy('salary')">
+                                    Salary
+                                </button>
+                                <button class="clustering-btn" onclick="setClusteringStrategy('distance')">
+                                    Distance
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="control-section">
+                            <div class="control-title">Visualization Options</div>
+                            <div class="toggle-switch">
+                                <span>3D Buildings</span>
+                                <div class="switch" id="3d-toggle" onclick="toggle3D()">
+                                    <div class="switch-handle"></div>
+                                </div>
+                            </div>
+                            <div class="toggle-switch">
+                                <span>Heat Map</span>
+                                <div class="switch" id="heatmap-toggle" onclick="toggleHeatmap()">
+                                    <div class="switch-handle"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="control-section">
+                            <div class="control-title">Quick Filters</div>
+                            <div class="quick-filters">
+                                <div class="quick-filter" onclick="toggleQuickFilter(this, 'urgent')">
+                                    Urgent Only
+                                </div>
+                                <div class="quick-filter" onclick="toggleQuickFilter(this, 'high-salary')">
+                                    High Salary
+                                </div>
+                                <div class="quick-filter" onclick="toggleQuickFilter(this, 'recent')">
+                                    Recent Posts
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Map Legend -->
+                <div class="map-legend">
+                    <div class="legend-title">Cluster Colors</div>
+                    <div class="legend-item">
+                        <div class="legend-color high-salary"></div>
+                        <span>High Salary ($100k+)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color medium-salary"></div>
+                        <span>Medium Salary ($60k-$100k)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color urgent"></div>
+                        <span>Urgent Hiring</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color default"></div>
+                        <span>Standard Jobs</span>
+                    </div>
+                </div>
+                
+                <!-- Map Stats -->
+                <div class="map-stats">
+                    <div id="cluster-analysis">
+                        <div class="cluster-stats">
+                            <div class="stat-item">
+                                <span class="stat-label">Loading...</span>
+                                <span class="stat-value">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Enhanced Features Info -->
+            <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="feature-card glass-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-brain text-3xl text-blue-500"></i>
+                    </div>
+                    <h3 class="feature-title">Smart Clustering</h3>
+                    <p class="feature-description">
+                        AI-powered clustering considers job similarity, salary ranges, and geographic proximity for intelligent grouping.
+                    </p>
+                </div>
+                
+                <div class="feature-card glass-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-cube text-3xl text-purple-500"></i>
+                    </div>
+                    <h3 class="feature-title">3D Visualization</h3>
+                    <p class="feature-description">
+                        Interactive 3D building visualization with job density heat mapping and customizable viewing angles.
+                    </p>
+                </div>
+                
+                <div class="feature-card glass-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-line text-3xl text-green-500"></i>
+                    </div>
+                    <h3 class="feature-title">Real-time Analytics</h3>
+                    <p class="feature-description">
+                        Live clustering analysis, salary zone detection, and market insights updated as you navigate.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="js/supabase-client.js"></script>
+    <script src="js/interactive-map.js"></script>
+    
+    <script>
+        // Enhanced map control functions
+        function setClusteringStrategy(strategy) {
+            // Update button states
+            document.querySelectorAll('.clustering-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Apply clustering strategy
+            if (window.jobMap) {
+                window.jobMap.setClusteringStrategy(strategy);
+            }
+        }
+        
+        function toggle3D() {
+            const toggle = document.getElementById('3d-toggle');
+            toggle.classList.toggle('active');
+            
+            if (window.jobMap) {
+                window.jobMap.toggle3DVisualization();
+            }
+        }
+        
+        function toggleHeatmap() {
+            const toggle = document.getElementById('heatmap-toggle');
+            toggle.classList.toggle('active');
+            
+            if (window.jobMap && window.jobMap.map) {
+                const visibility = toggle.classList.contains('active') ? 'visible' : 'none';
+                if (window.jobMap.map.getLayer('job-heatmap-3d')) {
+                    window.jobMap.map.setLayoutProperty('job-heatmap-3d', 'visibility', visibility);
+                }
+            }
+        }
+        
+        function toggleQuickFilter(element, filterType) {
+            element.classList.toggle('active');
+            
+            if (window.jobMap) {
+                // Apply quick filter logic
+                const isActive = element.classList.contains('active');
+                switch (filterType) {
+                    case 'urgent':
+                        window.jobMap.mapState.filters.isUrgent = isActive;
+                        break;
+                    case 'high-salary':
+                        window.jobMap.mapState.filters.salaryMin = isActive ? 100000 : 0;
+                        break;
+                    case 'recent':
+                        // Filter for jobs posted in last 7 days
+                        window.jobMap.mapState.filters.recentOnly = isActive;
+                        break;
+                }
+                window.jobMap.applyFilters();
+            }
+        }
+        
+        // Initialize enhanced map
+        document.addEventListener('DOMContentLoaded', () => {
+            window.jobMap = new InteractiveJobMap('map', {
+                enable3D: false,
+                smartClusterRadius: 80,
+                clusteringStrategy: 'smart'
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,25 @@
+mod home;
+mod login;
+mod register;
+mod dashboard;
+mod jobs;
+mod job_detail;
+mod map;
+mod profile;
+mod messages;
+mod applications;
+mod create_job;
+mod admin;
+
+pub use home::HomePage;
+pub use login::LoginPage;
+pub use register::RegisterPage;
+pub use dashboard::DashboardPage;
+pub use jobs::JobsPage;
+pub use job_detail::JobDetailPage;
+pub use map::MapPage;
+pub use profile::ProfilePage;
+pub use messages::MessagesPage;
+pub use applications::ApplicationsPage;
+pub use create_job::CreateJobPage;
+pub use admin::AdminPage;

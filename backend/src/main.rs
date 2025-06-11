@@ -34,13 +34,15 @@ use tokio::signal;
 
 use crate::{
     config::Config,
-    handlers::{jobs, health, users, auth, local_auth, websocket, search, root as handlers},
+    handlers::{jobs, enhanced_jobs, health, users, auth, local_auth, websocket, search, applications, root as handlers},
+    services::ApplicationService,
 };
 
 #[derive(Clone)]
 pub struct AppState {
     pub config: Config,
     pub db: DatabaseConnection,
+    pub application_service: ApplicationService,
     pub demo_mode: bool,
 }
 
@@ -60,122 +62,62 @@ async fn main() -> anyhow::Result<()> {
     // Load configuration
     let config = Config::from_env()?;
     
-    // Try to setup database connection, fall back to demo mode if it fails
-    tracing::info!("🔗 Attempting to set up database connection...");
+    // Setup database connection - no fallbacks
+    tracing::info!("🔗 Setting up database connection...");
     
-    // Temporarily force demo mode to avoid database seeding issues
-    match if true { Err(anyhow::anyhow!("Forced demo mode")) } else { database::setup_database().await } {
-        Ok(db) => {
-            tracing::info!("🚀 Starting Loco Platform server with full database support");
-            let state = AppState { config: config.clone(), db, demo_mode: false };
-            
-            // Build middleware stack (simplified for now)
-            let middleware_stack = ServiceBuilder::new()
-                // Request tracing (simplified)
-                .layer(TraceLayer::new_for_http())
-                // CORS with Australian domain handling
-                .layer(create_cors_layer());
+    let db = database::setup_database().await
+        .map_err(|e| anyhow::anyhow!("Database connection failed: {}. Please ensure PostgreSQL is running and database is configured.", e))?;
+        
+    tracing::info!("✅ Database connection established successfully");
+    
+    let application_service = ApplicationService::new(db.clone());
+    let state = AppState { 
+        config: config.clone(), 
+        db, 
+        application_service,
+        demo_mode: true, // Enable demo mode for development
+    };
+    
+    // Build middleware stack
+    let middleware_stack = ServiceBuilder::new()
+        .layer(TraceLayer::new_for_http())
+        .layer(create_cors_layer());
 
-            // Build our application with routes
-            let app = Router::new()
-                // Root and health endpoints
-                .route("/", get(handlers::root))
-                .route("/health", get(handlers::health_check))
-                .route("/health/detailed", get(health::health_detailed))
-                .route("/health/ready", get(health::readiness_check))
-                .route("/health/live", get(health::liveness_check))
-                
-                // API v1 routes
-                .nest("/api/v1", api_v1_routes())
-                
-                // Legacy API routes (for backward compatibility)
-                .route("/api/jobs", get(jobs::list_jobs).post(jobs::create_job))
-                .route("/api/jobs/search", post(jobs::search_jobs))
-                .route("/api/jobs/:id", get(jobs::get_job).put(jobs::update_job).delete(jobs::delete_job))
-                
-                // User routes  
-                .route("/api/users/:id", get(users::get_user).put(users::update_user).delete(users::delete_user))
-                
-                // WebSocket routes
-                .route("/ws", get(websocket::websocket_handler))
-                
-                // Apply middleware stack
-                .layer(middleware_stack)
-                .with_state(state);
+    // Build application with routes
+    let app = Router::new()
+        // Root and health endpoints
+        .route("/", get(handlers::root))
+        .route("/health", get(handlers::health_check))
+        .route("/health/detailed", get(health::health_detailed))
+        .route("/health/ready", get(health::readiness_check))
+        .route("/health/live", get(health::liveness_check))
+        
+        // API v1 routes
+        .nest("/api/v1", api_v1_routes())
+        
+        // Legacy API routes (for backward compatibility)
+        .route("/api/jobs", get(jobs::list_jobs).post(jobs::create_job))
+        .route("/api/jobs/search", post(jobs::search_jobs))
+        .route("/api/jobs/:id", get(jobs::get_job).put(jobs::update_job).delete(jobs::delete_job))
+        
+        // User routes  
+        .route("/api/users/:id", get(users::get_user).put(users::update_user).delete(users::delete_user))
+        
+        // WebSocket routes
+        .route("/ws", get(websocket::websocket_handler))
+        
+        // Apply middleware stack
+        .layer(middleware_stack)
+        .with_state(state);
 
-            // Start server with graceful shutdown
-            start_server_with_graceful_shutdown(app, config.port).await?;
-        },
-        Err(e) => {
-            tracing::warn!("⚠️ Database connection failed: {}", e);
-            tracing::info!("🚀 Starting Loco Platform server in DEMO MODE (no database)");
-            
-            // Demo mode - create state with mock database connection
-            let state = AppState { 
-                config: config.clone(), 
-                db: DatabaseConnection::default(), // Mock connection
-                demo_mode: true 
-            };
-            
-            // Build demo application with full routes but demo data
-            let app = Router::new()
-                .route("/", get(handlers::root))
-                .route("/health", get(health::health_check))
-                .route("/health/detailed", get(health::health_detailed))
-                .route("/health/ready", get(health::readiness_check))
-                .route("/health/live", get(health::liveness_check))
-                
-                // API routes
-                .nest("/api/v1", api_v1_routes())
-                .nest("/api", legacy_routes())
-                
-                // WebSocket endpoint
-                .route("/ws", get(websocket::websocket_handler))
-                
-                .layer(CorsLayer::permissive())
-                .with_state(state);
-
-            let addr = SocketAddr::from(([0, 0, 0, 0], 3070));
-            tracing::info!("🚀 Loco Platform backend (DEMO MODE) listening on {}", addr);
-            
-            let listener = tokio::net::TcpListener::bind(addr).await?;
-            axum::serve(listener, app).await?;
-        }
-    }
+    tracing::info!("🚀 Starting Loco Platform server with full database support");
+    
+    // Start server with graceful shutdown
+    start_server_with_graceful_shutdown(app, config.port).await?;
 
     Ok(())
 }
 
-// Demo mode handlers
-async fn demo_root() -> &'static str {
-    "Loco Platform Demo - Backend Running (No Database)"
-}
-
-async fn demo_health() -> axum::Json<serde_json::Value> {
-    axum::Json(serde_json::json!({
-        "status": "ok",
-        "mode": "demo",
-        "message": "Server running without database"
-    }))
-}
-
-async fn demo_jobs() -> axum::Json<serde_json::Value> {
-    axum::Json(serde_json::json!({
-        "jobs": [
-            {
-                "id": "demo-1",
-                "title": "Demo Pharmacist Position",
-                "description": "This is a demo job listing",
-                "location": "Sydney, NSW",
-                "hourly_rate": 45.00,
-                "job_type": "Pharmacist",
-                "is_urgent": false
-            }
-        ],
-        "total": 1,
-        "message": "Demo data - database not connected"
-    }))
-}
 
 /// Create CORS layer with Australian domain handling
 fn create_cors_layer() -> CorsLayer {
@@ -220,6 +162,12 @@ fn api_v1_routes() -> Router<AppState> {
         .route("/jobs/search", post(jobs::search_jobs)) // Public job search
         .route("/jobs/:id", get(jobs::get_job)) // Public job details
         
+        // Enhanced job routes
+        .route("/jobs/enhanced", get(enhanced_jobs::list_jobs)) // Enhanced job listing with better filtering
+        .route("/jobs/enhanced/search", get(enhanced_jobs::search_jobs)) // Enhanced text search
+        .route("/jobs/enhanced/nearby", get(enhanced_jobs::find_jobs_nearby)) // Location-based search
+        .route("/jobs/enhanced/stats", get(enhanced_jobs::get_global_job_statistics)) // Global statistics
+        
         // Advanced search routes
         .route("/search/advanced", post(search::advanced_search))
         .route("/search/quick", get(search::quick_search))
@@ -231,6 +179,13 @@ fn api_v1_routes() -> Router<AppState> {
         .route("/jobs", post(jobs::create_job))
         .route("/jobs/:id", put(jobs::update_job).delete(jobs::delete_job))
         
+        // Enhanced job routes (protected)
+        .route("/jobs/enhanced", post(enhanced_jobs::create_job)) // Create job with enhanced features
+        .route("/jobs/enhanced/:id", get(enhanced_jobs::get_job).delete(enhanced_jobs::delete_job)) // Enhanced job operations
+        .route("/jobs/enhanced/:id/status", put(enhanced_jobs::update_job_status)) // Update job status
+        .route("/jobs/enhanced/my", get(enhanced_jobs::get_my_jobs)) // Get user's jobs
+        .route("/jobs/enhanced/my/stats", get(enhanced_jobs::get_job_statistics)) // User's job statistics
+        
         // User management routes (protected)
         .route("/users/:id", get(users::get_user).put(users::update_user).delete(users::delete_user))
         
@@ -241,8 +196,13 @@ fn api_v1_routes() -> Router<AppState> {
         .route("/profile", get(auth::get_profile).put(auth::update_profile))
         
         // Application routes (protected)
-        .route("/applications", get(placeholder_handler).post(placeholder_handler))
-        .route("/applications/:id", get(placeholder_handler).put(placeholder_handler).delete(placeholder_handler))
+        .route("/applications", get(applications::list_applications).post(applications::create_application))
+        .route("/applications/:id", get(applications::get_application).put(applications::update_application).delete(applications::delete_application))
+        .route("/applications/:id/status", put(applications::update_application_status))
+        .route("/applications/:id/withdraw", put(applications::withdraw_application))
+        .route("/applications/stats", get(applications::get_application_stats))
+        .route("/jobs/:id/applications", get(applications::get_job_applications))
+        .route("/users/:id/applications", get(applications::get_user_applications))
         
         // Protected search routes
         .route("/search/saved", get(search::get_saved_searches))
@@ -257,13 +217,6 @@ fn legacy_routes() -> Router<AppState> {
         .route("/users/:id", get(users::get_user))
 }
 
-/// Placeholder handler for routes not yet implemented
-async fn placeholder_handler() -> axum::Json<serde_json::Value> {
-    axum::Json(serde_json::json!({
-        "message": "This endpoint is not yet implemented",
-        "status": "coming_soon"
-    }))
-}
 
 /// Start server with graceful shutdown handling
 async fn start_server_with_graceful_shutdown(app: Router, port: u16) -> anyhow::Result<()> {

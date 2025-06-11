@@ -6,11 +6,14 @@ edition = "2021"
 [lib]
 crate-type = ["cdylib", "rlib"]
 
+[[bin]]
+name = "loco-app"
+path = "src/main.rs"
+
 [dependencies]
-leptos = { workspace = true, features = ["csr", "serde"] }
-leptos_meta = { workspace = true, features = ["csr"] }
-leptos_router = { workspace = true, features = ["csr"] }
-leptos_axum = { workspace = true, optional = true }
+leptos = { workspace = true }
+leptos_meta = { workspace = true }
+leptos_router = { workspace = true }
 
 # Core dependencies
 serde = { workspace = true }
@@ -20,11 +23,15 @@ uuid = { workspace = true }
 thiserror = { workspace = true }
 tracing = { workspace = true }
 
+# Advanced features
+# leptos-use = "0.10"  # Temporarily removed due to compatibility issues
+
 # Shared types
 shared = { path = "../shared" }
 
 # HTTP client
 gloo-net = { workspace = true }
+gloo-timers = { version = "0.3", features = ["futures"] }
 reqwest = { workspace = true }
 
 # WASM specific
@@ -32,11 +39,21 @@ wasm-bindgen = { workspace = true }
 web-sys = { workspace = true, features = [
     "Window", "Document", "Element", "HtmlElement", "Node",
     "Navigator", "Geolocation", "Storage", "Location", "History",
-    "CustomEvent", "DomRect", "DomTokenList", "MediaQueryList"
+    "CustomEvent", "DomRect", "DomTokenList", "MediaQueryList",
+    "DataTransfer", "DragEvent", "File", "FileList", "FileReader",
+    "HtmlScriptElement", "HtmlDivElement", "CssStyleDeclaration",
+    "EventTarget", "Event", "MouseEvent", "HtmlLinkElement",
+    "HtmlInputElement", "HtmlTextAreaElement", "HtmlSelectElement",
+    "HtmlFormElement", "FormData", "Headers", "Request", "RequestInit",
+    "Response", "ResponseInit"
 ]}
 js-sys = { workspace = true }
 getrandom = { workspace = true }
 console_error_panic_hook = { workspace = true }
+gloo-console = "0.3"
+gloo-utils = "0.2"
+futures = "0.3"
+serde-wasm-bindgen = "0.6"
 
 # Supabase client
 postgrest = { workspace = true }
@@ -52,26 +69,13 @@ tower-http = { workspace = true, features = ["fs"], optional = true }
 
 [features]
 default = ["csr"]
-csr = ["leptos/csr", "leptos_meta/csr", "leptos_router/csr"]
-hydrate = ["leptos/hydrate", "leptos_meta/hydrate", "leptos_router/hydrate"]
-ssr = [
-    "dep:axum",
-    "dep:tokio",
-    "dep:tower",
-    "dep:tower-http",
-    "dep:leptos_axum",
-    "leptos/ssr",
-    "leptos_meta/ssr",
-    "leptos_router/ssr",
-]
-
-# Platform-specific features
-web = ["csr"]
-desktop = ["ssr"]
+csr = ["leptos/csr"]
+hydrate = ["leptos/hydrate"]
+ssr = ["leptos/ssr", "axum", "tokio", "tower", "tower-http"]
 
 # Target-specific dependencies
 [target.'cfg(target_arch = "wasm32")'.dependencies]
-wasm-bindgen-futures = "0.4"
+wasm-bindgen-futures = "0.4.47"
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 tokio = { workspace = true, features = ["full"] }
